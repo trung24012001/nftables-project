@@ -1,6 +1,1 @@
-----
-
-Windows
-pip install mysqlclient
-Linux
-pip install pysql
+\*\*\* PYTHON VERSION 3.6
