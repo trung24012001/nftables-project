@@ -1,1 +1,0 @@
-\*\*\* PYTHON VERSION 3.6

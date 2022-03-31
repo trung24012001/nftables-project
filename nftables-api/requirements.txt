@@ -1,7 +1,7 @@
+autopep8==1.6.0
 Flask==2.0.3
 Flask-SQLAlchemy==2.5.1
 python-dotenv==0.20.0
 flask-cors==3.0.10
 pymysql==1.0.2
-mysql-connector==2.2.9
-
+jsonschema==3.2.0 
