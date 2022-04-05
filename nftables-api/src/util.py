@@ -20,3 +20,15 @@ def nft_replace_parser(data):
 
 def nft_flush_parser(data):
     return dict(nftables=[dict(flush=dict(data))])
+
+
+def nft_expr_parser(data):
+    return (
+        dict(
+            match=dict(
+                op="==",
+                left=dict(payload=data["payload"]),
+                right=data["value"],
+            )
+        ),
+    )

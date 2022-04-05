@@ -120,8 +120,28 @@ def get_rules():
 
 
 def add_filter_rule(rule):
-    policy = {}
-    policy[rule["policy"]] = None
+    # policy = {}
+    # policy[rule["policy"]] = None
+
+    ip_src_match = dict(
+        payload=dict(protocol=rule["protocol"], field="saddr"),
+        value=rule["ip_src"],
+    )
+
+    port_src_match = dict(
+        payload=dict(protocol=rule["protocol"], field="sport"),
+        value=rule["port_src"],
+    )
+
+    ip_dst_match = dict(
+        payload=dict(protocol=rule["protocol"], field="daddr"),
+        value=rule["ip_dst"],
+    )
+
+    port_dst_match = dict(
+        payload=dict(protocol=rule["protocol"], field="dport"),
+        value=rule["port_dst"],
+    )
 
     data_structure = util.nft_add_parser(
         rule=dict(
@@ -129,16 +149,8 @@ def add_filter_rule(rule):
             table=rule["table"],
             chain=rule["chain"],
             expr=[
-                dict(
-                    match=dict(
-                        op="==",
-                        left=dict(
-                            payload=dict(protocol=rule["protocol"], field=rule["field"])
-                        ),
-                        right=rule["value"],
-                    )
-                ),
-                policy,
+                util.nft_expr_parser(ip_src_match),
+                {rule["policy"]: None},
             ],
         )
     )

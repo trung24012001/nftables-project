@@ -1,4 +1,4 @@
-from nft_controller import flush_all, get_chains, get_tables
+from nft_controller import get_chains, get_tables
 from http_controller import add_table_db, add_chain_db
 
 
@@ -11,6 +11,9 @@ def sync_table():
     except:
         print("Error: sync table be interrupted")
         return False
+
+
+1
 
 
 def sync_chain():

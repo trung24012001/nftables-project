@@ -35,10 +35,12 @@ class Table(Base):
     __tablename__ = "tables"
     id = sa.Column(sa.Integer, primary_key=True)
     family = sa.Column(sa.String(255), default="ip")
-    name = sa.Column(sa.String(255), nullable=False, unique=True)
+    name = sa.Column(sa.String(255), nullable=False)
     # handle = sa.Column(sa.Integer)
 
     chains = relationship("Chain", back_populates="table")
+
+    __table_args__ = (UniqueConstraint("family", "name", name="_customer_table_uc"),)
 
     def __repr__(self):
         return "<Table {self.family} {self.name}>".format(self=self)

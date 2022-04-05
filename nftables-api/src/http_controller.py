@@ -1,4 +1,4 @@
-from database import Table, Chain, Rule, session
+from database import IpDst, IpSrc, Table, Chain, Rule, session
 import nft_controller as nft
 import util
 
@@ -11,11 +11,13 @@ def get_tables_db():
 
 def add_table_db(table):
     try:
-        check = nft.add_table(table)
-        if not check:
-            raise
+        # check = nft.add_table(table)
+        # if not check:
+        #     print("errrrrrrrrrrr")
+        #     raise
 
         new_table = Table(family=table["family"], name=table["name"])
+        print(new_table)
         session.add(new_table)
         session.commit()
 
@@ -28,9 +30,9 @@ def add_table_db(table):
 
 def add_chain_db(chain):
     try:
-        check = nft.add_chain(chain)
-        if not check:
-            raise
+        # check = nft.add_chain(chain)
+        # if not check:
+        #     raise
 
         table = session.query(Table).filter(Table.name == chain["table"]).one()
         new_chain = Chain(
@@ -55,18 +57,40 @@ def add_chain_db(chain):
 
 def add_rule_db(rule):
     try:
-        check = nft.add_filter_rule(rule)
+        # check = nft.add_filter_rule(rule)
 
-        if not check:
-            raise
+        # if not check:
+        #     raise
+
+        chain = (
+            session.query(Chain)
+            .filter(
+                Chain.name.like(rule["chain"]), Chain.table.name.like(rule["table"])
+            )
+            .one()
+        )
 
         new_rule = Rule(
-            family=rule["family"],
-            table=rule["table"],
-            chain=rule["chain"],
+            chain=chain,
+            protocol=rule.get("protocol"),
             policy=rule.get("policy"),
         )
-        session.add(new_rule)
+
+        ip_src = IpSrc(
+            host=rule.get("ip_src"), port=rule.get("port_src"), rule=new_rule
+        )
+
+        ip_dst = IpDst(
+            host=rule.get("ip_dst"), port=rule.get("port_dst"), rule=new_rule
+        )
+
+        new_rule.ip_src_list.append(ip_src)
+
+        new_rule.ip_dst_list.append(ip_dst)
+
+        chain.rules.append(new_rule)
+
+        session.add(chain)
         session.commit()
 
         return True
@@ -86,4 +110,17 @@ def clear_database():
         return False
 
 
-clear_database()
+def get_ruleset():
+    try:
+        # new_rule = Rule(family="ok")
+        # session.add(new_rule)
+        # session.commit()
+
+        return True
+    except:
+        return []
+
+
+def http_test():
+
+    return ""
