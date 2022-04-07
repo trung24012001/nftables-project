@@ -1,9 +1,9 @@
-from nft import load_nft, log_nft
+from nft import load_nft, read_nft
 import util
 
 
 def get_tables():
-    data_structure = log_nft("list tables")
+    data_structure = read_nft("list tables")
     tables = []
     for object in data_structure["nftables"]:
         table = object.get("table")
@@ -17,21 +17,21 @@ def get_tables():
 
 
 def add_table(table):
-    data_structure = util.nft_add_parser(table=table)
+    data_structure = util.nft_handle_parser({"table": table}, "add")
     ret = load_nft(data_structure)
 
     return ret
 
 
 def delete_table(table):
-    data_structure = util.nft_delete_parser(table=table)
+    data_structure = util.nft_handle_parser({"table": table}, "delete")
     ret = load_nft(data_structure)
 
     return ret
 
 
 def get_chains():
-    data_structure = log_nft("list chains")
+    data_structure = read_nft("list chains")
     chains = []
     for object in data_structure["nftables"]:
         chain = object.get("chain")
@@ -52,7 +52,7 @@ def get_chains():
 
 
 def get_chains_from_table(table=""):
-    data_structure = log_nft("list chains")
+    data_structure = read_nft("list chains")
     chains = []
 
     for object in data_structure["nftables"]:
@@ -78,19 +78,21 @@ def get_chains_from_table(table=""):
 
 
 def add_chain(chain):
-    data_structure = util.nft_add_parser(chain)
-    print(data_structure)
+    data_structure = util.nft_handle_parser({"chain": chain}, "add")
     ret = load_nft(data_structure)
 
     return ret
 
 
 def delete_chain(name, table):
-    data_structure = util.nft_delete_parser(
-        table=dict(
-            table=table,
-            name=name,
-        )
+    data_structure = util.nft_handle_parser(
+        {
+            "table": {
+                "table": table,
+                "name": name,
+            }
+        },
+        "delete",
     )
     ret = load_nft(data_structure)
 
@@ -98,7 +100,7 @@ def delete_chain(name, table):
 
 
 def get_rules():
-    data_structure = log_nft("list ruleset")
+    data_structure = read_nft("list ruleset")
     rules = []
     for object in data_structure["nftables"]:
         rule = object.get("rule")
@@ -123,76 +125,74 @@ def get_rules():
 
 
 def add_filter_rule(rule):
+    rule_formater = {
+        "rule": {
+            "family": rule["family"],
+            "table": rule["table"],
+            "chain": rule["chain"],
+            "expr": [],
+        }
+    }
 
-    ip_src_match = dict(
-        payload=dict(protocol=rule["protocol"], field="saddr"),
-        value=rule.get("ip_src"),
-    )
+    if rule.get("ip_src"):
+        ip_src = rule["ip_src"]
+        ip_src_match = {
+            "payload": {"protocol": ip_src["protocol"], "field": "daddr"},
+            "value": ip_src["value"],
+        }
+        rule_formater["rule"]["expr"].append(util.nft_expr_parser(ip_src_match))
 
-    port_src_match = dict(
-        payload=dict(protocol=rule["protocol"], field="sport"),
-        value=rule.get("port_src"),
-    )
+    if rule.get("ip_dst"):
+        ip_dst = rule["ip_dst"]
+        ip_dst_match = {
+            "payload": {"protocol": ip_dst["protocol"], "field": "daddr"},
+            "value": ip_dst["value"],
+        }
+        rule_formater["rule"]["expr"].append(util.nft_expr_parser(ip_dst_match))
 
-    ip_dst_match = dict(
-        payload=dict(protocol=rule["protocol"], field="daddr"),
-        value=rule.get("ip_dst"),
-    )
+    if rule.get("protocol"):
+        prot = rule["protocol"]
+        protocol_match = {
+            "payload": {"protocol": prot["protocol"], "field": "protocol"},
+            "value": prot["value"],
+        }
+        rule_formater["rule"]["expr"].append(util.nft_expr_parser(protocol_match))
 
-    port_dst_match = dict(
-        payload=dict(protocol=rule["protocol"], field="dport"),
-        value=rule.get("port_dst"),
-    )
+    if rule.get("port_src"):
+        s_port = rule["port_src"]
+        port_src_match = {
+            "payload": {"protocol": s_port["protocol"], "field": "sport"},
+            "value": s_port["value"],
+        }
+        rule_formater["rule"]["expr"].append(util.nft_expr_parser(port_src_match))
 
-    data_structure = util.nft_add_parser(
-        rule=dict(
-            family=rule["family"],
-            table=rule["table"],
-            chain=rule["chain"],
-            expr=[
-                util.nft_expr_parser(ip_src_match),
-                {rule["policy"]: None},
-            ],
-        )
+    if rule.get("port_dst"):
+        d_port = rule["port_dst"]
+        port_dst_match = {
+            "payload": {"protocol": d_port["protocol"], "field": "sport"},
+            "value": d_port["value"],
+        }
+        rule_formater["rule"]["expr"].append(util.nft_expr_parser(port_dst_match))
+
+    rule_formater["rule"]["expr"].append({rule["policy"]: None})
+
+    data_structure = util.nft_handle_parser(
+        rule_formater,
+        "add",
     )
     ret = load_nft(data_structure)
 
     return ret
 
 
-def test():
-    data_structure = util.nft_add_parser(
-        dict(
-            table=dict(
-                family="ip",
-                name=None,
-            )
-        )
-    )
-    print(data_structure)
-    ret = load_nft(data_structure)
-    # rule = dict()
-    # rule["policy"] = "accept"
-    # rule["protocol"] = "tcp"
-    # ip_src_match = dict(
-    #     payload=dict(protocol=rule["protocol"], field="saddr"),
-    #     value=rule.get("ip_src"),
-    # )
-
-    # print(rule.get("ip_src"))
-    # print(
-    #     dict(
-    #         expr=[
-    #             util.nft_expr_parser(ip_src_match),
-    #             {rule["policy"]: None},
-    #         ],
-    #     )
-    # )
-
-
-test()
-# def flush_ruleset():
-#     data_structure = util.nft_flush_parser(ruleset=None)
-#     ret = load_nft(data_structure)
-
-#     return ret
+add_filter_rule(
+    {
+        "family": "ip",
+        "table": "filter",
+        "chain": "output",
+        "protocol": {"protocol": "ip", "value": "udp"},
+        "port_dst": {"protocol": "udp", "value": "30"},
+        "ip_dst": {"protocol": "ip", "value": "30"},
+        "policy": "accept",
+    }
+)

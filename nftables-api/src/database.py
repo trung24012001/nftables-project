@@ -34,7 +34,7 @@ class AlchemyEncoder(json.JSONEncoder):
 class Table(Base):
     __tablename__ = "tables"
     id = sa.Column(sa.Integer, primary_key=True)
-    family = sa.Column(sa.String(255), default="ip")
+    family = sa.Column(sa.String(255), default="ip", nullable=False)
     name = sa.Column(sa.String(255), nullable=False)
     # handle = sa.Column(sa.Integer)
 
@@ -60,7 +60,6 @@ class Chain(Base):
     priority = sa.Column(sa.Integer, default=0)
     policy = sa.Column(sa.String(255), default="accept")
     table_id = sa.Column(sa.Integer, sa.ForeignKey("tables.id", ondelete="CASCADE"))
-
     table = relationship("Table", back_populates="chains")
     rules = relationship("Rule", back_populates="chain")
 
@@ -76,9 +75,8 @@ class IpDst(Base):
     __tablename__ = "ip_dst"
     id = sa.Column(sa.Integer, primary_key=True)
     host = sa.Column(sa.String(255))
-    port = sa.Column(sa.Integer)
+    port = sa.Column(sa.String(255))
     rule_id = sa.Column(sa.Integer, sa.ForeignKey("rules.id", ondelete="CASCADE"))
-
     rule = relationship("Rule", back_populates="ip_dst_list")
 
     def __repr__(self):
@@ -89,9 +87,8 @@ class IpSrc(Base):
     __tablename__ = "ip_src"
     id = sa.Column(sa.Integer, primary_key=True)
     host = sa.Column(sa.String(255))
-    port = sa.Column(sa.Integer)
+    port = sa.Column(sa.String(255))
     rule_id = sa.Column(sa.Integer, sa.ForeignKey("rules.id", ondelete="CASCADE"))
-
     rule = relationship("Rule", back_populates="ip_src_list")
 
     def __repr__(self):
@@ -104,7 +101,6 @@ class Rule(Base):
     protocol = sa.Column(sa.String(255))
     policy = sa.Column(sa.String(255))
     chain_id = sa.Column(sa.Integer, sa.ForeignKey("chains.id", ondelete="CASCADE"))
-
     chain = relationship("Chain", back_populates="rules")
     ip_src_list = relationship("IpSrc", back_populates="rule")
     ip_dst_list = relationship("IpDst", back_populates="rule")
@@ -114,10 +110,7 @@ class Rule(Base):
 
 
 load_dotenv()
-
 SQLALCHEMY_DB_URI = os.environ.get("SQLALCHEMY_DB_URI")
-
 engine = sa.create_engine(SQLALCHEMY_DB_URI)
 session = scoped_session(sessionmaker(bind=engine))
-
 Base.metadata.create_all(engine)
