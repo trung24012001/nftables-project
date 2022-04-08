@@ -1,9 +1,13 @@
+import { CssBaseline } from '@mui/material';
 import React from 'react';
+import { Router } from 'routers';
+
 
 function App() {
   return (
-    <div className="App">
-
+    <div>
+      <CssBaseline />
+      <Router />
     </div>
   );
 }

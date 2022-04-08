@@ -1,8 +1,8 @@
 import json
-from database import AlchemyEncoder
+from src.schema.database import AlchemyEncoder
 
 
-def query_data_to_str(data):
+def query_to_str(data):
     return json.dumps(data, cls=AlchemyEncoder)
 
 
@@ -22,13 +22,13 @@ def nft_expr_parser(data):
     }
 
 
-def get_match_key(expr, key):
-    for match in expr:
-        match = expr.get("match")
+def get_expr_value(expr, key):
+    for object in expr:
+        match = object.get("match")
         if not match:
             continue
-        m_key = match.get("left").get("payload").get("field").get("field")
+        m_key = match.get("left").get("payload").get("field")
         if m_key == key:
             return match.get("right")
 
-    return ""
+    return None

@@ -1,5 +1,5 @@
-from nft import load_nft, read_nft
-import util
+from src.nftables.nft import load_nft, read_nft
+import src.lib.util as util
 
 
 def get_tables():
@@ -99,7 +99,7 @@ def delete_chain(name, table):
     return ret
 
 
-def get_rules():
+def get_ruleset():
     data_structure = read_nft("list ruleset")
     rules = []
     for object in data_structure["nftables"]:
@@ -113,11 +113,11 @@ def get_rules():
                 table=rule["table"],
                 chain=rule["chain"],
                 handle=rule["handle"],
-                ip_src=util.get_match_key(rule.get("expr"), "saddr"),
-                ip_dst=util.get_match_key(rule.get("expr"), "daddr"),
-                port_src=util.get_match_key(rule.get("expr"), "sport"),
-                port_dst=util.get_match_key(rule.get("expr"), "dport"),
-                policy=rule["expr"][-1],
+                ip_src=util.get_expr_value(rule.get("expr"), "saddr"),
+                ip_dst=util.get_expr_value(rule.get("expr"), "daddr"),
+                port_src=util.get_expr_value(rule.get("expr"), "sport"),
+                port_dst=util.get_expr_value(rule.get("expr"), "dport"),
+                policy=list(rule["expr"][-1].keys())[0],
             )
         )
 
@@ -185,14 +185,5 @@ def add_filter_rule(rule):
     return ret
 
 
-add_filter_rule(
-    {
-        "family": "ip",
-        "table": "filter",
-        "chain": "output",
-        "protocol": {"protocol": "ip", "value": "udp"},
-        "port_dst": {"protocol": "udp", "value": "30"},
-        "ip_dst": {"protocol": "ip", "value": "30"},
-        "policy": "accept",
-    }
-)
+def delete_rule():
+    print()
