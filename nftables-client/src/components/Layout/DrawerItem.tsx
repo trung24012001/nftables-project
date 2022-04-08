@@ -1,11 +1,10 @@
 import React from 'react'
-import Box from '@mui/material/Box';
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
 import { Divider, List, ListItem, ListItemIcon, ListItemText, Toolbar, Drawer } from '@mui/material'
 
 
-export default function DrawerItem() {
+const DrawerItem: React.VFC = () => {
   return (
     <div>
       <Toolbar />
@@ -34,3 +33,5 @@ export default function DrawerItem() {
     </div>
   )
 }
+
+export { DrawerItem }
