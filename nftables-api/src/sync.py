@@ -13,9 +13,6 @@ def sync_table():
         return False
 
 
-1
-
-
 def sync_chain():
     try:
         chains = get_chains()
