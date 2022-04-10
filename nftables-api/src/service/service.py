@@ -1,11 +1,10 @@
 from flask import Blueprint, jsonify, request
-from sync import sync_table, sync_chain, sync_rule
+from src.lib.sync import sync_nft_to_db, sync_db_to_nft
 from http_controller import (
     add_table_db,
     add_chain_db,
-    clear_database,
+    get_ruleset_db,
     get_tables_db,
-    get_ruleset,
     add_rule_db,
     http_test,
 )
@@ -26,11 +25,7 @@ def test():
 @main_api.route("/sync-to-db")
 def sync_database():
     try:
-        clear_database()
-        sync_table()
-        sync_chain()
-        # sync_rule()
-
+        sync_nft_to_db()
         return jsonify({"message": "sync successfully"}), 200
     except:
         return jsonify({"error": "sync interrupted"}), 500
@@ -39,11 +34,7 @@ def sync_database():
 @main_api.route("/sync-to-nft")
 def sync_nft():
     try:
-        clear_database()
-        sync_table()
-        sync_chain()
-        # sync_rule()
-
+        sync_db_to_nft()
         return jsonify({"message": "sync successfully"}), 200
     except:
         return jsonify({"error": "sync interrupted"}), 500
@@ -60,9 +51,7 @@ def add_table():
     try:
         payload = request.get_json()
         table = dict(family=payload["family"], name=payload["name"])
-
         add_table_db(table)
-
         return jsonify({"message": "success"}), 200
 
     except:
@@ -82,7 +71,6 @@ def add_chain():
             priority=payload.get("priority"),
             policy=payload.get("policy"),
         )
-
         add_chain_db(chain)
 
         return jsonify({"message": "success"}), 200
@@ -95,7 +83,7 @@ def add_chain():
 @main_api.route("/rules")
 def get_all_ruleset():
     try:
-        ruleset = get_ruleset()
+        ruleset = get_ruleset_db()
 
         return jsonify({"ruleset": ruleset}), 200
 

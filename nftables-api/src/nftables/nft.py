@@ -6,7 +6,7 @@ nft_api.set_json_output(True)
 nft_api.set_handle_output(True)
 
 
-def log_nft(cmd="list ruleset"):
+def read_nft(cmd="list ruleset"):
 
     rc, output, error = nft_api.cmd(cmd)
 
@@ -41,7 +41,6 @@ def load_nft(data_structure):
         return False
 
     print(f"INFO: running json cmd: {data_structure}")
-
     rc, output, error = nft_api.json_cmd(data_structure)
 
     if rc != 0:
