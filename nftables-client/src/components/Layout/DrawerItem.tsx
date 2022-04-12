@@ -1,35 +1,32 @@
 import React from 'react'
 import InboxIcon from '@mui/icons-material/MoveToInbox';
 import MailIcon from '@mui/icons-material/Mail';
-import { Divider, List, ListItem, ListItemIcon, ListItemText, Toolbar, Drawer } from '@mui/material'
-
+import { Divider, List, ListItem, ListItemIcon, ListItemText, Toolbar } from '@mui/material'
+import { useNavigate } from 'react-router-dom';
+import { APP_NAME, sidebarItems } from 'lib';
 
 const DrawerItem: React.VFC = () => {
+  const navigate = useNavigate();
+  const handleClick = (route: string) => {
+    navigate(route)
+  }
+
   return (
     <div>
-      <Toolbar />
+      <Toolbar component='h1'>{APP_NAME}</Toolbar>
       <Divider />
       <List>
-        {['Inbox', 'Starred', 'Send email', 'Drafts'].map((text, index) => (
-          <ListItem button key={text}>
+        {sidebarItems.map((item, index) => (
+          <ListItem button key={index}
+            onClick={() => handleClick(item.route)}>
             <ListItemIcon>
               {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
             </ListItemIcon>
-            <ListItemText primary={text} />
+            <ListItemText primary={item.name} />
           </ListItem>
         ))}
       </List>
-      <Divider />
-      <List>
-        {['All mail', 'Trash', 'Spam'].map((text, index) => (
-          <ListItem button key={text}>
-            <ListItemIcon>
-              {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-            </ListItemIcon>
-            <ListItemText primary={text} />
-          </ListItem>
-        ))}
-      </List>
+      {/* <Divider /> */}
     </div>
   )
 }

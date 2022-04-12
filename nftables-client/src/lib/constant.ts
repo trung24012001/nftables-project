@@ -1,0 +1,37 @@
+type RoutesType = {
+  TABLE_ROUTE: string;
+  CHAIN_ROUTE: string;
+  RULESET_ROUTE: string;
+  ADD_RULE_ROUTE: string;
+};
+
+const routes: RoutesType = {
+  TABLE_ROUTE: "/",
+  CHAIN_ROUTE: "/chains",
+  RULESET_ROUTE: "/rules",
+  ADD_RULE_ROUTE: "/rules/add",
+};
+
+type SidebarType = {
+  name: string;
+  route: string;
+};
+
+const sidebarItems: SidebarType[] = [
+  {
+    name: "Tables",
+    route: routes.TABLE_ROUTE,
+  },
+  {
+    name: "Chains",
+    route: routes.CHAIN_ROUTE,
+  },
+  {
+    name: "Ruleset",
+    route: routes.RULESET_ROUTE,
+  },
+];
+
+const APP_NAME = "Nftables Manager";
+
+export { sidebarItems, routes, APP_NAME };

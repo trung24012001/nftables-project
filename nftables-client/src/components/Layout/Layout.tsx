@@ -1,13 +1,22 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { Box } from "@mui/material";
+import { Box, styled, Toolbar } from "@mui/material";
 import Sidebar from "./Sidebar";
 
-export function Layout() {
+export function Layout(): React.ReactElement {
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box sx={{ display: 'flex' }} bgcolor="grey.100">
       <Sidebar />
-      <Outlet />
+      <Main>
+        <Toolbar />
+        <Outlet />
+      </Main>
     </Box>
   )
-} 
+}
+
+const Main = styled('main')(({ theme }) => ({
+  flexGrow: 1,
+  minHeight: '100vh',
+  padding: theme.spacing(5),
+}))

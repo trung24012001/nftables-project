@@ -1,18 +1,10 @@
 import * as React from 'react';
 import Box from '@mui/material/Box';
-import Divider from '@mui/material/Divider';
 import Drawer from '@mui/material/Drawer';
-import InboxIcon from '@mui/icons-material/MoveToInbox';
-import List from '@mui/material/List';
-import ListItem from '@mui/material/ListItem';
-import ListItemIcon from '@mui/material/ListItemIcon';
-import ListItemText from '@mui/material/ListItemText';
-import MailIcon from '@mui/icons-material/Mail';
-import Toolbar from '@mui/material/Toolbar';
 import { DrawerItem } from './DrawerItem';
 
 
-const drawerWidth = 300;
+export const drawerWidth = 300;
 
 interface Props {
   /**
@@ -52,7 +44,7 @@ export default function Sidebar(props: Props) {
             '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
           }}
         >
-          {DrawerItem}
+          <DrawerItem />
         </Drawer>
         <Drawer
           variant="permanent"
@@ -62,7 +54,7 @@ export default function Sidebar(props: Props) {
           }}
           open
         >
-          {DrawerItem}
+          <DrawerItem />
         </Drawer>
       </Box>
     </Box >

@@ -1,2 +1,2 @@
-export * from "./TableRuleset";
 export * from "./AddRuleset";
+export * from "./RulesetTable";

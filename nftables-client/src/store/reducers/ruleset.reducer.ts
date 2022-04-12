@@ -1,10 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 
 export interface RuleState {
+  tables: any;
+  chains: any;
   rules: any;
 }
 
 const initialState: RuleState = {
+  tables: [],
+  chains: [],
   rules: [],
 };
 
