@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import { request } from "lib";
+import { ChainType, RuleType, TableType } from "lib/type";
 
 export interface RuleState {
-  tables: any;
-  chains: any;
-  rules: any;
+  tables: TableType[];
+  chains: ChainType[];
+  rules: RuleType[];
 }
 
 const initialState: RuleState = {
@@ -12,12 +14,38 @@ const initialState: RuleState = {
   rules: [],
 };
 
+export const getTables = createAsyncThunk(
+  "/tables",
+  async ({}: object, { rejectWithValue }) => {
+    try {
+      const res = await request.get("/tables");
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      rejectWithValue(err);
+    }
+  }
+);
+
+export const getChains = createAsyncThunk(
+  "/chains",
+  async ({}: object, { rejectWithValue }) => {
+    try {
+      const res = await request.get("/chains");
+      return res.data;
+    } catch (err) {
+      console.log(err);
+      rejectWithValue(err);
+    }
+  }
+);
+
 export const getRuleset = createAsyncThunk(
   "/product/getProductsInCate",
   async (obj: { cateId: number }, { rejectWithValue }) => {
     try {
-      // const res = await .get('/products/categories/' + obj.cateId);
-      // return res.data;
+      const res = await request.get("/ruleset");
+      return res.data;
     } catch (err) {
       console.log(err);
       rejectWithValue(err);
@@ -30,7 +58,20 @@ export const rulesetSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers(builder) {
-    builder.addCase(getRuleset.fulfilled, (state, action) => {});
+    builder.addCase(getTables.rejected, (state, action) => {
+      console.log("get tables rejected!");
+    });
+    builder.addCase(getTables.fulfilled, (state, action) => {
+      console.log(action.payload);
+      state.tables = action.payload.tables;
+    });
+    builder.addCase(getChains.rejected, (state, action) => {
+      console.log("get chains rejected!");
+    });
+    builder.addCase(getChains.fulfilled, (state, action) => {
+      console.log(action.payload);
+      state.chains = action.payload.chains;
+    });
   },
 });
 

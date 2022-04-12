@@ -1,14 +1,15 @@
-import { CssBaseline } from '@mui/material';
-import React from 'react';
-import { Router } from 'routers';
-
+import React from "react";
+import { CssBaseline } from "@mui/material";
+import { Provider } from "react-redux";
+import { Router } from "routers";
+import { store } from "store";
 
 function App() {
   return (
-    <div>
+    <Provider store={store}>
       <CssBaseline />
       <Router />
-    </div>
+    </Provider>
   );
 }
 

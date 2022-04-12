@@ -4,8 +4,9 @@ import src.lib.util as util
 
 
 def get_tables_db():
-    query = session.query(Table).all()
-    tables = util.query_to_str(query)
+    # query = session.query(Table).all()
+    # tables = util.query_to_str(query)
+    tables = nft.get_tables()
     return tables
 
 
@@ -77,14 +78,16 @@ def add_chain_db(chain):
 
 
 def get_chains_db():
-    query = session.query(Chain).all()
-    chains = util.query_to_str(query)
+    # query = session.query(Chain).all()
+    # chains = util.query_to_str(query)
+    chains = nft.get_chains()
     return chains
 
 
 def delete_chain_db(chain):
     try:
-        chain = Chain(family=chain["family"], table=chain["table"], name=chain["name"])
+        chain = Chain(family=chain["family"],
+                      table=chain["table"], name=chain["name"])
         session.delete(chain)
         session.flush()
         is_deleted = nft.delete_table(chain)

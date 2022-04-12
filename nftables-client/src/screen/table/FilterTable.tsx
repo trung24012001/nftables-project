@@ -1,28 +1,38 @@
-import { Box, Button, IconButton, Stack } from '@mui/material'
-import { ReactTable } from 'components/ReactTable'
-import AddCircleIcon from '@mui/icons-material/AddCircle';
-import React from 'react'
-export function FilterTable(): React.ReactElement {
+import { Box } from "@mui/material";
+import { ReactTable } from "components/ReactTable";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "store";
+import { getTables } from "store/reducers/ruleset.reducer";
 
-  const headers = ['Family', 'Name', 'Priority']
-  const rows = [{
-    family: 'ip',
-    name: 'filter',
-    priority: 1
-  }, {
-    family: 'inet',
-    name: 'filter',
-    priority: 2
-  }, {
-    family: 'ip',
-    name: 'newtable',
-    priority: 3
-  }]
+const headers = [
+  {
+    name: "Family",
+    access: "family",
+  },
+  {
+    name: "Name",
+    access: "name",
+  },
+  {
+    name: "Handle",
+    access: "handle",
+  },
+];
+
+export function FilterTable(): React.ReactElement {
+  const tables = useSelector((state: RootState) => state.ruleset.tables);
+  const dispatch = useDispatch();
+
+  console.log(tables);
+
+  useEffect(() => {
+    dispatch(getTables({}));
+  }, []);
 
   return (
     <Box>
-      <ReactTable headers={headers}
-        rows={rows} />
+      <ReactTable headers={headers} rows={tables} />
     </Box>
-  )
+  );
 }

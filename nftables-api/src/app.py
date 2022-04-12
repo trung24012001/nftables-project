@@ -1,5 +1,5 @@
 from flask import Flask
-from service.service import main_api
+from src.service.service import main_api
 import os
 from flask_cors import CORS
 

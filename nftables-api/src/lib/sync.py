@@ -1,5 +1,5 @@
-from nftables.nft_controller import get_chains, get_tables, get_ruleset
-from service.http_controller import (
+from src.nftables.nft_controller import get_chains, get_tables, get_ruleset
+from src.service.http_controller import (
     add_table_db,
     add_chain_db,
     get_ruleset_db,

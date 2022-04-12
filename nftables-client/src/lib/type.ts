@@ -1,7 +1,7 @@
 export type TableType = {
   family: string;
   name: string;
-  priority: number;
+  handle: number;
 };
 
 export type ChainType = {
@@ -9,7 +9,7 @@ export type ChainType = {
   name: string;
   type: string;
   hook: string;
-  priority: number;
+  handle: number;
 };
 
 export type RuleType = {
@@ -18,5 +18,5 @@ export type RuleType = {
   portSrc: string;
   ipDst: string;
   portDst: string;
-  priority: number;
+  handle: number;
 };

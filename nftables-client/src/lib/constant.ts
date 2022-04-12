@@ -32,6 +32,4 @@ const sidebarItems: SidebarType[] = [
   },
 ];
 
-const APP_NAME = "Nftables Manager";
-
-export { sidebarItems, routes, APP_NAME };
+export { sidebarItems, routes };

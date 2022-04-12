@@ -1,8 +1,9 @@
 from flask import Blueprint, jsonify, request
 from src.lib.sync import sync_nft_to_db, sync_db_to_nft
-from http_controller import (
+from src.service.http_controller import (
     add_table_db,
     add_chain_db,
+    get_chains_db,
     get_ruleset_db,
     get_tables_db,
     add_rule_db,
@@ -57,6 +58,12 @@ def add_table():
     except:
 
         return jsonify({"error": "could not add table"}), 500
+
+
+@main_api.route("/chains")
+def get_chains():
+    chains = get_chains_db()
+    return jsonify({"chains": chains}), 200
 
 
 @main_api.route("/chains", methods=["POST"])
