@@ -1,1 +1,2 @@
-export * from "./FilterTable";
+export * from "./NftTable";
+export * from "./AddTable";

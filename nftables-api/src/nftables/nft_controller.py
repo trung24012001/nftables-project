@@ -10,7 +10,8 @@ def get_tables():
         if not table:
             continue
         tables.append(
-            dict(family=table["family"], name=table["name"], handle=table["handle"])
+            dict(family=table["family"],
+                 name=table["name"], handle=table["handle"])
         )
 
     return tables
@@ -39,10 +40,12 @@ def get_chains():
             continue
         chains.append(
             dict(
+                family=chain["family"],
                 table=chain["table"],
                 name=chain["name"],
                 handle=chain["handle"],
                 hook=chain.get("hook"),
+                type=chain.get("type"),
                 priority=chain.get("prio"),
                 policy=chain.get("policy"),
             )
@@ -64,11 +67,12 @@ def get_chains_from_table(table=""):
             continue
         chains.append(
             dict(
+                family=chain["family"],
                 table=chain["table"],
                 name=chain["name"],
                 handle=chain["handle"],
-                type=chain.get("type"),
                 hook=chain.get("hook"),
+                type=chain.get("type"),
                 priority=chain.get("prio"),
                 policy=chain.get("policy"),
             )
@@ -140,7 +144,8 @@ def add_filter_rule(rule):
             "payload": {"protocol": ip_src["protocol"], "field": "daddr"},
             "value": ip_src["value"],
         }
-        rule_formater["rule"]["expr"].append(util.nft_expr_parser(ip_src_match))
+        rule_formater["rule"]["expr"].append(
+            util.nft_expr_parser(ip_src_match))
 
     if rule.get("ip_dst"):
         ip_dst = rule["ip_dst"]
@@ -148,7 +153,8 @@ def add_filter_rule(rule):
             "payload": {"protocol": ip_dst["protocol"], "field": "daddr"},
             "value": ip_dst["value"],
         }
-        rule_formater["rule"]["expr"].append(util.nft_expr_parser(ip_dst_match))
+        rule_formater["rule"]["expr"].append(
+            util.nft_expr_parser(ip_dst_match))
 
     if rule.get("protocol"):
         prot = rule["protocol"]
@@ -156,7 +162,8 @@ def add_filter_rule(rule):
             "payload": {"protocol": prot["protocol"], "field": "protocol"},
             "value": prot["value"],
         }
-        rule_formater["rule"]["expr"].append(util.nft_expr_parser(protocol_match))
+        rule_formater["rule"]["expr"].append(
+            util.nft_expr_parser(protocol_match))
 
     if rule.get("port_src"):
         s_port = rule["port_src"]
@@ -164,7 +171,8 @@ def add_filter_rule(rule):
             "payload": {"protocol": s_port["protocol"], "field": "sport"},
             "value": s_port["value"],
         }
-        rule_formater["rule"]["expr"].append(util.nft_expr_parser(port_src_match))
+        rule_formater["rule"]["expr"].append(
+            util.nft_expr_parser(port_src_match))
 
     if rule.get("port_dst"):
         d_port = rule["port_dst"]
@@ -172,7 +180,8 @@ def add_filter_rule(rule):
             "payload": {"protocol": d_port["protocol"], "field": "sport"},
             "value": d_port["value"],
         }
-        rule_formater["rule"]["expr"].append(util.nft_expr_parser(port_dst_match))
+        rule_formater["rule"]["expr"].append(
+            util.nft_expr_parser(port_dst_match))
 
     rule_formater["rule"]["expr"].append({rule["policy"]: None})
 

@@ -19,4 +19,6 @@ export type RuleType = {
   ipDst: string;
   portDst: string;
   handle: number;
+  protocol: string;
+  policy: string;
 };

@@ -3,7 +3,7 @@ import { ReactTable } from "components/ReactTable";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store";
-import { getChains } from "store/reducers/ruleset.reducer";
+import { getChains } from "store/reducers";
 
 const headers = [
   {
@@ -27,35 +27,12 @@ const headers = [
     access: "hook",
   },
   {
+    name: "Priority",
+    access: "priority",
+  },
+  {
     name: "Handle",
     access: "handle",
-  },
-];
-
-const rows = [
-  {
-    family: "ip",
-    table: "filter",
-    name: "output",
-    type: "filter",
-    hook: "output",
-    priority: 1,
-  },
-  {
-    family: "ip6",
-    table: "filter",
-    name: "output",
-    type: "filter",
-    hook: "output",
-    priority: 2,
-  },
-  {
-    family: "inet",
-    table: "filter",
-    name: "output",
-    type: "filter",
-    hook: "output",
-    priority: 3,
   },
 ];
 

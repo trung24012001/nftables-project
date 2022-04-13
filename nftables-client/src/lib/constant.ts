@@ -1,5 +1,6 @@
 type RoutesType = {
   TABLE_ROUTE: string;
+  ADD_TABLE_ROUTE: string;
   CHAIN_ROUTE: string;
   RULESET_ROUTE: string;
   ADD_RULE_ROUTE: string;
@@ -7,6 +8,7 @@ type RoutesType = {
 
 const routes: RoutesType = {
   TABLE_ROUTE: "/",
+  ADD_TABLE_ROUTE: "/tables/add",
   CHAIN_ROUTE: "/chains",
   RULESET_ROUTE: "/rules",
   ADD_RULE_ROUTE: "/rules/add",

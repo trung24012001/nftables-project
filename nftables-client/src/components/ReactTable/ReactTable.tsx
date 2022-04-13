@@ -23,7 +23,7 @@ export function ReactTable({
 }: {
   headers: HeaderType[];
   rows: any;
-  handleActionAdd?: void;
+  handleActionAdd?: () => void;
   handleActionDelete?: void;
 }): React.ReactElement {
   const [page, setPage] = React.useState(0);
@@ -46,7 +46,7 @@ export function ReactTable({
   return (
     <Stack spacing={2}>
       <Box>
-        <IconButton onClick={() => handleActionAdd}>
+        <IconButton onClick={handleActionAdd}>
           <AddCircleIcon />
         </IconButton>
       </Box>

@@ -15,7 +15,7 @@ const initialState: RuleState = {
 };
 
 export const getTables = createAsyncThunk(
-  "/tables",
+  "/getTables",
   async ({}: object, { rejectWithValue }) => {
     try {
       const res = await request.get("/tables");
@@ -28,7 +28,7 @@ export const getTables = createAsyncThunk(
 );
 
 export const getChains = createAsyncThunk(
-  "/chains",
+  "/getChains",
   async ({}: object, { rejectWithValue }) => {
     try {
       const res = await request.get("/chains");
@@ -41,10 +41,10 @@ export const getChains = createAsyncThunk(
 );
 
 export const getRuleset = createAsyncThunk(
-  "/product/getProductsInCate",
-  async (obj: { cateId: number }, { rejectWithValue }) => {
+  "/getRuleset",
+  async ({}: object, { rejectWithValue }) => {
     try {
-      const res = await request.get("/ruleset");
+      const res = await request.get("/rules");
       return res.data;
     } catch (err) {
       console.log(err);
@@ -62,15 +62,19 @@ export const rulesetSlice = createSlice({
       console.log("get tables rejected!");
     });
     builder.addCase(getTables.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.tables = action.payload.tables;
     });
     builder.addCase(getChains.rejected, (state, action) => {
       console.log("get chains rejected!");
     });
     builder.addCase(getChains.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.chains = action.payload.chains;
+    });
+    builder.addCase(getRuleset.rejected, (state, action) => {
+      console.log("get rules rejected!");
+    });
+    builder.addCase(getRuleset.fulfilled, (state, action) => {
+      state.rules = action.payload.ruleset;
     });
   },
 });

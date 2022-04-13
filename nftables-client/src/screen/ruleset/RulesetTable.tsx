@@ -1,53 +1,58 @@
 import { Box } from "@mui/material";
 import { ReactTable } from "components/ReactTable";
-import React from "react";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "store";
+import { getRuleset } from "store/reducers";
 
 export function RulesetTable(): React.ReactElement {
   const headers = [
-    "Family",
-    "Table",
-    "Chain",
-    "IPSrc",
-    "PortSrc",
-    "IPDst",
-    "PortDst",
-    "Protocol",
-    "Priority",
-  ];
-  const rows = [
     {
-      family: "ip",
-      table: "filter",
-      chain: "output",
-      ipSrc: "1.2.3.4",
-      portSrc: 3000,
-      ipDst: "23.34.5.6",
-      portDst: 5000,
-      protocol: "tcp",
-      priority: 10,
+      name: "Family",
+      access: "family",
     },
     {
-      family: "ip",
-      table: "filter",
-      chain: "output",
-      ipSrc: "1.2.3.4-2.3.4.5",
-      portSrc: 3000,
-      ipDst: "23.34.5.6",
-      portDst: 5000,
-      protocol: "tcp",
-      priority: 11,
+      name: "Table",
+      access: "table",
     },
     {
-      family: "ip",
-      table: "filter",
-      chain: "output",
-      ipSrc: "1.2.3.4",
-      portSrc: 3000,
-      ipDst: "23.34.5.6",
-      portDst: 5000,
-      protocol: "tcp",
-      priority: 12,
+      name: "Chain",
+      access: "chain",
+    },
+    {
+      name: "IPSrc",
+      access: "ip_src",
+    },
+    {
+      name: "PortSrc",
+      access: "port_src",
+    },
+    {
+      name: "IPDst",
+      access: "ip_dst",
+    },
+    {
+      name: "PortDst",
+      access: "port_dst",
+    },
+    {
+      name: "Protocol",
+      access: "protocol",
+    },
+    {
+      name: "Handle",
+      access: "handle",
     },
   ];
-  return <Box>{/* <ReactTable headers={headers} rows={rows} /> */}</Box>;
+  const rules = useSelector((state: RootState) => state.ruleset.rules);
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    dispatch(getRuleset({}));
+  }, []);
+  return (
+    <Box>
+      <ReactTable headers={headers} rows={rules} />
+    </Box>
+  );
 }
