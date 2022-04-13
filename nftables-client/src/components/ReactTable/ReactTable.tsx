@@ -9,6 +9,7 @@ import Paper from "@mui/material/Paper";
 import { Box, IconButton, Stack, styled, TablePagination } from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import MenuTable from "./MenuTable";
 
 export type HeaderType = {
   name: string;
@@ -24,10 +25,17 @@ export function ReactTable({
   headers: HeaderType[];
   rows: any;
   handleActionAdd?: () => void;
-  handleActionDelete?: void;
+  handleActionDelete?: () => void;
 }): React.ReactElement {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [anchorMenu, setAnchorMenu] = React.useState<null | HTMLElement>(null);
+  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorMenu(event.currentTarget);
+  };
+  const handleCloseMenu = () => {
+    setAnchorMenu(null);
+  };
 
   const handleChangePage = (
     event: React.MouseEvent<HTMLButtonElement> | null,
@@ -72,7 +80,7 @@ export function ReactTable({
                     </TableCell>
                   ))}
                   <TableCell align="center">
-                    <IconButton>
+                    <IconButton onClick={handleOpenMenu} >
                       <MoreHorizIcon />
                     </IconButton>
                   </TableCell>
@@ -91,6 +99,9 @@ export function ReactTable({
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
+      <MenuTable anchorEl={anchorMenu}
+        handleDelete={handleActionDelete}
+        handleClose={handleCloseMenu} />
     </Stack>
   );
 }

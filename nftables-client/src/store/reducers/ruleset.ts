@@ -1,15 +1,15 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request } from "lib";
-import { ChainType, RuleType, TableType } from "lib/type";
+import { ChainType, RuleType, TableType } from "lib";
 
-export interface RuleState {
+export interface IRuleState {
   tables: TableType[];
   chains: ChainType[];
   rules: RuleType[];
 }
 
-const initialState: RuleState = {
-  tables: [],
+const initialState: IRuleState = {
+  tables: [{ family: "ip", name: "hello", handle: 1 }],
   chains: [],
   rules: [],
 };

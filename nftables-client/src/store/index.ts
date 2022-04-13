@@ -1,9 +1,11 @@
 import { configureStore } from "@reduxjs/toolkit";
-import rulesetReducer from "./reducers/ruleset.reducer";
+import rulesetReducer from "./reducers/ruleset";
+import commonReducer from "./reducers/common";
 
 export const store = configureStore({
   reducer: {
     ruleset: rulesetReducer,
+    common: commonReducer,
   },
 });
 

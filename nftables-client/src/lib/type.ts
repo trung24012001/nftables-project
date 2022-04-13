@@ -1,3 +1,5 @@
+import { AlertColor } from "@mui/material";
+
 export type TableType = {
   family: string;
   name: string;
@@ -21,4 +23,9 @@ export type RuleType = {
   handle: number;
   protocol: string;
   policy: string;
+};
+
+export type MessageAlertType = {
+  content: string;
+  type: AlertColor;
 };

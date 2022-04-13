@@ -5,10 +5,9 @@ import Sidebar from "./Sidebar";
 
 export function Layout(): React.ReactElement {
   return (
-    <Box sx={{ display: 'flex' }} bgcolor="grey.100">
+    <Box sx={{ display: 'flex', }} bgcolor="grey.100">
       <Sidebar />
       <Main>
-        <Toolbar />
         <Outlet />
       </Main>
     </Box>
@@ -17,6 +16,9 @@ export function Layout(): React.ReactElement {
 
 const Main = styled('main')(({ theme }) => ({
   flexGrow: 1,
+  display: 'flex',
+  flexDirection: 'column',
   minHeight: '100vh',
   padding: theme.spacing(5),
+  position: 'relative'
 }))
