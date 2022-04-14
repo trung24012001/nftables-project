@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { ReactTable } from "components/ReactTable";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 import { getRuleset } from "store/reducers";
 
@@ -46,13 +47,26 @@ export function RulesetTable(): React.ReactElement {
   ];
   const rules = useSelector((state: RootState) => state.ruleset.rules);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     dispatch(getRuleset({}));
   }, []);
+  const handleAdd = () => {
+    navigate("/rules/add");
+  };
+
+  const handleDelete = () => {
+    navigate("/rules/add");
+  };
   return (
     <Box>
-      <ReactTable headers={headers} rows={rules} />
+      <ReactTable
+        headers={headers}
+        rows={rules}
+        handleActionAdd={handleAdd}
+        handleActionDelete={handleDelete}
+      />
     </Box>
   );
 }

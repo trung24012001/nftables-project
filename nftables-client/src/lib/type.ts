@@ -3,15 +3,16 @@ import { AlertColor } from "@mui/material";
 export type TableType = {
   family: string;
   name: string;
-  handle: number;
+  handle?: number;
 };
 
 export type ChainType = {
-  table: TableType;
+  table: null | TableType;
   name: string;
   type: string;
   hook: string;
-  handle: number;
+  priority: number;
+  handle?: number;
 };
 
 export type RuleType = {

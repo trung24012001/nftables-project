@@ -29,8 +29,9 @@ def add_table_db(table):
 
 def delete_table_db(table):
     try:
-        table = Table(family=table["family"], name=table["name"])
-        session.delete(table)
+        delete_table = session.query(Table).filter_by(
+            family=table["family"], name=table["name"]).one()
+        session.delete(delete_table)
         session.flush()
         is_deleted = nft.delete_table(table)
         if not is_deleted:
@@ -105,9 +106,7 @@ def delete_chain_db(chain):
 def get_ruleset_db():
     # query = session.query(Rule).all()
     # rules = util.query_to_str(query)
-
     rules = nft.get_ruleset()
-
     return rules
 
 

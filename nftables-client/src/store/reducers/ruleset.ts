@@ -9,7 +9,7 @@ export interface IRuleState {
 }
 
 const initialState: IRuleState = {
-  tables: [{ family: "ip", name: "hello", handle: 1 }],
+  tables: [],
   chains: [],
   rules: [],
 };

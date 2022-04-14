@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { ReactTable } from "components/ReactTable";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 import { getChains } from "store/reducers";
 
@@ -39,13 +40,26 @@ const headers = [
 export function ChainTable(): React.ReactElement {
   const chains = useSelector((state: RootState) => state.ruleset.chains);
   const dispatch = useDispatch();
-
+  const navigate = useNavigate();
   useEffect(() => {
     dispatch(getChains({}));
   }, []);
+  const handleAdd = () => {
+    navigate("/chains/add");
+  };
+
+  const handleDelete = () => {
+    navigate("/chains/add");
+  };
+
   return (
     <Box>
-      <ReactTable headers={headers} rows={chains} />
+      <ReactTable
+        headers={headers}
+        rows={chains}
+        handleActionAdd={handleAdd}
+        handleActionDelete={handleDelete}
+      />
     </Box>
   );
 }

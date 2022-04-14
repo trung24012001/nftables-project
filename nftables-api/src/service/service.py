@@ -3,6 +3,7 @@ from src.lib.sync import sync_nft_to_db, sync_db_to_nft
 from src.service.http_controller import (
     add_table_db,
     add_chain_db,
+    delete_table_db,
     get_chains_db,
     get_ruleset_db,
     get_tables_db,
@@ -43,8 +44,11 @@ def sync_nft():
 
 @main_api.route("/tables")
 def get_tables():
-    tables = get_tables_db()
-    return jsonify({"tables": tables}), 200
+    try:
+        tables = get_tables_db()
+        return jsonify({"tables": tables}), 200
+    except:
+        return jsonify({"error": "could not get tables"})
 
 
 @main_api.route("/tables", methods=["POST"])
@@ -54,16 +58,28 @@ def add_table():
         table = dict(family=payload["family"], name=payload["name"])
         add_table_db(table)
         return jsonify({"message": "success"}), 200
-
     except:
-
         return jsonify({"error": "could not add table"}), 500
+
+
+@main_api.route("/tables", methods=["DELETE"])
+def delete_table():
+    try:
+        table = dict(family=request.args.get('family'),
+                     name=request.args.get('name'))
+        delete_table_db(table)
+        return jsonify({"message": "success"}), 200
+    except:
+        return jsonify({"error": "could not delete table"}), 500
 
 
 @main_api.route("/chains")
 def get_chains():
-    chains = get_chains_db()
-    return jsonify({"chains": chains}), 200
+    try:
+        chains = get_chains_db()
+        return jsonify({"chains": chains}), 200
+    except:
+        return jsonify({"error": "could not get chains"})
 
 
 @main_api.route("/chains", methods=["POST"])
@@ -79,11 +95,8 @@ def add_chain():
             policy=payload.get("policy"),
         )
         add_chain_db(chain)
-
         return jsonify({"message": "success"}), 200
-
     except:
-
         return jsonify({"error": "could not add chain"}), 500
 
 
@@ -91,9 +104,7 @@ def add_chain():
 def get_all_ruleset():
     try:
         ruleset = get_ruleset_db()
-
         return jsonify({"ruleset": ruleset}), 200
-
     except:
         return jsonify({"error": "could not add chain"}), 500
 
@@ -112,11 +123,7 @@ def add_rule():
             policy=payload.get("policy"),
             protocol=payload.get("protocol"),
         )
-
         add_rule_db(rule)
-
         return jsonify({"message": "success"}), 200
-
     except:
-
         return jsonify({"error": "could not add chain"}), 500

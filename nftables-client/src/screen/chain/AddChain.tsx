@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
   Box,
@@ -10,43 +10,57 @@ import {
   MenuItem,
   Select,
   Stack,
-  styled,
   TextField,
   Typography,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { request, TableType } from "lib";
+import { ChainType, request, TableType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useDispatch } from "react-redux";
-import { setMessage } from "store/reducers";
+import { useDispatch, useSelector } from "react-redux";
+import { getTables, setMessage } from "store/reducers";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { useNavigate } from "react-router-dom";
+import { RootState } from "store";
 
 const validate = yup.object({
-  family: yup.string().required("Family is required"),
-  name: yup.string().required("Name is required"),
+  table: yup.string().required("required table"),
+  name: yup.string().required(),
+  type: yup.string().required(),
+  hook: yup.string().required(),
+  priority: yup.number().required(),
 });
 
-const FAMILY = ["ip", "ip6", "inet", "bridge"];
+const TYPE = ["filter", "nat"];
+const HOOK_FILTER = ["input", "forward", "output"];
+const HOOK_NAT = ["prerouting", "output", "postrouting"];
 
-export function AddTable() {
+export function AddChain() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const tables = useSelector((state: RootState) => state.ruleset.tables);
+
+  useEffect(() => {
+    dispatch(getTables({}));
+  }, []);
+
   const {
     register,
     handleSubmit,
     reset,
     watch,
     formState: { errors },
-  } = useForm<TableType>({
+  } = useForm<ChainType>({
     defaultValues: {
-      family: "ip",
+      table: null,
       name: "",
+      type: "filter",
+      hook: "forward",
+      priority: 0,
     },
     resolver: yupResolver(validate),
   });
-  const onSubmit: SubmitHandler<TableType> = async (data) => {
+  const onSubmit: SubmitHandler<ChainType> = async (data) => {
     console.log(data);
 
     try {
@@ -80,7 +94,7 @@ export function AddTable() {
           navigate("/");
         }}
       />
-      <Page title="Add table">
+      <Page title="Add chain">
         <Box
           p={5}
           display="flex"
@@ -92,24 +106,47 @@ export function AddTable() {
         >
           <Stack spacing={3} width="70%" minWidth="600px">
             <FormControl fullWidth>
-              <FormLabel>Family</FormLabel>
-              <Select value={watch("family")} {...register("family")}>
-                {FAMILY.map((f) => {
-                  <MenuItem key={f} value={f}>
-                    {f}
+              <FormLabel>Table</FormLabel>
+              <Select value={watch("table")} {...register("table")}>
+                {tables.map((table) => {
+                  <MenuItem key={table.name} value={table.family + table.name}>
+                    {table.name}
                   </MenuItem>;
                 })}
               </Select>
             </FormControl>
             <FormControl>
               <FormLabel>Name</FormLabel>
-              <ValidationTextField
-                error={!!errors.name?.message}
-                {...register("name")}
-              />
+              <TextField error={!!errors.name?.message} {...register("name")} />
               <FormHelperText error={!!errors.name?.message}>
                 {errors.name?.message}
               </FormHelperText>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Type</FormLabel>
+              <Select value={watch("type")} {...register("type")}>
+                {TYPE.map((t) => {
+                  return <MenuItem value={t}>{t}</MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Hook</FormLabel>
+              <Select value={watch("hook")} {...register("hook")}>
+                {HOOK_FILTER.map((hook) => {
+                  <MenuItem key={hook} value={hook}>
+                    {hook}
+                  </MenuItem>;
+                })}
+              </Select>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Hook</FormLabel>
+              <TextField
+                type="number"
+                value={watch("priority")}
+                {...register("priority")}
+              />
             </FormControl>
             <Grid container justifyContent="flex-end" mb={3}>
               <Button variant="contained" type="submit">
@@ -122,15 +159,3 @@ export function AddTable() {
     </>
   );
 }
-
-const ValidationTextField = styled(TextField)({
-  // "& input:valid:focus + fieldset": {
-  //   borderColor: "black",
-  //   borderWidth: 2,
-  // },
-  // "& input:invalid + fieldset": {
-  //   borderColor: "red",
-  //   borderWidth: 2,
-  // },
-  // "& input:valid:focus + fieldset": {},
-});

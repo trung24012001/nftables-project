@@ -23,16 +23,19 @@ export function ReactTable({
   handleActionDelete,
 }: {
   headers: HeaderType[];
-  rows: any;
+  rows: any[];
   handleActionAdd?: () => void;
-  handleActionDelete?: () => void;
+  handleActionDelete?: (row: any) => void;
 }): React.ReactElement {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
   const [anchorMenu, setAnchorMenu] = React.useState<null | HTMLElement>(null);
-  const handleOpenMenu = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorMenu(event.currentTarget);
-  };
+  const [rowSelected, setRowSelected] = React.useState<null | any>(null);
+  const handleOpenMenu =
+    (row: any) => (event: React.MouseEvent<HTMLElement>) => {
+      setAnchorMenu(event.currentTarget);
+      setRowSelected(row);
+    };
   const handleCloseMenu = () => {
     setAnchorMenu(null);
   };
@@ -49,6 +52,11 @@ export function ReactTable({
   ) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
+  };
+
+  const handleDelete = () => {
+    setAnchorMenu(null);
+    handleActionDelete && handleActionDelete(rowSelected);
   };
 
   return (
@@ -80,7 +88,7 @@ export function ReactTable({
                     </TableCell>
                   ))}
                   <TableCell align="center">
-                    <IconButton onClick={handleOpenMenu} >
+                    <IconButton onClick={handleOpenMenu(row)}>
                       <MoreHorizIcon />
                     </IconButton>
                   </TableCell>
@@ -99,9 +107,11 @@ export function ReactTable({
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </TableContainer>
-      <MenuTable anchorEl={anchorMenu}
-        handleDelete={handleActionDelete}
-        handleClose={handleCloseMenu} />
+      <MenuTable
+        anchorEl={anchorMenu}
+        handleDelete={handleDelete}
+        handleClose={handleCloseMenu}
+      />
     </Stack>
   );
 }
