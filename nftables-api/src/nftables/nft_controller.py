@@ -121,6 +121,7 @@ def get_ruleset():
                 ip_dst=util.get_expr_value(rule.get("expr"), "daddr"),
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
+                protocol=util.get_expr_value(rule.get("expr"), "protocol"),
                 policy=list(rule["expr"][-1].keys())[0],
             )
         )

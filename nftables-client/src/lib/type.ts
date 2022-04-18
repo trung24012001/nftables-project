@@ -7,12 +7,13 @@ export type TableType = {
 };
 
 export type ChainType = {
-  table: null | TableType;
+  table: TableType;
   name: string;
   type: string;
   hook: string;
   priority: number;
   handle?: number;
+  policy: string;
 };
 
 export type RuleType = {

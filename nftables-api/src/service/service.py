@@ -10,6 +10,7 @@ from src.service.http_controller import (
     add_rule_db,
     http_test,
 )
+import json
 
 main_api = Blueprint("api", __name__)
 
@@ -87,7 +88,7 @@ def add_chain():
     try:
         payload = request.get_json()
         chain = dict(
-            table=payload["table"],
+            table=json.loads(payload["table"]),
             name=payload["name"],
             type=payload.get("type"),
             hook=payload.get("hook"),

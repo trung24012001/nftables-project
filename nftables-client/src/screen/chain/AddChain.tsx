@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useMemo } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
   Box,
@@ -34,6 +34,7 @@ const validate = yup.object({
 const TYPE = ["filter", "nat"];
 const HOOK_FILTER = ["input", "forward", "output"];
 const HOOK_NAT = ["prerouting", "output", "postrouting"];
+const POLICY_FILTER = ["accept", "drop", "reject"];
 
 export function AddChain() {
   const navigate = useNavigate();
@@ -52,11 +53,15 @@ export function AddChain() {
     formState: { errors },
   } = useForm<ChainType>({
     defaultValues: {
-      table: null,
+      table: {
+        family: '',
+        name: ''
+      },
       name: "",
       type: "filter",
       hook: "",
       priority: 0,
+      policy: 'accept'
     },
     resolver: yupResolver(validate),
   });
@@ -77,7 +82,7 @@ export function AddChain() {
       console.log(error);
       dispatch(
         setMessage({
-          content: "Add table error",
+          content: "Add chain error",
           type: "error",
         })
       );
@@ -85,14 +90,14 @@ export function AddChain() {
     reset();
   };
 
-  const hooksFromType = () => {
+  const hooksFromType = useMemo(() => {
     switch (watch("type")) {
       case "filter":
         return HOOK_FILTER;
       case "nat":
         return HOOK_NAT;
     }
-  }
+  }, [watch("type")])
 
   return (
     <>
@@ -123,14 +128,16 @@ export function AddChain() {
             </FormControl>
             <FormControl fullWidth>
               <FormLabel>Table</FormLabel>
-              <Select value={watch('table')}
-                {...register("table")}>
-                {tables.map((table: TableType) => (
-                  <MenuItem key={table.name} value={`${table.family}-${table.name}`} >
-                    {table.name}
-                  </MenuItem>
-                ))}
-              </Select>
+              {tables.length &&
+                <Select value={watch('table')}
+                  {...register("table")}>
+                  {tables.map((table: TableType) => (
+                    <MenuItem key={table.name} value={JSON.stringify(table)} >
+                      {table.name}
+                    </MenuItem>
+                  ))}
+                </Select>
+              }
             </FormControl>
             <FormControl>
               <FormLabel>Type</FormLabel>
@@ -142,13 +149,15 @@ export function AddChain() {
             </FormControl>
             <FormControl>
               <FormLabel>Hook</FormLabel>
-              <Select value={watch("hook")} {...register("hook")}>
-                {hooksFromType()?.map((hook: string) => (
-                  <MenuItem key={hook} value={hook}>
-                    {hook}
-                  </MenuItem>
-                ))}
-              </Select>
+              {hooksFromType &&
+                <Select value={watch("hook")} {...register("hook")}>
+                  {hooksFromType.map((hook: string) => (
+                    <MenuItem key={hook} value={hook}>
+                      {hook}
+                    </MenuItem>
+                  ))}
+                </Select>
+              }
             </FormControl>
             <FormControl>
               <FormLabel>Priority</FormLabel>
@@ -157,6 +166,16 @@ export function AddChain() {
                 value={watch("priority")}
                 {...register("priority")}
               />
+            </FormControl>
+            <FormControl>
+              <FormLabel>Policy</FormLabel>
+              <Select value={watch("policy")} {...register("policy")}>
+                {POLICY_FILTER.map((p: string) => (
+                  <MenuItem key={p} value={p}>
+                    {p}
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
             <Grid container justifyContent="flex-end" mb={3}>
               <Button variant="contained" type="submit">

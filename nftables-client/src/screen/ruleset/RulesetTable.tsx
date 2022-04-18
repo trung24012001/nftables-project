@@ -41,6 +41,10 @@ export function RulesetTable(): React.ReactElement {
       access: "protocol",
     },
     {
+      name: "Policy",
+      access: "policy",
+    },
+    {
       name: "Handle",
       access: "handle",
     },

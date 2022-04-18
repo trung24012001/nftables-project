@@ -30,5 +30,15 @@ def get_expr_value(expr, key):
         m_key = match.get("left").get("payload").get("field")
         if m_key == key:
             return match.get("right")
+    return None
 
+
+def get_expr_prot(expr, key):
+    for object in expr:
+        match = object.get("match")
+        if not match:
+            continue
+        m_key = match.get("left").get("payload").get("field")
+        if m_key == key:
+            return match.get("left").get("payload").get("protocol")
     return None

@@ -50,8 +50,8 @@ def add_chain_db(chain):
         table = (
             session.query(Table)
             .filter(
-                Table.name.like(chain["table"]),
-                Table.family.like(chain["family"]),
+                Table.name.like(chain["table"].get("name")),
+                Table.family.like(chain["table"].get("family")),
             )
             .one()
         )
@@ -66,6 +66,8 @@ def add_chain_db(chain):
         session.add(new_chain)
         session.flush()
         chain["prio"] = chain.pop("priority")
+        chain["family"] = chain["table"].get("family")
+        chain["table"] = chain["table"].get("name")
         is_added = nft.add_chain(chain)
         if not is_added:
             raise Exception("Could not add chain to nft")
