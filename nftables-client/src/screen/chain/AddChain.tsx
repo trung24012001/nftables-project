@@ -55,7 +55,7 @@ export function AddChain() {
       table: null,
       name: "",
       type: "filter",
-      hook: "forward",
+      hook: "",
       priority: 0,
     },
     resolver: yupResolver(validate),
@@ -64,7 +64,7 @@ export function AddChain() {
     console.log(data);
 
     try {
-      const res = await request.post("/tables", data);
+      const res = await request.post("/chains", data);
       if (res.status === 200) {
         dispatch(
           setMessage({
@@ -85,13 +85,22 @@ export function AddChain() {
     reset();
   };
 
+  const hooksFromType = () => {
+    switch (watch("type")) {
+      case "filter":
+        return HOOK_FILTER;
+      case "nat":
+        return HOOK_NAT;
+    }
+  }
+
   return (
     <>
       <KeyboardBackspaceIcon
         fontSize="large"
         sx={{ mb: 5, cursor: "pointer" }}
         onClick={() => {
-          navigate("/");
+          navigate("/chains");
         }}
       />
       <Page title="Add chain">
@@ -105,16 +114,6 @@ export function AddChain() {
           autoComplete="off"
         >
           <Stack spacing={3} width="70%" minWidth="600px">
-            <FormControl fullWidth>
-              <FormLabel>Table</FormLabel>
-              <Select value={watch("table")} {...register("table")}>
-                {tables.map((table) => {
-                  <MenuItem key={table.name} value={table.family + table.name}>
-                    {table.name}
-                  </MenuItem>;
-                })}
-              </Select>
-            </FormControl>
             <FormControl>
               <FormLabel>Name</FormLabel>
               <TextField error={!!errors.name?.message} {...register("name")} />
@@ -122,26 +121,37 @@ export function AddChain() {
                 {errors.name?.message}
               </FormHelperText>
             </FormControl>
+            <FormControl fullWidth>
+              <FormLabel>Table</FormLabel>
+              <Select value={watch('table')}
+                {...register("table")}>
+                {tables.map((table: TableType) => (
+                  <MenuItem key={table.name} value={`${table.family}-${table.name}`} >
+                    {table.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
             <FormControl>
               <FormLabel>Type</FormLabel>
               <Select value={watch("type")} {...register("type")}>
-                {TYPE.map((t) => {
-                  return <MenuItem value={t}>{t}</MenuItem>;
+                {TYPE.map((t: string) => {
+                  return <MenuItem key={t} value={t}>{t}</MenuItem>;
                 })}
               </Select>
             </FormControl>
             <FormControl>
               <FormLabel>Hook</FormLabel>
               <Select value={watch("hook")} {...register("hook")}>
-                {HOOK_FILTER.map((hook) => {
+                {hooksFromType()?.map((hook: string) => (
                   <MenuItem key={hook} value={hook}>
                     {hook}
-                  </MenuItem>;
-                })}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl>
-              <FormLabel>Hook</FormLabel>
+              <FormLabel>Priority</FormLabel>
               <TextField
                 type="number"
                 value={watch("priority")}

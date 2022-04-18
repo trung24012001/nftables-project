@@ -94,11 +94,11 @@ export function AddTable() {
             <FormControl fullWidth>
               <FormLabel>Family</FormLabel>
               <Select value={watch("family")} {...register("family")}>
-                {FAMILY.map((f) => {
-                  <MenuItem key={f} value={f}>
-                    {f}
-                  </MenuItem>;
-                })}
+                {FAMILY.map((fam) => (
+                  <MenuItem key={fam} value={fam}>
+                    {fam}
+                  </MenuItem>
+                ))}
               </Select>
             </FormControl>
             <FormControl>
