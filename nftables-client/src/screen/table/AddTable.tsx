@@ -103,10 +103,7 @@ export function AddTable() {
             </FormControl>
             <FormControl>
               <FormLabel>Name</FormLabel>
-              <ValidationTextField
-                error={!!errors.name?.message}
-                {...register("name")}
-              />
+              <TextField error={!!errors.name?.message} {...register("name")} />
               <FormHelperText error={!!errors.name?.message}>
                 {errors.name?.message}
               </FormHelperText>
@@ -122,15 +119,3 @@ export function AddTable() {
     </>
   );
 }
-
-const ValidationTextField = styled(TextField)({
-  // "& input:valid:focus + fieldset": {
-  //   borderColor: "black",
-  //   borderWidth: 2,
-  // },
-  // "& input:invalid + fieldset": {
-  //   borderColor: "red",
-  //   borderWidth: 2,
-  // },
-  // "& input:valid:focus + fieldset": {},
-});

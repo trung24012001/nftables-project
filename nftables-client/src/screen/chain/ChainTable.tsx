@@ -1,5 +1,6 @@
 import { Box } from "@mui/material";
 import { ReactTable } from "components/ReactTable";
+import { request } from "lib";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -48,8 +49,12 @@ export function ChainTable(): React.ReactElement {
     navigate("/chains/add");
   };
 
-  const handleDelete = () => {
-    navigate("/chains/add");
+  const handleDelete = async () => {
+    try {
+      const res = await request.delete("/chains");
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

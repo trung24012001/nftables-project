@@ -30,7 +30,7 @@ def add_table_db(table):
 def delete_table_db(table):
     try:
         delete_table = session.query(Table).filter_by(
-            family=table["family"], name=table["name"]).one()
+            family=table["family"], name=table["name"]).first()
         session.delete(delete_table)
         session.flush()
         is_deleted = nft.delete_table(table)
@@ -53,7 +53,7 @@ def add_chain_db(chain):
                 Table.name.like(chain["table"].get("name")),
                 Table.family.like(chain["table"].get("family")),
             )
-            .one()
+            .first()
         )
         new_chain = Chain(
             name=chain["name"],
@@ -117,11 +117,13 @@ def add_rule_db(rule):
         chain = (
             session.query(Chain)
             .filter(
-                Chain.name.like(rule["chain"]),
-                Chain.table.has(name=rule["table"], family=rule["family"]),
+                Chain.name.like(rule["chain"].get("name")),
+                Chain.table.has(name=rule["chain"].get(
+                    "table"), family=rule["chain"].get("family")),
             )
             .first()
         )
+        print(chain)
         new_rule = Rule(
             chain=chain,
             protocol=rule.get("protocol"),

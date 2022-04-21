@@ -53,15 +53,12 @@ export function AddChain() {
     formState: { errors },
   } = useForm<ChainType>({
     defaultValues: {
-      table: {
-        family: '',
-        name: ''
-      },
+      table: {},
       name: "",
       type: "filter",
       hook: "",
       priority: 0,
-      policy: 'accept'
+      policy: "accept",
     },
     resolver: yupResolver(validate),
   });
@@ -97,7 +94,7 @@ export function AddChain() {
       case "nat":
         return HOOK_NAT;
     }
-  }, [watch("type")])
+  }, [watch("type")]);
 
   return (
     <>
@@ -128,28 +125,31 @@ export function AddChain() {
             </FormControl>
             <FormControl fullWidth>
               <FormLabel>Table</FormLabel>
-              {tables.length &&
-                <Select value={watch('table')}
-                  {...register("table")}>
+              {tables.length && (
+                <Select value={watch("table")} {...register("table")}>
                   {tables.map((table: TableType) => (
-                    <MenuItem key={table.name} value={JSON.stringify(table)} >
+                    <MenuItem key={table.name} value={JSON.stringify(table)}>
                       {table.name}
                     </MenuItem>
                   ))}
                 </Select>
-              }
+              )}
             </FormControl>
             <FormControl>
               <FormLabel>Type</FormLabel>
               <Select value={watch("type")} {...register("type")}>
                 {TYPE.map((t: string) => {
-                  return <MenuItem key={t} value={t}>{t}</MenuItem>;
+                  return (
+                    <MenuItem key={t} value={t}>
+                      {t}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
             <FormControl>
               <FormLabel>Hook</FormLabel>
-              {hooksFromType &&
+              {hooksFromType && (
                 <Select value={watch("hook")} {...register("hook")}>
                   {hooksFromType.map((hook: string) => (
                     <MenuItem key={hook} value={hook}>
@@ -157,7 +157,7 @@ export function AddChain() {
                     </MenuItem>
                   ))}
                 </Select>
-              }
+              )}
             </FormControl>
             <FormControl>
               <FormLabel>Priority</FormLabel>

@@ -114,15 +114,16 @@ def get_all_ruleset():
 def add_rule():
     try:
         payload = request.get_json()
+        print(json.load(payload["chain"]))
         rule = dict(
-            table=payload["table"],
-            chain=payload["chain"],
-            ip_src=payload.get("ip_src"),
-            port_src=payload.get("port_src"),
-            ip_dst=payload.get("ip_dst"),
-            port_dst=payload.get("port_dst"),
-            policy=payload.get("policy"),
+            chain=json.load(payload["chain"]),
+            ip_src=payload.get("ipSrc"),
+            port_src=payload.get("portSrc"),
+            ip_dst=payload.get("ipDst"),
+            port_dst=payload.get("portDst"),
+            port_prot=payload.get("portProt"),
             protocol=payload.get("protocol"),
+            policy=payload.get("policy"),
         )
         add_rule_db(rule)
         return jsonify({"message": "success"}), 200

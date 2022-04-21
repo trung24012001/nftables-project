@@ -1,6 +1,8 @@
 import * as React from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
+import DeleteIcon from "@mui/icons-material/Delete";
+import { ListItemIcon, ListItemText } from "@mui/material";
 
 export default function MenuTable({
   anchorEl,
@@ -27,7 +29,12 @@ export default function MenuTable({
         horizontal: "left",
       }}
     >
-      <MenuItem onClick={handleDelete}>Delete</MenuItem>
+      <MenuItem onClick={handleDelete}>
+        <ListItemIcon>
+          <DeleteIcon />
+        </ListItemIcon>
+        <ListItemText>Delete</ListItemText>
+      </MenuItem>
     </Menu>
   );
 }

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, useWatch } from "react-hook-form";
 import {
   Box,
   Button,
@@ -10,7 +10,6 @@ import {
   Select,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
 import { ChainType, request, RuleType, TableType } from "lib";
@@ -23,12 +22,12 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 
 const validate = yup.object({
-  family: yup.string().required("required family"),
-  name: yup.string().required(),
+  chain: yup.string().required("Chain is required"),
 });
 
 const POLICY_FILTER = ["accept", "drop", "reject"];
-const PROTOCOL = ["all", "tcp", "udp", "icmp"];
+const PROTOCOL = ["tcp", "udp", "icmp"];
+const PORT_PROTOCOL = ["tcp", "udp"];
 
 export function AddRule() {
   const navigate = useNavigate();
@@ -43,22 +42,39 @@ export function AddRule() {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<RuleType>({
     defaultValues: {
       chain: {},
-      ipSrc: '',
-      portSrc: '',
-      ipDst: '',
-      portDst: '',
-      protocol: '',
-      policy: 'accept',
+      ipSrc: "",
+      portSrc: "",
+      ipDst: "",
+      portDst: "",
+      portProt: "",
+      protocol: "",
+      policy: "accept",
     },
-    resolver: yupResolver(validate),
+    // resolver: yupResolver(validate),
   });
+
+  useEffect(() => {
+    const subscription = watch((value, { name, type }) => {
+      if (name === "portProt") {
+        setValue("protocol", "");
+      }
+    });
+    // return () => subscription.unsubscribe();
+  }, [watch]);
+
+  let wchain = {} as ChainType;
+
+  if (Object.keys(watch("chain")).length) {
+    wchain = JSON.parse(watch("chain") as unknown as string) as ChainType;
+  }
+
   const onSubmit: SubmitHandler<RuleType> = async (data) => {
     console.log(data);
-
     try {
       const res = await request.post("/rules", data);
       if (res.status === 200) {
@@ -97,64 +113,99 @@ export function AddRule() {
           justifyContent="center"
           component="form"
           onSubmit={handleSubmit(onSubmit)}
-          noValidate
-          autoComplete="off"
         >
           <Stack spacing={3} width="70%" minWidth="600px">
-            <FormControl>
-              <FormLabel>Family</FormLabel>
-              <TextField disabled value={watch('chain')?.table?.family} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Table</FormLabel>
-              <TextField disabled value={watch('chain')?.table?.name} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Type</FormLabel>
-              <TextField disabled value={watch('chain')?.type} />
-            </FormControl>
+            <Stack direction={"row"} spacing={2}>
+              <FormControl fullWidth>
+                <FormLabel>Family</FormLabel>
+                <TextField disabled variant="filled" value={wchain.family} />
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Table</FormLabel>
+                <TextField disabled variant="filled" value={wchain.table} />
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Type</FormLabel>
+                <TextField disabled variant="filled" value={wchain.type} />
+              </FormControl>
+            </Stack>
             <FormControl fullWidth>
               <FormLabel>Chain</FormLabel>
-              {chains.length &&
-                <Select value={watch('chain')}
-                  {...register("chain")}>
-                  {chains.map((chain: ChainType, idx: number) => (
-                    <MenuItem key={idx} value={JSON.stringify(chain)} >
-                      {chain.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              }
+              <Select value={watch("chain")} {...register("chain")}>
+                <MenuItem value="" sx={{ opacity: 0.6 }}>
+                  None
+                </MenuItem>
+                {chains.map((chain: ChainType, idx: number) => (
+                  <MenuItem key={idx} value={JSON.stringify(chain)}>
+                    {chain.name}
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
-            <FormControl>
-              <FormLabel>IP source</FormLabel>
-              <TextField {...register("ipSrc")} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Port source</FormLabel>
-              <TextField {...register("portSrc")} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Protocol source</FormLabel>
-              <TextField {...register("portSrc")} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>IP destination</FormLabel>
-              <TextField {...register("ipDst")} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Port destination</FormLabel>
-              <TextField {...register("portDst")} />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Protocol destination</FormLabel>
-              <TextField {...register("portSrc")} />
-            </FormControl>
-            <FormControl>
+            <Grid container justifyContent={"space-between"}>
+              <Grid item xs={5.5}>
+                <FormControl fullWidth>
+                  <FormLabel>IP source</FormLabel>
+                  <TextField {...register("ipSrc")} />
+                </FormControl>
+                <Stack direction={"row"} spacing={2}>
+                  <FormControl fullWidth>
+                    <FormLabel>Port</FormLabel>
+                    <TextField {...register("portSrc")} />
+                  </FormControl>
+                  <FormControl sx={{ width: "120px" }}>
+                    <FormLabel>Protocol</FormLabel>
+                    <Select value={watch("portProt")} {...register("portProt")}>
+                      <MenuItem value="" sx={{ opacity: 0.6 }}>
+                        None
+                      </MenuItem>
+                      {PORT_PROTOCOL.map((p: string, idx: number) => (
+                        <MenuItem key={idx} value={p}>
+                          {p}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Stack>
+              </Grid>
+              <Grid item xs={5.5}>
+                <FormControl fullWidth>
+                  <FormLabel>IP destination</FormLabel>
+                  <TextField {...register("ipDst")} />
+                </FormControl>
+                <Stack direction={"row"} spacing={2}>
+                  <FormControl fullWidth>
+                    <FormLabel>Port</FormLabel>
+                    <TextField {...register("portDst")} />
+                  </FormControl>
+                  <FormControl sx={{ width: "120px" }}>
+                    <FormLabel>Protocol</FormLabel>
+                    <Select value={watch("portProt")} {...register("portProt")}>
+                      <MenuItem value="" sx={{ opacity: 0.6 }}>
+                        None
+                      </MenuItem>
+                      {PORT_PROTOCOL.map((p: string, idx: number) => (
+                        <MenuItem key={idx} value={p}>
+                          {p}
+                        </MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Stack>
+              </Grid>
+            </Grid>
+            <FormControl disabled={!!watch("portProt")}>
               <FormLabel>Protocol</FormLabel>
               <Select value={watch("protocol")} {...register("protocol")}>
+                <MenuItem value="" sx={{ opacity: 0.6 }}>
+                  None
+                </MenuItem>
                 {PROTOCOL.map((p: string) => {
-                  return <MenuItem key={p} value={p}>{p}</MenuItem>;
+                  return (
+                    <MenuItem key={p} value={p}>
+                      {p}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
@@ -162,15 +213,17 @@ export function AddRule() {
               <FormLabel>Policy</FormLabel>
               <Select value={watch("policy")} {...register("policy")}>
                 {POLICY_FILTER.map((p: string) => {
-                  return <MenuItem key={p} value={p}>{p}</MenuItem>;
+                  return (
+                    <MenuItem key={p} value={p}>
+                      {p}
+                    </MenuItem>
+                  );
                 })}
               </Select>
             </FormControl>
-            <Grid container justifyContent="flex-end" mb={3}>
-              <Button variant="contained" type="submit">
-                Add
-              </Button>
-            </Grid>
+            <Button variant="contained" type="submit">
+              Add
+            </Button>
           </Stack>
         </Box>
       </Page>
