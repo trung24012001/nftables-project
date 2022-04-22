@@ -1,6 +1,6 @@
 import React from "react";
 import { Outlet } from "react-router-dom";
-import { Box, styled, Toolbar } from "@mui/material";
+import { Box, styled } from "@mui/material";
 import Sidebar from "./Sidebar";
 import { MessageAlert } from "components/MessageAlert";
 

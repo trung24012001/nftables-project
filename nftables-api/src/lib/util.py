@@ -33,7 +33,7 @@ def get_expr_value(expr, key):
     return None
 
 
-def get_expr_prot(expr, ):
+def get_expr_prot(expr):
     for object in expr:
         match = object.get("match")
         if not match:
@@ -44,3 +44,10 @@ def get_expr_prot(expr, ):
         if m_key == "protocol":
             return match.get("right")
     return None
+
+
+def get_expr_policy(expr):
+    policy = list(expr[-1].keys())[0]
+    if (policy in ['accept', 'reject', 'drop']):
+        return policy
+    return ''

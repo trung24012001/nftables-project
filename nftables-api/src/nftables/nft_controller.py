@@ -1,5 +1,6 @@
 from src.nftables.nft import load_nft, read_nft
 import src.lib.util as util
+import json
 
 
 def get_tables():
@@ -122,7 +123,7 @@ def get_ruleset():
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
                 protocol=util.get_expr_prot(rule.get("expr")),
-                policy=list(rule["expr"][-1].keys())[0],
+                policy=util.get_expr_policy(rule.get("expr"))
             )
         )
 
@@ -177,7 +178,9 @@ def add_filter_rule(rule):
             }
             rule_formater["rule"]["expr"].append(
                 util.nft_expr_parser(port_dst_match))
-        rule_formater["rule"]["expr"].append({rule["policy"]: None})
+        if rule.get("policy"):
+            rule_formater["rule"]["expr"].append({rule["policy"]: None})
+
         data_structure = util.nft_handle_parser(
             rule_formater,
             "add",

@@ -33,10 +33,6 @@ export function AddRule() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const chains = useSelector((state: RootState) => state.ruleset.chains);
-  // const wchain = useRef<ChainType | undefined>();
-  useEffect(() => {
-    dispatch(getChains({}));
-  }, []);
 
   const {
     register,
@@ -54,33 +50,27 @@ export function AddRule() {
       portDst: "",
       portProt: "",
       protocol: "",
-      policy: "",
+      policy: "accept",
     },
     // resolver: yupResolver(validate),
   });
 
-  // let wchain = {} as ChainType;
-  const wchain = useRef<ChainType>();
+  useEffect(() => {
+    dispatch(getChains({}));
+  }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
-      (name === "portProt") &&
-        setValue("protocol", value.portProt as string);
-
-      if (name === 'chain') {
-        console.log(value.chain)
-        wchain.current = value.chain as ChainType;
-      }
-
+      name === "portProt" && setValue("protocol", value.portProt as string);
+      name === "chain" && setValue("policy", value.chain?.policy as string);
     });
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  console.log(wchain.current)
-
-  // if (Object.keys(watch("chain")).length) {
-  //   wchain = JSON.parse(watch("chain") as unknown as string) as ChainType;
-  // }
+  let wchain = undefined as ChainType | undefined;
+  if (Object.keys(watch("chain")).length) {
+    wchain = JSON.parse(watch("chain") as unknown as string) as ChainType;
+  }
 
   const onSubmit: SubmitHandler<RuleType> = async (data) => {
     console.log(data);
@@ -123,31 +113,31 @@ export function AddRule() {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Stack spacing={3} width="70%" minWidth="600px">
+          <Stack spacing={2} width="70%" minWidth="600px">
             <Stack direction={"row"} spacing={2}>
               <FormControl fullWidth>
                 <FormLabel>Family</FormLabel>
-                <TextField disabled variant="filled" value={wchain.current?.family} />
+                <TextField disabled variant="filled" value={wchain?.family} />
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Table</FormLabel>
-                <TextField disabled variant="filled" value={wchain.current?.table} />
+                <TextField disabled variant="filled" value={wchain?.table} />
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Type</FormLabel>
-                <TextField disabled variant="filled" value={wchain.current?.type} />
+                <TextField disabled variant="filled" value={wchain?.type} />
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Hook</FormLabel>
-                <TextField disabled variant="filled" value={wchain.current?.hook} />
+                <TextField disabled variant="filled" value={wchain?.hook} />
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Priority</FormLabel>
-                <TextField disabled variant="filled" value={wchain.current?.priority} />
+                <TextField disabled variant="filled" value={wchain?.priority} />
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Policy</FormLabel>
-                <TextField disabled variant="filled" value={wchain.current?.policy} />
+                <TextField disabled variant="filled" value={wchain?.policy} />
               </FormControl>
             </Stack>
             <FormControl fullWidth>
@@ -233,7 +223,7 @@ export function AddRule() {
             <FormControl>
               <FormLabel>Policy</FormLabel>
               <Select value={watch("policy")} {...register("policy")}>
-                <MenuItem value={wchain.current?.policy} sx={{ opacity: 0.6 }}>
+                <MenuItem value={wchain?.policy} sx={{ opacity: 0.6 }}>
                   Follow chain
                 </MenuItem>
                 {POLICY_FILTER.map((p: string) => {

@@ -1,24 +1,47 @@
-import { Paper, PaperProps, Stack, Typography } from '@mui/material'
-import React from 'react'
+import { Paper, PaperProps, Stack, styled, Typography } from "@mui/material";
+import React from "react";
 
 type PageProps = {
-  title?: string
-  leftHeader?: React.ReactNode
-} & PaperProps
+  title?: string;
+  leftHeader?: React.ReactNode;
+} & PaperProps;
 
-const Page: React.VFC<PageProps> = ({ children, title, leftHeader, ...paperProps }) => {
+const Page: React.VFC<PageProps> = ({
+  children,
+  title,
+  leftHeader,
+  ...paperProps
+}) => {
   return (
-    <Paper elevation={1} sx={{ p: 3, position: 'relative', height: '100%', width: '100%', m: 'auto', borderRadius: 2 }} {...paperProps}>
+    <PageStyle elevation={1} {...paperProps}>
       {title && (
-        <Stack direction="row" alignItems="center" justifyContent="space-between" mb={{ md: 6 }}>
-          <Typography variant="h4">{title}</Typography>
-
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={{ md: 6 }}
+        >
+          <Typography
+            variant="h4"
+            sx={(theme) => ({ color: theme.palette.primary.main })}
+          >
+            {title}
+          </Typography>
           {leftHeader}
         </Stack>
       )}
       {children}
-    </Paper>
-  )
-}
+    </PageStyle>
+  );
+};
 
-export { Page }
+const PageStyle = styled(Paper)(({ theme }) => ({
+  padding: "24px",
+  margin: "auto",
+  position: "relative",
+  height: "100%",
+  width: "100%",
+  borderRadius: "16px",
+}));
+
+export { Page };

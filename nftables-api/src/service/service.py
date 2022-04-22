@@ -95,8 +95,9 @@ def get_all_ruleset():
     try:
         ruleset = get_ruleset_db()
         return jsonify({"ruleset": ruleset}), 200
-    except:
-        return jsonify({"error": "could not add chain"}), 500
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "could not get rules"}), 500
 
 
 @main_api.route("/rules", methods=["POST"])

@@ -177,11 +177,9 @@ export function AddChain() {
                 ))}
               </Select>
             </FormControl>
-            <Grid container justifyContent="flex-end" mb={3}>
-              <Button variant="contained" type="submit">
-                Add
-              </Button>
-            </Grid>
+            <Button variant="contained" type="submit">
+              Add
+            </Button>
           </Stack>
         </Box>
       </Page>
