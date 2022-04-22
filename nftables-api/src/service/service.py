@@ -8,21 +8,10 @@ from src.service.http_controller import (
     get_ruleset_db,
     get_tables_db,
     add_rule_db,
-    http_test,
 )
 import json
 
 main_api = Blueprint("api", __name__)
-
-
-@main_api.route("/test")
-def test():
-    try:
-        http_test()
-
-        return jsonify({"message": "hello"}), 200
-    except:
-        return jsonify({"error": "error"}), 500
 
 
 @main_api.route("/sync-to-db")
@@ -114,9 +103,8 @@ def get_all_ruleset():
 def add_rule():
     try:
         payload = request.get_json()
-        print(json.load(payload["chain"]))
         rule = dict(
-            chain=json.load(payload["chain"]),
+            chain=json.loads(payload["chain"]),
             ip_src=payload.get("ipSrc"),
             port_src=payload.get("portSrc"),
             ip_dst=payload.get("ipDst"),

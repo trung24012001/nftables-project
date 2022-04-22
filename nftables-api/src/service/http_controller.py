@@ -118,25 +118,27 @@ def add_rule_db(rule):
             session.query(Chain)
             .filter(
                 Chain.name.like(rule["chain"].get("name")),
-                Chain.table.has(name=rule["chain"].get(
-                    "table"), family=rule["chain"].get("family")),
+                Chain.table.has(name=rule["chain"].get("table"),
+                                family=rule["chain"].get("family")),
             )
             .first()
         )
-        print(chain)
+
         new_rule = Rule(
-            chain=chain,
             protocol=rule.get("protocol"),
             policy=rule.get("policy"),
         )
+
         ip_src = IpSrc(
-            host=rule.get("ip_src"), port=rule.get("port_src"), rule=new_rule
+            host=rule.get("ip_src"), port=rule.get("port_src")
         )
+
         ip_dst = IpDst(
-            host=rule.get("ip_dst"), port=rule.get("port_dst"), rule=new_rule
+            host=rule.get("ip_dst"), port=rule.get("port_dst")
         )
-        new_rule.ip_src_list.append(ip_src)
-        new_rule.ip_dst_list.append(ip_dst)
+
+        # new_rule.ip_src_list.append(ip_src)
+        # new_rule.ip_dst_list.append(ip_dst)
         chain.rules.append(new_rule)
         session.add(chain)
         session.flush()
@@ -156,16 +158,7 @@ def clear_database():
     try:
         tables = session.query(Table).delete()
         session.commit()
-        print(tables)
         return True
     except:
         session.rollback()
         return False
-
-
-def http_test():
-    new_table = Table(family="ok")
-    session.add(new_table)
-    session.flush()
-    session.rollback()
-    return ""

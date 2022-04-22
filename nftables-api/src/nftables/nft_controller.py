@@ -121,7 +121,7 @@ def get_ruleset():
                 ip_dst=util.get_expr_value(rule.get("expr"), "daddr"),
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
-                protocol=util.get_expr_value(rule.get("expr"), "protocol"),
+                protocol=util.get_expr_prot(rule.get("expr")),
                 policy=list(rule["expr"][-1].keys())[0],
             )
         )
@@ -130,69 +130,65 @@ def get_ruleset():
 
 
 def add_filter_rule(rule):
-    rule_formater = {
-        "rule": {
-            "family": rule["family"],
-            "table": rule["table"],
-            "chain": rule["chain"],
-            "expr": [],
+    try:
+        port_prot = rule.get('port_prot')
+        family = rule["chain"].get("family")
+        rule_formater = {
+            "rule": {
+                "family": family,
+                "table": rule["chain"].get("table"),
+                "chain": rule["chain"].get("name"),
+                "expr": [],
+            }
         }
-    }
 
-    if rule.get("ip_src"):
-        ip_src = rule["ip_src"]
-        ip_src_match = {
-            "payload": {"protocol": ip_src["protocol"], "field": "daddr"},
-            "value": ip_src["value"],
-        }
-        rule_formater["rule"]["expr"].append(
-            util.nft_expr_parser(ip_src_match))
+        if rule.get("ip_src"):
+            ip_src_match = {
+                "payload": {"protocol": family, "field": "saddr"},
+                "value": rule["ip_src"],
+            }
+            rule_formater["rule"]["expr"].append(
+                util.nft_expr_parser(ip_src_match))
+        if rule.get("ip_dst"):
+            ip_dst_match = {
+                "payload": {"protocol": family, "field": "daddr"},
+                "value": rule["ip_dst"],
+            }
+            rule_formater["rule"]["expr"].append(
+                util.nft_expr_parser(ip_dst_match))
+        if rule.get("protocol"):
+            protocol_match = {
+                "payload": {"protocol": family, "field": "protocol"},
+                "value": rule["protocol"],
+            }
+            rule_formater["rule"]["expr"].append(
+                util.nft_expr_parser(protocol_match))
+        if rule.get("port_src"):
+            port_src_match = {
+                "payload": {"protocol": port_prot, "field": "sport"},
+                "value": rule["port_src"],
+            }
+            rule_formater["rule"]["expr"].append(
+                util.nft_expr_parser(port_src_match))
+        if rule.get("port_dst"):
+            port_dst_match = {
+                "payload": {"protocol": port_prot, "field": "sport"},
+                "value": rule["port_dst"],
+            }
+            rule_formater["rule"]["expr"].append(
+                util.nft_expr_parser(port_dst_match))
+        rule_formater["rule"]["expr"].append({rule["policy"]: None})
+        data_structure = util.nft_handle_parser(
+            rule_formater,
+            "add",
+        )
 
-    if rule.get("ip_dst"):
-        ip_dst = rule["ip_dst"]
-        ip_dst_match = {
-            "payload": {"protocol": ip_dst["protocol"], "field": "daddr"},
-            "value": ip_dst["value"],
-        }
-        rule_formater["rule"]["expr"].append(
-            util.nft_expr_parser(ip_dst_match))
+        ret = load_nft(data_structure)
 
-    if rule.get("protocol"):
-        prot = rule["protocol"]
-        protocol_match = {
-            "payload": {"protocol": prot["protocol"], "field": "protocol"},
-            "value": prot["value"],
-        }
-        rule_formater["rule"]["expr"].append(
-            util.nft_expr_parser(protocol_match))
-
-    if rule.get("port_src"):
-        s_port = rule["port_src"]
-        port_src_match = {
-            "payload": {"protocol": s_port["protocol"], "field": "sport"},
-            "value": s_port["value"],
-        }
-        rule_formater["rule"]["expr"].append(
-            util.nft_expr_parser(port_src_match))
-
-    if rule.get("port_dst"):
-        d_port = rule["port_dst"]
-        port_dst_match = {
-            "payload": {"protocol": d_port["protocol"], "field": "sport"},
-            "value": d_port["value"],
-        }
-        rule_formater["rule"]["expr"].append(
-            util.nft_expr_parser(port_dst_match))
-
-    rule_formater["rule"]["expr"].append({rule["policy"]: None})
-
-    data_structure = util.nft_handle_parser(
-        rule_formater,
-        "add",
-    )
-    ret = load_nft(data_structure)
-
-    return ret
+        return ret
+    except Exception as e:
+        print("Error: could not add rule to nft.", e)
+        return False
 
 
 def delete_rule():

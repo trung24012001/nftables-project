@@ -33,12 +33,14 @@ def get_expr_value(expr, key):
     return None
 
 
-def get_expr_prot(expr, key):
+def get_expr_prot(expr, ):
     for object in expr:
         match = object.get("match")
         if not match:
             continue
         m_key = match.get("left").get("payload").get("field")
-        if m_key == key:
+        if m_key == "sport" or m_key == "dport":
             return match.get("left").get("payload").get("protocol")
+        if m_key == "protocol":
+            return match.get("right")
     return None

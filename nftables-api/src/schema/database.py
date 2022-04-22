@@ -84,7 +84,7 @@ class IpDst(Base):
     rule = relationship("Rule", back_populates="ip_dst_list")
 
     def __repr__(self):
-        return "<IpDest(id={self.id!r})>".format(self=self)
+        return "<IpDest(host={self.host!r})>".format(self=self)
 
 
 class IpSrc(Base):
@@ -97,7 +97,7 @@ class IpSrc(Base):
     rule = relationship("Rule", back_populates="ip_src_list")
 
     def __repr__(self):
-        return "<IpSource(id={self.id!r})>".format(self=self)
+        return "<IpSource(host={self.host!r})>".format(self=self)
 
 
 class Rule(Base):
@@ -112,7 +112,7 @@ class Rule(Base):
     ip_dst_list = relationship("IpDst", back_populates="rule")
 
     def __repr__(self):
-        return "<Rule(id={self.id!r})>".format(self=self)
+        return "<Rule(policy={self.policy!r})>".format(self=self)
 
 
 load_dotenv()

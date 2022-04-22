@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler, useWatch } from "react-hook-form";
 import {
   Box,
@@ -33,6 +33,7 @@ export function AddRule() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const chains = useSelector((state: RootState) => state.ruleset.chains);
+  // const wchain = useRef<ChainType | undefined>();
   useEffect(() => {
     dispatch(getChains({}));
   }, []);
@@ -53,25 +54,33 @@ export function AddRule() {
       portDst: "",
       portProt: "",
       protocol: "",
-      policy: "accept",
+      policy: "",
     },
     // resolver: yupResolver(validate),
   });
 
+  // let wchain = {} as ChainType;
+  const wchain = useRef<ChainType>();
+
   useEffect(() => {
     const subscription = watch((value, { name, type }) => {
-      if (name === "portProt") {
-        setValue("protocol", "");
+      (name === "portProt") &&
+        setValue("protocol", value.portProt as string);
+
+      if (name === 'chain') {
+        console.log(value.chain)
+        wchain.current = value.chain as ChainType;
       }
+
     });
-    // return () => subscription.unsubscribe();
+    return () => subscription.unsubscribe();
   }, [watch]);
 
-  let wchain = {} as ChainType;
+  console.log(wchain.current)
 
-  if (Object.keys(watch("chain")).length) {
-    wchain = JSON.parse(watch("chain") as unknown as string) as ChainType;
-  }
+  // if (Object.keys(watch("chain")).length) {
+  //   wchain = JSON.parse(watch("chain") as unknown as string) as ChainType;
+  // }
 
   const onSubmit: SubmitHandler<RuleType> = async (data) => {
     console.log(data);
@@ -118,15 +127,27 @@ export function AddRule() {
             <Stack direction={"row"} spacing={2}>
               <FormControl fullWidth>
                 <FormLabel>Family</FormLabel>
-                <TextField disabled variant="filled" value={wchain.family} />
+                <TextField disabled variant="filled" value={wchain.current?.family} />
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Table</FormLabel>
-                <TextField disabled variant="filled" value={wchain.table} />
+                <TextField disabled variant="filled" value={wchain.current?.table} />
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Type</FormLabel>
-                <TextField disabled variant="filled" value={wchain.type} />
+                <TextField disabled variant="filled" value={wchain.current?.type} />
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Hook</FormLabel>
+                <TextField disabled variant="filled" value={wchain.current?.hook} />
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Priority</FormLabel>
+                <TextField disabled variant="filled" value={wchain.current?.priority} />
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Policy</FormLabel>
+                <TextField disabled variant="filled" value={wchain.current?.policy} />
               </FormControl>
             </Stack>
             <FormControl fullWidth>
@@ -198,7 +219,7 @@ export function AddRule() {
               <FormLabel>Protocol</FormLabel>
               <Select value={watch("protocol")} {...register("protocol")}>
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
-                  None
+                  All
                 </MenuItem>
                 {PROTOCOL.map((p: string) => {
                   return (
@@ -212,6 +233,9 @@ export function AddRule() {
             <FormControl>
               <FormLabel>Policy</FormLabel>
               <Select value={watch("policy")} {...register("policy")}>
+                <MenuItem value={wchain.current?.policy} sx={{ opacity: 0.6 }}>
+                  Follow chain
+                </MenuItem>
                 {POLICY_FILTER.map((p: string) => {
                   return (
                     <MenuItem key={p} value={p}>
