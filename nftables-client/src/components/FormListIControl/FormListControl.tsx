@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import {
   Box,
+  FormControl,
   FormLabel,
   Stack,
 } from "@mui/material";
@@ -11,17 +12,19 @@ export function FormListControl({
   type = 'select',
   title,
   options,
+  fullWidth,
   onCallback
 }: {
   type?: 'select' | 'textfield',
   title: string,
+  fullWidth?: boolean,
   options?: string[],
   onCallback: (selected: string[]) => void
 }) {
   const [data, setData] = useState<string[]>(['']);
 
   return (
-    <Box>
+    <Box width={'100%'}>
       <FormLabel>{title}</FormLabel>
       <Stack spacing={2}>
         {

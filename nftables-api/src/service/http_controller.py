@@ -65,9 +65,6 @@ def add_chain_db(chain):
         # )
         # session.add(new_chain)
         # session.flush()
-        chain["prio"] = chain.pop("priority")
-        chain["family"] = chain["table"].get("family")
-        chain["table"] = chain["table"].get("name")
         is_added = nft.add_chain(chain)
         if not is_added:
             raise Exception("Could not add chain to nft")
@@ -93,7 +90,7 @@ def delete_chain_db(chain):
         #               table=chain["table"], name=chain["name"])
         # session.delete(chain)
         # session.flush()
-        is_deleted = nft.delete_table(chain)
+        is_deleted = nft.delete_chain(chain)
         if not is_deleted:
             raise Exception("Could not delete chain from nft.")
         # session.commit()
@@ -156,11 +153,12 @@ def add_rule_db(rule):
 
 def delete_rule_db(rule):
     try:
-        is_added = nft.delete_rule(rule)
-        if not is_added:
+        if not nft.delete_rule(rule):
             raise Exception("Could not delete rule in nft")
+        return True
     except Exception as e:
         print("Error: could not delete rule", e)
+        return False
 
 
 def clear_database():

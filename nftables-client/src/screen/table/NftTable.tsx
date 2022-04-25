@@ -24,12 +24,11 @@ export function NftTable(): React.ReactElement {
     navigate("/tables/add");
   };
 
-  const handleDelete = async (row: any) => {
+  const handleDelete = async (table: TableType) => {
     try {
       const res = await request.delete("/tables", {
         params: {
-          family: row.family,
-          name: row.name,
+          table
         },
       });
       if (res.status === 200) {
@@ -41,7 +40,6 @@ export function NftTable(): React.ReactElement {
         );
       }
       dispatch(getTables({}));
-      return res.data;
     } catch (err) {
       console.log(err);
       dispatch(
@@ -51,7 +49,6 @@ export function NftTable(): React.ReactElement {
         })
       );
     }
-    console.log(row);
   };
 
   return (

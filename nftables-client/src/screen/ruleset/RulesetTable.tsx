@@ -22,14 +22,23 @@ export function RulesetTable(): React.ReactElement {
     navigate("/rules/add");
   };
 
-  const handleDelete = async (rule: RuleType) => {
+  const handleDelete = async (rule: any) => {
     try {
       console.log(rule)
-      // const res = await request.delete('/rules', {
-      //   params: {
-      //     rule
-      //   }
-      // })
+      const res = await request.delete('/rules', {
+        params: {
+          rule
+        }
+      })
+      if (res.status === 200) {
+        dispatch(
+          setMessage({
+            content: res.data.message,
+            type: "success",
+          })
+        );
+        dispatch(getRuleset({}))
+      }
     } catch (error) {
       console.log(error);
       dispatch(

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
   Box,
@@ -8,7 +8,9 @@ import {
   FormLabel,
   MenuItem,
   Select,
+  SelectChangeEvent,
   Stack,
+  styled,
   TextField,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
@@ -22,8 +24,8 @@ import { RootState } from "store";
 import Background from "components/Layout/Background";
 
 const validate = yup.object({
-  table: yup.string().required("required table"),
-  name: yup.string().required(),
+  table_name: yup.string().required("Table is a required field"),
+  name: yup.string().required("Name is a required field"),
   type: yup.string().required(),
   hook: yup.string().required(),
   priority: yup.number().required(),
@@ -38,6 +40,7 @@ export function AddChain() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const tables = useSelector((state: RootState) => state.ruleset.tables);
+  const [tableSelected, setTableSelected] = useState<TableType | string>("");
 
   useEffect(() => {
     dispatch(getTables({}));
@@ -48,10 +51,11 @@ export function AddChain() {
     handleSubmit,
     reset,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<ChainType>({
     defaultValues: {
-      table: {},
+      table_name: "",
       name: "",
       type: "filter",
       hook: "",
@@ -61,10 +65,18 @@ export function AddChain() {
     resolver: yupResolver(validate),
   });
   const onSubmit: SubmitHandler<ChainType> = async (data) => {
-    console.log(data);
+
+    const payload = {
+      ...data,
+      table: JSON.parse(tableSelected as string)
+    }
+
+    delete payload.table_name;
+
+    console.log(payload)
 
     try {
-      const res = await request.post("/chains", data);
+      const res = await request.post("/chains", payload);
       if (res.status === 200) {
         dispatch(
           setMessage({
@@ -82,7 +94,6 @@ export function AddChain() {
         })
       );
     }
-    reset();
   };
 
   const hooksFromType = useMemo(() => {
@@ -93,6 +104,11 @@ export function AddChain() {
         return HOOK_NAT;
     }
   }, [watch("type")]);
+
+  const onTableChange = (e: SelectChangeEvent<TableType | string>) => {
+    setTableSelected(e.target.value);
+    setValue('table_name', e.target.value as string);
+  }
 
   return (
     <Background onClick={() => { navigate('/chains') }}>
@@ -106,7 +122,7 @@ export function AddChain() {
           noValidate
           autoComplete="off"
         >
-          <Stack spacing={3} width="70%" minWidth="600px">
+          <Stack spacing={2} width="70%" minWidth="600px">
             <FormControl>
               <FormLabel>Name</FormLabel>
               <TextField error={!!errors.name?.message} {...register("name")} />
@@ -116,56 +132,67 @@ export function AddChain() {
             </FormControl>
             <FormControl fullWidth>
               <FormLabel>Table</FormLabel>
-              <Select value={watch("table")} {...register("table")}>
-                {tables.map((table: TableType) => (
-                  <MenuItem key={table.name} value={JSON.stringify(table)}>
+              <Select value={tableSelected} onChange={onTableChange} error={!!errors.table_name?.message}>
+                <MenuItem value="" sx={{ opacity: 0.6 }}>
+                  None
+                </MenuItem>
+                {tables.map((table: TableType, idx: number) => (
+                  <MenuItem key={idx} value={JSON.stringify(table)}>
                     {table.name}
+                    <MenuSubTitle>
+                      family: {table.family}
+                    </MenuSubTitle>
                   </MenuItem>
                 ))}
               </Select>
+              <FormHelperText error={!!errors.table_name?.message}>
+                {errors.table_name?.message}
+              </FormHelperText>
             </FormControl>
-            <FormControl>
-              <FormLabel>Type</FormLabel>
-              <Select value={watch("type")} {...register("type")}>
-                {TYPE.map((t: string) => {
-                  return (
-                    <MenuItem key={t} value={t}>
-                      {t}
-                    </MenuItem>
-                  );
-                })}
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Hook</FormLabel>
-              {hooksFromType && (
-                <Select value={watch("hook")} {...register("hook")}>
-                  {hooksFromType.map((hook: string) => (
-                    <MenuItem key={hook} value={hook}>
-                      {hook}
+            <Stack direction={'row'} spacing={2}>
+              <FormControl fullWidth>
+                <FormLabel>Type</FormLabel>
+                <Select value={watch("type")} {...register("type")} >
+                  {TYPE.map((t: string) => {
+                    return (
+                      <MenuItem key={t} value={t}>
+                        {t}
+                      </MenuItem>
+                    );
+                  })}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Hook</FormLabel>
+                {hooksFromType && (
+                  <Select value={watch("hook")} {...register("hook")} >
+                    {hooksFromType.map((hook: string) => (
+                      <MenuItem key={hook} value={hook}>
+                        {hook}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                )}
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Priority</FormLabel>
+                <TextField
+                  type="number"
+                  value={watch("priority")}
+                  {...register("priority")}
+                />
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Policy</FormLabel>
+                <Select value={watch("policy")} {...register("policy")}>
+                  {POLICY_FILTER.map((p: string) => (
+                    <MenuItem key={p} value={p}>
+                      {p}
                     </MenuItem>
                   ))}
                 </Select>
-              )}
-            </FormControl>
-            <FormControl>
-              <FormLabel>Priority</FormLabel>
-              <TextField
-                type="number"
-                value={watch("priority")}
-                {...register("priority")}
-              />
-            </FormControl>
-            <FormControl>
-              <FormLabel>Policy</FormLabel>
-              <Select value={watch("policy")} {...register("policy")}>
-                {POLICY_FILTER.map((p: string) => (
-                  <MenuItem key={p} value={p}>
-                    {p}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
+              </FormControl>
+            </Stack>
             <Button variant="contained" type="submit">
               Add
             </Button>
@@ -175,3 +202,9 @@ export function AddChain() {
     </Background>
   );
 }
+
+const MenuSubTitle = styled('span')(() => ({
+  marginLeft: '15px',
+  opacity: 0.8,
+  fontStyle: 'italic'
+}))

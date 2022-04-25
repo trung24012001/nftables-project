@@ -69,11 +69,10 @@ export function AddTable() {
         })
       );
     }
-    reset();
   };
 
   return (
-    <Background onClick={() => { navigate('/') }}>
+    <Background onClick={() => { navigate('/tables') }}>
       <Page title="Add Table">
         <Box
           p={5}
@@ -84,24 +83,26 @@ export function AddTable() {
           noValidate
           autoComplete="off"
         >
-          <Stack spacing={3} width="70%" minWidth="600px">
-            <FormControl fullWidth>
-              <FormLabel>Family</FormLabel>
-              <Select value={watch("family")} {...register("family")}>
-                {FAMILY.map((fam) => (
-                  <MenuItem key={fam} value={fam}>
-                    {fam}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormControl>
-              <FormLabel>Name</FormLabel>
-              <TextField error={!!errors.name?.message} {...register("name")} />
-              <FormHelperText error={!!errors.name?.message}>
-                {errors.name?.message}
-              </FormHelperText>
-            </FormControl>
+          <Stack spacing={2} width="70%" minWidth="600px">
+            <Stack direction='row' spacing={2}>
+              <FormControl sx={{ width: '200px' }}>
+                <FormLabel>Family</FormLabel>
+                <Select value={watch("family")} {...register("family")}>
+                  {FAMILY.map((fam) => (
+                    <MenuItem key={fam} value={fam}>
+                      {fam}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+              <FormControl fullWidth>
+                <FormLabel>Name</FormLabel>
+                <TextField error={!!errors.name?.message} {...register("name")} />
+                <FormHelperText error={!!errors.name?.message}>
+                  {errors.name?.message}
+                </FormHelperText>
+              </FormControl>
+            </Stack>
             <Button variant="contained" type="submit">
               Add
             </Button>

@@ -83,7 +83,6 @@ export const rulesetSlice = createSlice({
       console.log("get rules rejected!");
     });
     builder.addCase(getRuleset.fulfilled, (state, action) => {
-      console.log(action.payload);
       state.rules = action.payload;
     });
   },

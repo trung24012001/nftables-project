@@ -4,6 +4,7 @@ from src.service.http_controller import (
     add_table_db,
     add_chain_db,
     delete_table_db,
+    delete_chain_db,
     get_chains_db,
     get_ruleset_db,
     get_tables_db,
@@ -47,18 +48,20 @@ def add_table():
     try:
         payload = request.get_json()
         table = dict(family=payload["family"], name=payload["name"])
-        add_table_db(table)
+        if not add_table_db(table):
+            return jsonify({"error": "could not add table"}), 400
         return jsonify({"message": "success"}), 200
-    except:
+    except Exception as e:
+        print("Could not ad table. ", e)
         return jsonify({"error": "could not add table"}), 500
 
 
 @main_api.route("/tables", methods=["DELETE"])
 def delete_table():
     try:
-        table = dict(family=request.args.get('family'),
-                     name=request.args.get('name'))
-        delete_table_db(table)
+        table = json.loads(request.args.get('table'))
+        if not delete_table_db(table):
+            return jsonify({"error": "could not delete table"}), 500
         return jsonify({"message": "success"}), 200
     except:
         return jsonify({"error": "could not delete table"}), 500
@@ -78,17 +81,34 @@ def add_chain():
     try:
         payload = request.get_json()
         chain = dict(
-            table=json.loads(payload["table"]),
+            family=payload["table"].get("family"),
+            table=payload["table"].get("name"),
             name=payload["name"],
             type=payload.get("type"),
             hook=payload.get("hook"),
-            priority=payload.get("priority"),
+            prio=payload.get("priority"),
             policy=payload.get("policy"),
         )
-        add_chain_db(chain)
+        is_added = add_chain_db(chain)
+        if not is_added:
+            return jsonify({"error": "could not add chain"}), 400
         return jsonify({"message": "success"}), 200
-    except:
+    except Exception as e:
+        print("Could not add chain. ", e)
         return jsonify({"error": "could not add chain"}), 500
+
+
+@main_api.route("/chains", methods=["DELETE"])
+def delete_chain():
+    try:
+        chain = json.loads(request.args.get('chain'))
+        if not delete_chain_db(chain):
+            return jsonify({"error": "could not delete chain"}), 400
+        return jsonify({"message": "success"}), 200
+
+    except Exception as e:
+        print("Could not delete chain. ", e)
+        return jsonify({"error": "could not delete chain"}), 500
 
 
 @main_api.route("/rules")
@@ -106,7 +126,7 @@ def add_rule():
     try:
         payload = request.get_json()
         rule = dict(
-            chain=json.loads(payload["chain"]),
+            chain=payload["chain"],
             ip_src=payload.get("ip_src"),
             ip_dst=payload.get("ip_dst"),
             port_src=payload.get("port_src"),
@@ -117,7 +137,7 @@ def add_rule():
         )
         is_added = add_rule_db(rule)
         if not is_added:
-            return jsonify({"message": "could not add rule"}), 400
+            return jsonify({"error": "could not add rule"}), 400
         return jsonify({"message": "success"}), 200
     except:
         return jsonify({"error": "could not add rule"}), 500
@@ -126,8 +146,17 @@ def add_rule():
 @main_api.route("/rules", methods=["DELETE"])
 def delete_rule():
     try:
-        delete_rule_db()
+        query_rule = json.loads(request.args.get("rule"))
+        rule = dict(
+            family=query_rule.get('family'),
+            table=query_rule.get("table"),
+            chain=query_rule.get('chain'),
+            handle=query_rule.get("handle")
+        )
+        print(rule)
+        if not delete_rule_db(rule):
+            return jsonify({"error": "could not delete rule"}), 400
         return jsonify({"message": "Delete successfully"}), 200
     except Exception as e:
-        print(e)
+        print("Could not delete rule. ", e)
         return jsonify({"error": "could not delete rule"}), 500

@@ -8,6 +8,7 @@ export type TableType = {
 };
 
 export type ChainType = {
+  table_name?: string;
   table: TableType;
   family: string;
   name: string;
@@ -20,6 +21,7 @@ export type ChainType = {
 
 export type RuleType = {
   chain: ChainType;
+  chain_name: string;
   ip_src: string;
   ip_dst: string;
   port_src: string;

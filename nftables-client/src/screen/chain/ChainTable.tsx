@@ -1,12 +1,12 @@
 import { Box } from "@mui/material";
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
-import { request } from "lib";
+import { ChainType, request } from "lib";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
-import { getChains } from "store/reducers";
+import { getChains, setMessage } from "store/reducers";
 import { headers } from "./header";
 
 export function ChainTable(): React.ReactElement {
@@ -20,15 +20,29 @@ export function ChainTable(): React.ReactElement {
     navigate("/chains/add");
   };
 
-  const handleDelete = async () => {
+  const handleDelete = async (chain: ChainType) => {
     try {
-      const res = await request.delete("/chains");
+      console.log(chain)
+      const res = await request.delete("/chains", {
+        params: {
+          chain
+        }
+      });
+      if (res.status === 200) {
+        dispatch(
+          setMessage({
+            content: res.data.message,
+            type: "success",
+          })
+        );
+      }
+      dispatch(getChains({}));
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleRow = () => {
+  const handleSelectRow = () => {
     console.log('hello')
   }
 
@@ -39,7 +53,7 @@ export function ChainTable(): React.ReactElement {
         rows={chains}
         onActionAdd={handleAdd}
         onActionDelete={handleDelete}
-        onActionRow={handleRow}
+        onActionRow={handleSelectRow}
       />
     </Background>
   );

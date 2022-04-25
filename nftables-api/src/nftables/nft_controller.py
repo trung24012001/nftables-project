@@ -28,7 +28,6 @@ def add_table(table):
 def delete_table(table):
     data_structure = util.nft_handle_parser({"table": table}, "delete")
     ret = load_nft(data_structure)
-
     return ret
 
 
@@ -83,25 +82,23 @@ def get_chains_from_table(table=""):
 
 
 def add_chain(chain):
-    data_structure = util.nft_handle_parser({"chain": chain}, "add")
-    ret = load_nft(data_structure)
+    try:
+        data_structure = util.nft_handle_parser({"chain": chain}, "add")
+        ret = load_nft(data_structure)
+        return ret
+    except Exception as e:
+        print("Error: could not add chain to nft.", e)
+        return False
 
-    return ret
 
-
-def delete_chain(name, table):
-    data_structure = util.nft_handle_parser(
-        {
-            "table": {
-                "table": table,
-                "name": name,
-            }
-        },
-        "delete",
-    )
-    ret = load_nft(data_structure)
-
-    return ret
+def delete_chain(chain):
+    try:
+        data_structure = util.nft_handle_parser({"chain": chain}, "delete")
+        ret = load_nft(data_structure)
+        return ret
+    except Exception as e:
+        print("Error: could not delete chain to nft.", e)
+        return False
 
 
 def get_ruleset():
@@ -132,60 +129,11 @@ def get_ruleset():
 
 def add_filter_rule(rule):
     try:
-        port_prot = rule.get('port_prot')
-        family = rule["chain"].get("family")
-        rule_formater = {
-            "rule": {
-                "family": family,
-                "table": rule["chain"].get("table"),
-                "chain": rule["chain"].get("name"),
-                "expr": [],
-            }
-        }
-
-        if rule.get("ip_src"):
-            ip_src_match = {
-                "payload": {"protocol": family, "field": "saddr"},
-                "value": rule["ip_src"],
-            }
-            rule_formater["rule"]["expr"].append(
-                util.nft_expr_parser(ip_src_match))
-        if rule.get("ip_dst"):
-            ip_dst_match = {
-                "payload": {"protocol": family, "field": "daddr"},
-                "value": rule["ip_dst"],
-            }
-            rule_formater["rule"]["expr"].append(
-                util.nft_expr_parser(ip_dst_match))
-        if rule.get("protocol"):
-            protocol_match = {
-                "payload": {"protocol": family, "field": "protocol"},
-                "value": rule["protocol"],
-            }
-            rule_formater["rule"]["expr"].append(
-                util.nft_expr_parser(protocol_match))
-        if rule.get("port_src"):
-            port_src_match = {
-                "payload": {"protocol": port_prot, "field": "sport"},
-                "value": rule["port_src"],
-            }
-            rule_formater["rule"]["expr"].append(
-                util.nft_expr_parser(port_src_match))
-        if rule.get("port_dst"):
-            port_dst_match = {
-                "payload": {"protocol": port_prot, "field": "sport"},
-                "value": rule["port_dst"],
-            }
-            rule_formater["rule"]["expr"].append(
-                util.nft_expr_parser(port_dst_match))
-        if rule.get("policy"):
-            rule_formater["rule"]["expr"].append({rule["policy"]: None})
-
+        rule_formater = util.nft_rule_formater(rule)
         data_structure = util.nft_handle_parser(
             rule_formater,
             "add",
         )
-
         ret = load_nft(data_structure)
         return ret
     except Exception as e:
@@ -194,12 +142,15 @@ def add_filter_rule(rule):
 
 
 def delete_rule(rule):
-    data_structure = util.nft_handle_parser(
-        {
-            "rule": rule
-        },
-        "delete",
-    )
-    ret = load_nft(data_structure)
-
-    return ret
+    try:
+        data_structure = util.nft_handle_parser(
+            {
+                "rule": rule
+            },
+            "delete",
+        )
+        ret = load_nft(data_structure)
+        return ret
+    except Exception as e:
+        print("Error: could not delete rule to nft.", e)
+        return False

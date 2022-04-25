@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import {
   Box,
   Button,
   FormControl,
+  FormHelperText,
   FormLabel,
   Grid,
   IconButton,
@@ -22,15 +23,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { getChains, setMessage } from "store/reducers";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
-import AddContainer from "./AddContainer";
 import Background from "components/Layout/Background";
 import { FormListControl } from "components/FormListIControl";
 
 const validate = yup.object({
-  chain: yup.string().required("Chain is required"),
+  chain_name: yup.string().required("Chain is a required field"),
 });
 
-const POLICY_FILTER = ["accept", "drop", "reject"];
+const POLICY_FILTER = ["accept", "drop"];
 const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
 const PORT_PROTOCOL = ["tcp", "udp", "sctp"];
 
@@ -39,27 +39,25 @@ export function AddRule() {
   const dispatch = useDispatch();
   const chains = useSelector((state: RootState) => state.ruleset.chains);
   const [chainSelected, setChainSelected] = useState<ChainType | string>("");
-  const [protocolSelected, setProtocolSelected] = useState<string[]>([]);
-  const [protocolSelect, setProtocolSelect] = useState<string[]>(['']);
-  const [ipSrcSelected, setIpSrcSelected] = useState<string[]>([]);
+  const protocolRef = useRef<string[]>([]);
+  const ipSrcRef = useRef<string[]>([]);
+  const ipDstRef = useRef<string[]>([]);
+  const portSrcRef = useRef<string[]>([]);
+  const portDstRef = useRef<string[]>([]);
 
   const {
     register,
     handleSubmit,
-    reset,
     watch,
     setValue,
     formState: { errors },
   } = useForm<RuleType>({
     defaultValues: {
-      ip_src: "",
-      ip_dst: "",
-      port_src: "",
-      port_dst: "",
+      chain_name: "",
       port_prot: "",
-      policy: "accept",
+      policy: "",
     },
-    // resolver: yupResolver(validate),
+    resolver: yupResolver(validate)
   });
 
   useEffect(() => {
@@ -74,9 +72,17 @@ export function AddRule() {
   }, [watch]);
 
   const onSubmit: SubmitHandler<RuleType> = async (data) => {
-    console.log(data);
+    const payload = {
+      ...data,
+      chain: JSON.parse(chainSelected as string),
+      protocol: protocolRef.current,
+      ip_src: ipSrcRef.current,
+      ip_dst: ipDstRef.current,
+      port_src: portSrcRef.current,
+      port_dst: portDstRef.current,
+    }
     try {
-      const res = await request.post("/rules", data);
+      const res = await request.post("/rules", payload);
       if (res.status === 200) {
         dispatch(
           setMessage({
@@ -94,31 +100,34 @@ export function AddRule() {
         })
       );
     }
-    reset();
   };
 
   const onChainChange = (e: SelectChangeEvent<ChainType | string>) => {
     setChainSelected(e.target.value);
+    setValue('chain_name', 'has value')
   }
 
   const onProtocol = (protocols: string[]) => {
-    console.log(protocols);
+    protocolRef.current = protocols;
   }
 
   const onIpSrc = (ipSrc: string[]) => {
-    console.log(ipSrc)
+    ipSrcRef.current = ipSrc;
   }
 
   const onIpDst = (ipDst: string[]) => {
-    console.log(ipDst)
+    ipDstRef.current = ipDst;
   }
 
   const onPortSrc = (portSrc: string[]) => {
-    console.log(portSrc)
+    portSrcRef.current = portSrc;
+    if (portDstRef.current.length) {
+
+    }
   }
 
   const onPortDst = (portDst: string[]) => {
-    console.log(portDst)
+    portDstRef.current = portDst;
   }
 
   return (
@@ -134,8 +143,8 @@ export function AddRule() {
           <Stack spacing={2} width="70%" minWidth="600px">
             <FormControl fullWidth>
               <FormLabel>Chain</FormLabel>
-              <Select value={chainSelected} onChange={onChainChange} >
-                <MenuItem sx={{ opacity: 0.6 }}>
+              <Select value={chainSelected} onChange={onChainChange} error={!!errors.chain_name?.message} >
+                <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
                 {chains.map((chain: ChainType, idx: number) => (
@@ -147,6 +156,9 @@ export function AddRule() {
                   </MenuItem>
                 ))}
               </Select>
+              <FormHelperText error={!!errors.chain_name?.message}>
+                {errors.chain_name?.message}
+              </FormHelperText>
             </FormControl>
             <FormControl>
               <FormLabel>Policy</FormLabel>
@@ -161,31 +173,33 @@ export function AddRule() {
               </Select>
             </FormControl>
 
-            <FormControl>
-              <FormLabel>Port Protocol</FormLabel>
-              <Select value={watch("port_prot")} {...register("port_prot")}>
-                <MenuItem value="" sx={{ opacity: 0.6 }}>
-                  None
-                </MenuItem>
-                {PORT_PROTOCOL.map((p: string, idx: number) => (
-                  <MenuItem key={idx} value={p}>
-                    {p}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-            <FormListControl title='Protocol' options={PROTOCOL} onCallback={onProtocol} />
 
-            <Grid container justifyContent={"space-between"}>
-              <Grid item xs={5.5}>
-                <FormListControl title='IP source' type="textfield" onCallback={onIpSrc} />
-                <FormListControl title="Port source" type="textfield" onCallback={onPortDst} />
-              </Grid>
-              <Grid item xs={5.5}>
-                <FormListControl title='IP destination' type="textfield" onCallback={onIpDst} />
-                <FormListControl title='Port destination' type='textfield' onCallback={onPortSrc} />
-              </Grid>
-            </Grid>
+
+            <Stack direction='row'>
+              <FormListControl title='IP source' type="textfield" onCallback={onIpSrc} />
+              <FormListControl title='IP destination' type="textfield" onCallback={onIpDst} />
+              <FormListControl title='Protocol' options={PROTOCOL} onCallback={onProtocol} fullWidth />
+            </Stack>
+
+            <Stack direction={'row'}>
+              <FormListControl title="Port source" type="textfield" onCallback={onPortSrc} />
+              <FormListControl title='Port destination' type='textfield' onCallback={onPortDst} />
+              <FormControl fullWidth>
+                <FormLabel>Port Protocol</FormLabel>
+                <Select value={watch("port_prot")} {...register("port_prot")}>
+                  <MenuItem value="" sx={{ opacity: 0.6 }}>
+                    None
+                  </MenuItem>
+                  {PORT_PROTOCOL.map((p: string, idx: number) => (
+                    <MenuItem key={idx} value={p}>
+                      {p}
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Stack>
+
+
             <Button variant="contained" type="submit">
               Add
             </Button>
