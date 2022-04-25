@@ -19,13 +19,16 @@ export type HeaderType = {
 export function ReactTable({
   headers,
   rows,
-  handleActionAdd,
-  handleActionDelete,
+  onActionAdd,
+  onActionDelete,
+  onActionRow
+
 }: {
   headers: HeaderType[];
   rows: any[];
-  handleActionAdd?: () => void;
-  handleActionDelete?: (row: any) => void;
+  onActionAdd?: () => void;
+  onActionDelete?: (row: any) => void;
+  onActionRow?: () => void
 }): React.ReactElement {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -56,13 +59,13 @@ export function ReactTable({
 
   const handleDelete = () => {
     setAnchorMenu(null);
-    handleActionDelete && handleActionDelete(rowSelected);
+    onActionDelete && onActionDelete(rowSelected);
   };
 
   return (
     <Stack spacing={2}>
       <Box>
-        <IconButton onClick={handleActionAdd}>
+        <IconButton onClick={onActionAdd}>
           <AddCircleIcon />
         </IconButton>
       </Box>
@@ -81,7 +84,7 @@ export function ReactTable({
           <TableBody>
             {rows.map((row: any, idx: number) => {
               return (
-                <StyledTableRow key={idx}>
+                <StyledTableRow hover key={idx} onClick={onActionRow}>
                   {headers.map((header) => (
                     <TableCell key={header.access} align="left">
                       {row[header.access]}
@@ -128,10 +131,10 @@ const StyledTableCell = styled(TableCell)(({ theme }) => ({
 
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:nth-of-type(odd)": {
-    backgroundColor: theme.palette.action.hover,
+    backgroundColor: theme.palette.grey[50],
   },
-  // hide last border
   "&:last-child td, &:last-child th": {
     border: 0,
   },
+  cursor: 'pointer'
 }));

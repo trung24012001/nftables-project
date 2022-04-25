@@ -8,6 +8,7 @@ from src.service.http_controller import (
     get_ruleset_db,
     get_tables_db,
     add_rule_db,
+    delete_rule_db
 )
 import json
 
@@ -106,15 +107,27 @@ def add_rule():
         payload = request.get_json()
         rule = dict(
             chain=json.loads(payload["chain"]),
-            ip_src=payload.get("ipSrc"),
-            port_src=payload.get("portSrc"),
-            ip_dst=payload.get("ipDst"),
-            port_dst=payload.get("portDst"),
-            port_prot=payload.get("portProt"),
+            ip_src=payload.get("ip_src"),
+            ip_dst=payload.get("ip_dst"),
+            port_src=payload.get("port_src"),
+            port_dst=payload.get("port_dst"),
+            port_prot=payload.get("port_prot"),
             protocol=payload.get("protocol"),
             policy=payload.get("policy"),
         )
-        add_rule_db(rule)
+        is_added = add_rule_db(rule)
+        if not is_added:
+            return jsonify({"message": "could not add rule"}), 400
         return jsonify({"message": "success"}), 200
     except:
-        return jsonify({"error": "could not add chain"}), 500
+        return jsonify({"error": "could not add rule"}), 500
+
+
+@main_api.route("/rules", methods=["DELETE"])
+def delete_rule():
+    try:
+        delete_rule_db()
+        return jsonify({"message": "Delete successfully"}), 200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "could not delete rule"}), 500

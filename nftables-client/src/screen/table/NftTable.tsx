@@ -1,4 +1,5 @@
 import { Box, Toolbar } from "@mui/material";
+import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
 import { request, TableType } from "lib";
 import React, { useEffect } from "react";
@@ -6,21 +7,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 import { getTables, setMessage } from "store/reducers";
+import { headers } from "./header";
 
-const headers = [
-  {
-    name: "Family",
-    access: "family",
-  },
-  {
-    name: "Name",
-    access: "name",
-  },
-  {
-    name: "Handle",
-    access: "handle",
-  },
-];
 
 export function NftTable(): React.ReactElement {
   const tables = useSelector((state: RootState) => state.ruleset.tables);
@@ -67,13 +55,13 @@ export function NftTable(): React.ReactElement {
   };
 
   return (
-    <Box>
+    <Background title='Tables'>
       <ReactTable
         headers={headers}
         rows={tables}
-        handleActionAdd={handleAdd}
-        handleActionDelete={handleDelete}
+        onActionAdd={handleAdd}
+        onActionDelete={handleDelete}
       />
-    </Box>
+    </Background>
   );
 }

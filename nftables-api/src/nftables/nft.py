@@ -51,16 +51,3 @@ def load_nft(data_structure):
         print(f"WARNING: output: {output}")
 
     return True
-
-
-NFTABLES_JSON = """
-{ "nftables": [
-    {"add": { "table": {
-        "family": "inet",
-        "name": "mytable"
-    }}}
-   
-]}
-"""
-
-# load_nft(NFTABLES_JSON)

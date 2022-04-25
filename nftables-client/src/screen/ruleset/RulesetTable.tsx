@@ -1,54 +1,16 @@
 import { Box } from "@mui/material";
+import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
+import { request, RuleType } from "lib";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
-import { getRuleset } from "store/reducers";
+import { getRuleset, setMessage } from "store/reducers";
+import { headers } from "./header";
 
 export function RulesetTable(): React.ReactElement {
-  const headers = [
-    {
-      name: "Family",
-      access: "family",
-    },
-    {
-      name: "Table",
-      access: "table",
-    },
-    {
-      name: "Chain",
-      access: "chain",
-    },
-    {
-      name: "IPSrc",
-      access: "ip_src",
-    },
-    {
-      name: "PortSrc",
-      access: "port_src",
-    },
-    {
-      name: "IPDst",
-      access: "ip_dst",
-    },
-    {
-      name: "PortDst",
-      access: "port_dst",
-    },
-    {
-      name: "Protocol",
-      access: "protocol",
-    },
-    {
-      name: "Policy",
-      access: "policy",
-    },
-    {
-      name: "Handle",
-      access: "handle",
-    },
-  ];
+
   const rules = useSelector((state: RootState) => state.ruleset.rules);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -60,17 +22,32 @@ export function RulesetTable(): React.ReactElement {
     navigate("/rules/add");
   };
 
-  const handleDelete = () => {
-    navigate("/rules/add");
+  const handleDelete = async (rule: RuleType) => {
+    try {
+      console.log(rule)
+      // const res = await request.delete('/rules', {
+      //   params: {
+      //     rule
+      //   }
+      // })
+    } catch (error) {
+      console.log(error);
+      dispatch(
+        setMessage({
+          content: "Delete rule error",
+          type: "error",
+        })
+      );
+    }
   };
   return (
-    <Box>
+    <Background title="Ruleset">
       <ReactTable
         headers={headers}
         rows={rules}
-        handleActionAdd={handleAdd}
-        handleActionDelete={handleDelete}
+        onActionAdd={handleAdd}
+        onActionDelete={handleDelete}
       />
-    </Box>
+    </Background>
   );
 }

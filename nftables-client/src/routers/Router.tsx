@@ -7,13 +7,15 @@ import { AddTable, NftTable } from "screen/table";
 import { ChainTable } from "screen/chain";
 import { AddRule, RulesetTable } from "screen/ruleset";
 import { AddChain } from "screen/chain/AddChain";
+import { Overview } from "screen/overview";
 
 const Router: React.VFC = () => {
   return (
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<Layout />}>
-          <Route index element={<NftTable />} />
+          <Route index element={<Overview />} />
+          <Route path={routes.TABLE_ROUTE} element={<NftTable />} />
           <Route path={routes.CHAIN_ROUTE} element={<ChainTable />} />
           <Route path={routes.RULESET_ROUTE} element={<RulesetTable />} />
           <Route path={routes.ADD_TABLE_ROUTE} element={<AddTable />} />

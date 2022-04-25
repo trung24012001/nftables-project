@@ -29,7 +29,10 @@ def get_expr_value(expr, key):
             continue
         m_key = match.get("left").get("payload").get("field")
         if m_key == key:
-            return match.get("right")
+            right = match.get("right")
+            if isinstance(right, dict):
+                return right.get("set")
+            return [right]
     return None
 
 
@@ -38,11 +41,15 @@ def get_expr_prot(expr):
         match = object.get("match")
         if not match:
             continue
-        m_key = match.get("left").get("payload").get("field")
+        left = object.get("match").get("left")
+        right = object.get("match").get("right")
+        m_key = left.get("payload").get("field")
         if m_key == "sport" or m_key == "dport":
-            return match.get("left").get("payload").get("protocol")
+            return [left.get("payload").get("protocol")]
         if m_key == "protocol":
-            return match.get("right")
+            if isinstance(right, dict):
+                return right.get("set")
+            return [right]
     return None
 
 

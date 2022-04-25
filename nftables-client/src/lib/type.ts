@@ -20,13 +20,25 @@ export type ChainType = {
 
 export type RuleType = {
   chain: ChainType;
-  ipSrc: string;
-  portSrc: string;
-  ipDst: string;
-  portDst: string;
-  portProt: string;
-  handle: number;
+  ip_src: string;
+  ip_dst: string;
+  port_src: string;
+  port_dst: string;
+  port_prot: string;
   protocol: string;
+  handle: number;
+  policy: string;
+};
+
+export type RuleTypeResponse = {
+  chain: ChainType;
+  ip_src: string[];
+  ip_dst: string[];
+  port_src: string[];
+  port_dst: string[];
+  port_prot: string;
+  protocol: string[];
+  handle: number;
   policy: string;
 };
 

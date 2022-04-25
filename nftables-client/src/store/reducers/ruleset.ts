@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { request } from "lib";
+import { request, RuleTypeResponse } from "lib";
 import { ChainType, RuleType, TableType } from "lib";
 
 export interface IRuleState {
@@ -45,7 +45,16 @@ export const getRuleset = createAsyncThunk(
   async ({}: object, { rejectWithValue }) => {
     try {
       const res = await request.get("/rules");
-      return res.data;
+      return res.data.ruleset.map((rule: RuleTypeResponse) => {
+        return {
+          ...rule,
+          ip_src: rule.ip_src?.join(", "),
+          ip_dst: rule.ip_dst?.join(", "),
+          port_src: rule.port_src?.join(", "),
+          port_dst: rule.port_dst?.join(", "),
+          protocol: rule.protocol?.join(", "),
+        };
+      });
     } catch (err) {
       console.log(err);
       rejectWithValue(err);
@@ -74,7 +83,8 @@ export const rulesetSlice = createSlice({
       console.log("get rules rejected!");
     });
     builder.addCase(getRuleset.fulfilled, (state, action) => {
-      state.rules = action.payload.ruleset;
+      console.log(action.payload);
+      state.rules = action.payload;
     });
   },
 });

@@ -187,12 +187,19 @@ def add_filter_rule(rule):
         )
 
         ret = load_nft(data_structure)
-
         return ret
     except Exception as e:
         print("Error: could not add rule to nft.", e)
         return False
 
 
-def delete_rule():
-    print()
+def delete_rule(rule):
+    data_structure = util.nft_handle_parser(
+        {
+            "rule": rule
+        },
+        "delete",
+    )
+    ret = load_nft(data_structure)
+
+    return ret

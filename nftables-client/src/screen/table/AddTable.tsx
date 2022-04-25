@@ -22,6 +22,7 @@ import { useDispatch } from "react-redux";
 import { setMessage } from "store/reducers";
 import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { useNavigate } from "react-router-dom";
+import Background from "components/Layout/Background";
 
 const validate = yup.object({
   family: yup.string().required("Family is required"),
@@ -72,15 +73,8 @@ export function AddTable() {
   };
 
   return (
-    <>
-      <KeyboardBackspaceIcon
-        fontSize="large"
-        sx={{ mb: 5, cursor: "pointer" }}
-        onClick={() => {
-          navigate("/");
-        }}
-      />
-      <Page title="Add table">
+    <Background onClick={() => { navigate('/') }}>
+      <Page title="Add Table">
         <Box
           p={5}
           display="flex"
@@ -114,6 +108,6 @@ export function AddTable() {
           </Stack>
         </Box>
       </Page>
-    </>
+    </Background>
   );
 }

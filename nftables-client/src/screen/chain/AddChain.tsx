@@ -6,12 +6,10 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  Grid,
   MenuItem,
   Select,
   Stack,
   TextField,
-  Typography,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
 import { ChainType, request, TableType } from "lib";
@@ -19,9 +17,9 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
 import { getTables, setMessage } from "store/reducers";
-import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
+import Background from "components/Layout/Background";
 
 const validate = yup.object({
   table: yup.string().required("required table"),
@@ -97,14 +95,7 @@ export function AddChain() {
   }, [watch("type")]);
 
   return (
-    <>
-      <KeyboardBackspaceIcon
-        fontSize="large"
-        sx={{ mb: 5, cursor: "pointer" }}
-        onClick={() => {
-          navigate("/chains");
-        }}
-      />
+    <Background onClick={() => { navigate('/chains') }}>
       <Page title="Add chain">
         <Box
           p={5}
@@ -125,15 +116,13 @@ export function AddChain() {
             </FormControl>
             <FormControl fullWidth>
               <FormLabel>Table</FormLabel>
-              {tables.length && (
-                <Select value={watch("table")} {...register("table")}>
-                  {tables.map((table: TableType) => (
-                    <MenuItem key={table.name} value={JSON.stringify(table)}>
-                      {table.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              )}
+              <Select value={watch("table")} {...register("table")}>
+                {tables.map((table: TableType) => (
+                  <MenuItem key={table.name} value={JSON.stringify(table)}>
+                    {table.name}
+                  </MenuItem>
+                ))}
+              </Select>
             </FormControl>
             <FormControl>
               <FormLabel>Type</FormLabel>
@@ -183,6 +172,6 @@ export function AddChain() {
           </Stack>
         </Box>
       </Page>
-    </>
+    </Background>
   );
 }
