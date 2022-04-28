@@ -5,7 +5,12 @@ import { Forbidden } from "screen/forbidden";
 import { routes } from "lib";
 import { AddTable, NftTable } from "screen/table";
 import { ChainTable } from "screen/chain";
-import { AddRule, RulesetTable } from "screen/ruleset";
+import {
+  AddFirewallRule,
+  AddNatRule,
+  FirewallTable,
+  NatTable,
+} from "screen/ruleset";
 import { AddChain } from "screen/chain/AddChain";
 import { Overview } from "screen/overview";
 
@@ -17,10 +22,15 @@ const Router: React.VFC = () => {
           <Route index element={<Overview />} />
           <Route path={routes.TABLE_ROUTE} element={<NftTable />} />
           <Route path={routes.CHAIN_ROUTE} element={<ChainTable />} />
-          <Route path={routes.RULESET_ROUTE} element={<RulesetTable />} />
+          <Route path={routes.FIREWALL_ROUTE} element={<FirewallTable />} />
+          <Route path={routes.NAT_ROUTE} element={<NatTable />} />
           <Route path={routes.ADD_TABLE_ROUTE} element={<AddTable />} />
           <Route path={routes.ADD_CHAIN_ROUTE} element={<AddChain />} />
-          <Route path={routes.ADD_RULE_ROUTE} element={<AddRule />} />
+          <Route
+            path={routes.ADD_FIREWALL_ROUTE}
+            element={<AddFirewallRule />}
+          />
+          <Route path={routes.ADD_NAT_ROUTE} element={<AddNatRule />} />
         </Route>
         <Route path="/forbidden" element={<Forbidden />} />
         {/* <Route path="*" element={<Navigate to="/" replace />} /> */}

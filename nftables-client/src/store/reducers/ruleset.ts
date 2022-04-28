@@ -5,13 +5,15 @@ import { ChainType, RuleType, TableType } from "lib";
 export interface IRuleState {
   tables: TableType[];
   chains: ChainType[];
-  rules: RuleType[];
+  firewall_rules: RuleType[];
+  nat_rules: RuleType[];
 }
 
 const initialState: IRuleState = {
   tables: [],
   chains: [],
-  rules: [],
+  firewall_rules: [],
+  nat_rules: [],
 };
 
 export const getTables = createAsyncThunk(
@@ -83,7 +85,7 @@ export const rulesetSlice = createSlice({
       console.log("get rules rejected!");
     });
     builder.addCase(getRuleset.fulfilled, (state, action) => {
-      state.rules = action.payload;
+      state.firewall_rules = action.payload;
     });
   },
 });

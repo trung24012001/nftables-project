@@ -10,7 +10,7 @@ export type SidebarType = {
 
 export const sidebarItems: SidebarType[] = [
   {
-    name: "Overview",
+    name: "Anomaly",
     route: routes.OVERVIEW_ROUTE,
     icon: <InboxIcon />,
   },
@@ -22,11 +22,16 @@ export const sidebarItems: SidebarType[] = [
   {
     name: "Chains",
     route: routes.CHAIN_ROUTE,
-    icon: <InboxIcon />
+    icon: <InboxIcon />,
   },
   {
-    name: "Ruleset",
-    route: routes.RULESET_ROUTE,
-    icon: <InboxIcon />
-  }
+    name: "Firewall",
+    route: routes.FIREWALL_ROUTE,
+    icon: <InboxIcon />,
+  },
+  {
+    name: "Nat",
+    route: routes.NAT_ROUTE,
+    icon: <InboxIcon />,
+  },
 ];
