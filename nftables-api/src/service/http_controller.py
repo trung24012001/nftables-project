@@ -102,10 +102,11 @@ def delete_chain_db(chain):
         return False
 
 
-def get_ruleset_db():
+def get_ruleset_db(type):
     # query = session.query(Rule).all()
     # rules = util.query_to_str(query)
-    rules = nft.get_ruleset()
+    print(type)
+    rules = nft.get_ruleset(type)
     return rules
 
 

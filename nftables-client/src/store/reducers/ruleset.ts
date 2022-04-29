@@ -44,10 +44,12 @@ export const getChains = createAsyncThunk(
 
 export const getRuleset = createAsyncThunk(
   "/getRuleset",
-  async ({}: object, { rejectWithValue }) => {
+  async ({ type }: { type: string }, { rejectWithValue }) => {
     try {
-      const res = await request.get("/rules");
-      return res.data.ruleset.map((rule: RuleTypeResponse) => {
+      const res = await request.get("/rules", {
+        params: { type },
+      });
+      const rules = res.data.ruleset.map((rule: RuleTypeResponse) => {
         return {
           ...rule,
           ip_src: rule.ip_src?.join(", "),
@@ -57,6 +59,10 @@ export const getRuleset = createAsyncThunk(
           protocol: rule.protocol?.join(", "),
         };
       });
+      return {
+        rules,
+        type,
+      };
     } catch (err) {
       console.log(err);
       rejectWithValue(err);
@@ -85,7 +91,13 @@ export const rulesetSlice = createSlice({
       console.log("get rules rejected!");
     });
     builder.addCase(getRuleset.fulfilled, (state, action) => {
-      state.firewall_rules = action.payload;
+      const rules = action.payload?.rules;
+      const type = action.payload?.type;
+      if (type === "filter") {
+        state.firewall_rules = rules;
+      } else if (type === "nat") {
+        state.nat_rules = rules;
+      }
     });
   },
 });

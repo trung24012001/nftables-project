@@ -114,7 +114,7 @@ def delete_chain():
 @main_api.route("/rules")
 def get_all_ruleset():
     try:
-        ruleset = get_ruleset_db()
+        ruleset = get_ruleset_db(request.args.get("type"))
         return jsonify({"ruleset": ruleset}), 200
     except Exception as e:
         print(e)

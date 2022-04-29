@@ -53,10 +53,6 @@ def get_expr_value(expr, key):
                 data.append('-'.join(str(x)
                             for x in value.get("range")))
 
-            # if m_key == "sport" or m_key == "dport":
-            #     data.append('({})'.format(
-            #         match.get("left").get("payload").get("protocol")))
-
             return data
     return None
 
@@ -78,11 +74,12 @@ def get_expr_prot(expr):
     return None
 
 
-def get_expr_policy(expr):
-    policy = list(expr[-1].keys())[0]
-    if (policy in ['accept', 'drop']):
-        return policy
-    return ''
+def get_expr_action(expr, actions):
+    for object in expr:
+        for type in actions:
+            if type in object:
+                return type
+    return ""
 
 
 def nft_rule_formater(rule):

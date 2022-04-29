@@ -101,12 +101,21 @@ def delete_chain(chain):
         return False
 
 
-def get_ruleset():
+def get_ruleset(type='filter'):
     data_structure = read_nft("list ruleset")
     rules = []
+    action = []
+    if type == 'filter':
+        action = ['accept', 'drop']
+    elif type == 'nat':
+        action = ["snat", "dnat", "masquerade", "redirect"]
+
     for object in data_structure["nftables"]:
         rule = object.get("rule")
         if not rule:
+            continue
+
+        if not find_rule_type(rule, type):
             continue
 
         rules.append(
@@ -120,11 +129,60 @@ def get_ruleset():
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
                 protocol=util.get_expr_prot(rule.get("expr")),
-                policy=util.get_expr_policy(rule.get("expr"))
+                action=util.get_expr_action(
+                    rule.get("expr"), action),
             )
         )
 
     return rules
+
+
+def get_nat_rules(type='nat'):
+    data_structure = read_nft("list ruleset")
+    rules = []
+    nat_action = ["snat", "dnat", "masquerade", "redirect"]
+    for object in data_structure["nftables"]:
+        rule = object.get("rule")
+        if not rule:
+            continue
+
+        if not find_rule_type(rule, type):
+            continue
+
+        rules.append(
+            dict(
+                family=rule["family"],
+                table=rule["table"],
+                chain=rule["chain"],
+                handle=rule["handle"],
+                ip_src=util.get_expr_value(rule.get("expr"), "saddr"),
+                ip_dst=util.get_expr_value(rule.get("expr"), "daddr"),
+                port_src=util.get_expr_value(rule.get("expr"), "sport"),
+                port_dst=util.get_expr_value(rule.get("expr"), "dport"),
+                protocol=util.get_expr_prot(rule.get("expr")),
+                action=util.get_expr_action(
+                    rule.get("expr"), nat_action),
+            )
+        )
+
+    print(rules)
+    return rules
+
+
+def find_rule_type(rule, type):
+    data_structure = read_nft("list chains")
+    for object in data_structure["nftables"]:
+        chain = object.get('chain')
+        if not chain:
+            continue
+        if chain["family"] == rule["family"] and \
+                chain["table"] == rule["table"] and \
+                chain["name"] == rule["chain"]:
+            print(chain)
+            if chain["type"] == type:
+                return True
+            return False
+    return False
 
 
 def add_filter_rule(rule):
