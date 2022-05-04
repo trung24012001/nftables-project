@@ -14,7 +14,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { ChainType, request, routes, RuleType, TableType } from "lib";
+import { ChainType, request, routes, NatRuleType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,11 +50,12 @@ export function AddNatRule() {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<RuleType>({
+  } = useForm<NatRuleType>({
     defaultValues: {
       chain_name: "",
       port_prot: "",
       policy: "",
+      to: "",
     },
     resolver: yupResolver(validate),
   });
@@ -70,7 +71,7 @@ export function AddNatRule() {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  const onSubmit: SubmitHandler<RuleType> = async (data) => {
+  const onSubmit: SubmitHandler<NatRuleType> = async (data) => {
     const payload = {
       ...data,
       chain: JSON.parse(chainSelected as string),
@@ -81,7 +82,7 @@ export function AddNatRule() {
       port_dst: portDstRef.current,
     };
     try {
-      const res = await request.post("/rules", payload);
+      const res = await request.post("/rules/nat", payload);
       if (res.status === 200) {
         dispatch(
           setMessage({
@@ -197,7 +198,8 @@ export function AddNatRule() {
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>To</FormLabel>
-                <TextField disabled={!watch("policy")} />
+                <TextField disabled={!watch("policy")} value={watch("to")}
+                  {...register("to")} />
               </FormControl>
             </Stack>
 

@@ -1,4 +1,4 @@
-export * from "./FirewallTable";
+export * from "./FilterTable";
 export * from "./NatTable";
-export * from "./AddFirewallRule";
+export * from "./AddFilterRule";
 export * from "./AddNatRule";

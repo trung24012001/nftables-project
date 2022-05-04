@@ -1,5 +1,4 @@
 import { AlertColor } from "@mui/material";
-import { type } from "os";
 
 export type TableType = {
   family: string;
@@ -19,7 +18,7 @@ export type ChainType = {
   policy: string;
 };
 
-export type RuleType = {
+export type FilterRuleType = {
   chain: ChainType;
   chain_name: string;
   ip_src: string;
@@ -30,6 +29,20 @@ export type RuleType = {
   protocol: string;
   handle: number;
   policy: string;
+};
+
+export type NatRuleType = {
+  chain: ChainType;
+  chain_name: string;
+  ip_src: string;
+  ip_dst: string;
+  port_src: string;
+  port_dst: string;
+  port_prot: string;
+  protocol: string;
+  handle: number;
+  policy: string;
+  to: string;
 };
 
 export type RuleTypeResponse = {
