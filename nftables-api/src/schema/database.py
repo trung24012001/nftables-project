@@ -36,7 +36,7 @@ class Table(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     family = sa.Column(sa.String(255), default="ip", nullable=False)
     name = sa.Column(sa.String(255), nullable=False)
-    handle = sa.Column(sa.Integer)
+    handle = sa.Column(sa.Integer, nullable=False)
 
     chains = relationship("Chain", back_populates="table")
 
@@ -51,22 +51,21 @@ class Chain(Base):
     __tablename__ = "chains"
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String(255), nullable=False)
-    handle = sa.Column(sa.Integer)
+    handle = sa.Column(sa.Integer, nullable=False)
     type = sa.Column(
         sa.String(255),
         nullable=False,
-        default="filter",
     )
     hook = sa.Column(sa.String(255), nullable=False)
-    priority = sa.Column(sa.Integer, default=0)
-    policy = sa.Column(sa.String(255), default="accept")
+    priority = sa.Column(sa.Integer)
+    policy = sa.Column(sa.String(255))
     table_id = sa.Column(sa.Integer, sa.ForeignKey(
         "tables.id", ondelete="CASCADE"), nullable=False)
     table = relationship("Table", back_populates="chains")
     rules = relationship("Rule", back_populates="chain")
 
     __table_args__ = (
-        UniqueConstraint("name", "type", "hook", "table_id",
+        UniqueConstraint("name", "handle", "table_id",
                          name="_customer_chain_uc"),
     )
 
@@ -84,20 +83,43 @@ class IpDst(Base):
     rule = relationship("Rule", back_populates="ip_dst_list")
 
     def __repr__(self):
-        return "<IpDest(host={self.host!r})>".format(self=self)
+        return "<IpDst(host={self.host!r})>".format(self=self)
 
 
 class IpSrc(Base):
     __tablename__ = "ip_src"
     id = sa.Column(sa.Integer, primary_key=True)
     host = sa.Column(sa.String(255))
-    port = sa.Column(sa.String(255))
     rule_id = sa.Column(sa.Integer, sa.ForeignKey(
         "rules.id", ondelete="CASCADE"))
     rule = relationship("Rule", back_populates="ip_src_list")
 
     def __repr__(self):
-        return "<IpSource(host={self.host!r})>".format(self=self)
+        return "<IpSrc(host={self.port!r})>".format(self=self)
+
+
+class PortSrc(Base):
+    __tablename__ = "port_src"
+    id = sa.Column(sa.Integer, primary_key=True)
+    port = sa.Column(sa.String(255))
+    rule_id = sa.Column(sa.Integer, sa.ForeignKey(
+        "rules.id", ondelete="CASCADE"))
+    rule = relationship("Rule", back_populates="port_src_list")
+
+    def __repr__(self):
+        return "<PortSrc(host={self.port!r})>".format(self=self)
+
+
+class PortSrc(Base):
+    __tablename__ = "port_dst"
+    id = sa.Column(sa.Integer, primary_key=True)
+    port = sa.Column(sa.String(255))
+    rule_id = sa.Column(sa.Integer, sa.ForeignKey(
+        "rules.id", ondelete="CASCADE"))
+    rule = relationship("Rule", back_populates="port_dst_list")
+
+    def __repr__(self):
+        return "<PortDst(host={self.host!r})>".format(self=self)
 
 
 class Rule(Base):
@@ -105,12 +127,14 @@ class Rule(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     protocol = sa.Column(sa.String(255))
     policy = sa.Column(sa.String(255))
-    handle = sa.Column(sa.Integer)
+    handle = sa.Column(sa.Integer, nullable=False)
     chain_id = sa.Column(sa.Integer, sa.ForeignKey(
         "chains.id", ondelete="CASCADE"))
     chain = relationship("Chain", back_populates="rules")
     ip_src_list = relationship("IpSrc", back_populates="rule")
     ip_dst_list = relationship("IpDst", back_populates="rule")
+    port_src_list = relationship("PortSrc", back_populates="rule")
+    port_dst_list = relationship("PortDst", back_populates="rule")
 
     def __repr__(self):
         return "<Rule(policy={self.policy!r})>".format(self=self)

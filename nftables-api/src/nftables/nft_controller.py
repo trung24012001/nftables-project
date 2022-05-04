@@ -118,7 +118,9 @@ def get_chain(data):
         chain = object.get("chain")
         if not chain:
             continue
-        if chain["family"] == data["family"] and chain["name"] == data["name"] and chain["table"] == data["table"]:
+        if chain["family"] == data["family"] and \
+                chain["name"] == data["name"] and \
+                chain["table"] == data["table"]:
             return chain
     return None
 

@@ -98,16 +98,28 @@ def insert_rule(rule, chain_db, table_db):
                 for new_ip_dst in util.decompose_ip(rule.get("ip_dst")) or ['']:
                     if new_ip_src:
                         ip_src = IpSrc(
-                            host=new_ip_src, port=rule.get("port_src")
+                            host=new_ip_src
                         )
                         rule_db.ip_src_list.append(ip_src)
                     if new_ip_dst:
                         ip_dst = IpDst(
-                            host=new_ip_dst, port=rule.get("port_dst")
+                            host=new_ip_dst
                         )
                         rule_db.ip_dst_list.append(ip_dst)
-                    chain_db.rules.append(rule_db)
-                    table_db.chains.append(chain_db)
+            for new_port_src in util.decompose_ip(rule.get("port_src")) or ['']:
+                for new_port_dst in util.decompose_ip(rule.get("port_dst")) or ['']:
+                    if new_port_src:
+                        posr_src = IpSrc(
+                            port=new_port_src
+                        )
+                        rule_db.port_src_list.append(posr_src)
+                    if new_port_dst:
+                        port_dst = IpDst(
+                            host=new_port_dst
+                        )
+                        rule_db.port_dst_list.append(port_dst)
+        chain_db.rules.append(rule_db)
+        table_db.chains.append(chain_db)
         session.add(table_db)
         session.commit()
         return rule_db

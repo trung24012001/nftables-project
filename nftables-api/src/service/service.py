@@ -17,24 +17,6 @@ import json
 main_api = Blueprint("api", __name__)
 
 
-@main_api.route("/sync-to-db")
-def sync_database():
-    try:
-        sync_nft_to_db()
-        return jsonify({"message": "sync successfully"}), 200
-    except:
-        return jsonify({"error": "sync interrupted"}), 500
-
-
-@main_api.route("/sync-to-nft")
-def sync_nft():
-    try:
-        sync_db_to_nft()
-        return jsonify({"message": "sync successfully"}), 200
-    except Exception as e:
-        return jsonify({"error": "sync interrupted"}), 500
-
-
 @main_api.route("/anomaly")
 def get_anomaly():
     try:
