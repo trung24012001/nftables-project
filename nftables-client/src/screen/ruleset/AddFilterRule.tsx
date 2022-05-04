@@ -15,7 +15,7 @@ import {
   styled,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { ChainType, request, routes, RuleType, TableType } from "lib";
+import { ChainType, request, routes, FilterRuleType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -50,7 +50,7 @@ export function AddFirewallRule() {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<RuleType>({
+  } = useForm<FilterRuleType>({
     defaultValues: {
       chain_name: "",
       port_prot: "",
@@ -70,7 +70,7 @@ export function AddFirewallRule() {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  const onSubmit: SubmitHandler<RuleType> = async (data) => {
+  const onSubmit: SubmitHandler<FilterRuleType> = async (data) => {
     const payload = {
       ...data,
       chain: JSON.parse(chainSelected as string),
@@ -81,7 +81,7 @@ export function AddFirewallRule() {
       port_dst: portDstRef.current,
     };
     try {
-      const res = await request.post("/rules", payload);
+      const res = await request.post("/rules/filter", payload);
       if (res.status === 200) {
         dispatch(
           setMessage({

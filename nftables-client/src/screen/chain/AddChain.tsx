@@ -34,7 +34,7 @@ const validate = yup.object({
 const TYPE = ["filter", "nat"];
 const HOOK_FILTER = ["input", "forward", "output"];
 const HOOK_NAT = ["prerouting", "output", "postrouting"];
-const POLICY_FILTER = ["accept", "drop", "reject"];
+const POLICY_FILTER = ["accept", "drop"];
 
 export function AddChain() {
   const navigate = useNavigate();

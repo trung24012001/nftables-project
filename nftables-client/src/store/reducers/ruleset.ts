@@ -1,18 +1,18 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { request, RuleTypeResponse } from "lib";
-import { ChainType, RuleType, TableType } from "lib";
+import { ChainType, FilterRuleType, NatRuleType, TableType } from "lib";
 
 export interface IRuleState {
   tables: TableType[];
   chains: ChainType[];
-  firewall_rules: RuleType[];
-  nat_rules: RuleType[];
+  filter_rules: FilterRuleType[];
+  nat_rules: NatRuleType[];
 }
 
 const initialState: IRuleState = {
   tables: [],
   chains: [],
-  firewall_rules: [],
+  filter_rules: [],
   nat_rules: [],
 };
 
@@ -94,7 +94,7 @@ export const rulesetSlice = createSlice({
       const rules = action.payload?.rules;
       const type = action.payload?.type;
       if (type === "filter") {
-        state.firewall_rules = rules;
+        state.filter_rules = rules;
       } else if (type === "nat") {
         state.nat_rules = rules;
       }

@@ -1,7 +1,6 @@
-import { Box } from "@mui/material";
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
-import { request, routes, RuleType } from "lib";
+import { request, routes } from "lib";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";

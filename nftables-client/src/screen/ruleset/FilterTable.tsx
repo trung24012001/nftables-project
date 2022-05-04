@@ -1,7 +1,7 @@
 import { Box } from "@mui/material";
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
-import { request, routes, RuleType } from "lib";
+import { request, routes } from "lib";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -11,7 +11,7 @@ import { firewallHeaders } from "./header";
 
 export function FirewallTable(): React.ReactElement {
   const firewallRules = useSelector(
-    (state: RootState) => state.ruleset.firewall_rules
+    (state: RootState) => state.ruleset.filter_rules
   );
   const dispatch = useDispatch();
   const navigate = useNavigate();
