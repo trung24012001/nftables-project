@@ -1,5 +1,4 @@
 from flask import Blueprint, jsonify, request
-from src.lib.sync import sync_nft_to_db, sync_db_to_nft
 from src.service.http_controller import (
     add_table_db,
     add_chain_db,
@@ -8,7 +7,7 @@ from src.service.http_controller import (
     get_chains_db,
     get_ruleset_db,
     get_tables_db,
-    add_rule_db,
+    add_rule_controller,
     delete_rule_db,
     get_anomaly_db
 )
@@ -114,8 +113,8 @@ def get_all_ruleset():
         return jsonify({"error": "could not get rules"}), 500
 
 
-@main_api.route("/rules", methods=["POST"])
-def add_rule():
+@main_api.route("/rules/filter", methods=["POST"])
+def add_filter_rule():
     try:
         payload = request.get_json()
         rule = dict(
@@ -126,9 +125,33 @@ def add_rule():
             port_dst=payload.get("port_dst"),
             port_prot=payload.get("port_prot"),
             protocol=payload.get("protocol"),
-            policy=payload.get("action"),
+            policy=payload.get("policy"),
         )
-        is_added = add_rule_db(rule)
+        is_added = add_rule_controller(rule, type='filter')
+        if not is_added:
+            return jsonify({"error": "could not add rule"}), 400
+        return jsonify({"message": "success"}), 200
+    except:
+        return jsonify({"error": "could not add rule"}), 500
+
+
+@main_api.route("/rules/nat", methods=["POST"])
+def add_nat_rule():
+    try:
+        payload = request.get_json()
+        rule = dict(
+            chain=payload["chain"],
+            ip_src=payload.get("ip_src"),
+            ip_dst=payload.get("ip_dst"),
+            port_src=payload.get("port_src"),
+            port_dst=payload.get("port_dst"),
+            port_prot=payload.get("port_prot"),
+            protocol=payload.get("protocol"),
+            policy=payload.get("policy"),
+            to=payload.get("to")
+
+        )
+        is_added = add_rule_controller(rule, type='nat')
         if not is_added:
             return jsonify({"error": "could not add rule"}), 400
         return jsonify({"message": "success"}), 200

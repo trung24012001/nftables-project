@@ -33,6 +33,8 @@ def nft_expr_parser(data):
 
 
 def get_expr_value(expr, key):
+    if not expr:
+        return None
     for object in expr:
         match = object.get("match")
         if not match:
@@ -58,6 +60,9 @@ def get_expr_value(expr, key):
 
 
 def get_expr_prot(expr):
+    if not expr:
+        return None
+
     for object in expr:
         match = object.get("match")
         if not match:
@@ -74,19 +79,20 @@ def get_expr_prot(expr):
     return None
 
 
-def get_expr_action(expr, actions):
+def get_expr_policy(expr, actions, default_policy):
+    if not expr:
+        return None
     for object in expr:
         for type in actions:
             if type in object:
                 return type
-    return ""
+    return default_policy
 
 
-def nft_rule_formater(rule):
-    print(rule)
+def nft_rule_formatter(rule):
     port_prot = rule.get('port_prot')
     family = rule["chain"].get("family")
-    rule_formater = {
+    rule_formatter = {
         "rule": {
             "family": family,
             "table": rule["chain"].get("table"),
@@ -132,9 +138,17 @@ def nft_rule_formater(rule):
     if rule.get("policy"):
         expr.append({rule["policy"]: None})
 
-    rule_formater["rule"]["expr"] = expr
+    rule_formatter["rule"]["expr"] = expr
 
-    return rule_formater
+    return rule_formatter
+
+
+def filter_rule_formatter(rule):
+    return nft_rule_formatter(rule)
+
+
+def nat_rule_formatter(rule):
+    return nft_rule_formatter(rule)
 
 
 def decompose_range(data):
@@ -152,10 +166,25 @@ def decompose_range(data):
 
 def decompose_ip(array):
     if not array:
-        return None
+        return ['']
     arr = []
     for item in array:
         if item.find('-') < 0:
+            arr.append(item)
+            continue
+        range_arr = item.split('-')
+        print(range_arr)
+        for item in range_arr:
+            arr.append(item)
+    return arr
+
+
+def decompose_port(array):
+    if not array:
+        return ['']
+    arr = []
+    for item in array:
+        if str(item).find('-') < 0:
             arr.append(item)
             continue
         range_arr = item.split('-')

@@ -139,8 +139,13 @@ def get_ruleset(type='filter', cmd='list ruleset'):
         if not rule:
             continue
 
-        if not find_rule_type(rule, type):
+        if not check_rule_type(rule, type):
             continue
+
+        raw_chain = get_chain(
+            dict(family=rule["family"], table=rule["table"], name=rule["chain"]))
+
+        print('kakaka', rule)
 
         rules.append(
             dict(
@@ -153,8 +158,8 @@ def get_ruleset(type='filter', cmd='list ruleset'):
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
                 protocol=util.get_expr_prot(rule.get("expr")),
-                policy=util.get_expr_action(
-                    rule.get("expr"), action),
+                policy=util.get_expr_policy(
+                    rule.get("expr"), action, default_policy=raw_chain["policy"]),
             )
         )
 
@@ -170,7 +175,7 @@ def get_nat_rules(type='nat'):
         if not rule:
             continue
 
-        if not find_rule_type(rule, type):
+        if not check_rule_type(rule, type):
             continue
 
         rules.append(
@@ -184,7 +189,7 @@ def get_nat_rules(type='nat'):
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
                 protocol=util.get_expr_prot(rule.get("expr")),
-                policy=util.get_expr_action(
+                policy=util.get_expr_policy(
                     rule.get("expr"), nat_action),
             )
         )
@@ -193,7 +198,7 @@ def get_nat_rules(type='nat'):
     return rules
 
 
-def find_rule_type(rule, type):
+def check_rule_type(rule, type):
     data_structure = read_nft("list chains")
     for object in data_structure["nftables"]:
         chain = object.get('chain')
@@ -209,11 +214,14 @@ def find_rule_type(rule, type):
     return False
 
 
-def add_filter_rule(rule):
+def add_rule(rule, type):
     try:
-        rule_formater = util.nft_rule_formater(rule)
+        if type == 'filter':
+            rule_formatter = util.filter_rule_formatter(rule)
+        elif type == 'nat':
+            rule_formatter = util.filter_rule_formatter(rule)
         data_structure = util.nft_handle_parser(
-            rule_formater,
+            rule_formatter,
             "add",
         )
         ret = load_nft(data_structure)

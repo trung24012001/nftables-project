@@ -1,5 +1,5 @@
 from sqlalchemy import table
-from src.schema.database import IpDst, IpSrc, Table, Chain, Rule, session
+from src.schema.database import IpDst, IpSrc, PortSrc, PortDst, Table, Chain, Rule, session
 import src.nftables.nft_controller as nft
 import src.lib.util as util
 
@@ -94,8 +94,8 @@ def insert_rule(rule, chain_db, table_db):
                 policy=rule.get("policy"),
                 handle=rule["handle"]
             )
-            for new_ip_src in util.decompose_ip(rule.get("ip_src")) or ['']:
-                for new_ip_dst in util.decompose_ip(rule.get("ip_dst")) or ['']:
+            for new_ip_src in util.decompose_ip(rule.get("ip_src")):
+                for new_ip_dst in util.decompose_ip(rule.get("ip_dst")):
                     if new_ip_src:
                         ip_src = IpSrc(
                             host=new_ip_src
@@ -106,16 +106,18 @@ def insert_rule(rule, chain_db, table_db):
                             host=new_ip_dst
                         )
                         rule_db.ip_dst_list.append(ip_dst)
-            for new_port_src in util.decompose_ip(rule.get("port_src")) or ['']:
-                for new_port_dst in util.decompose_ip(rule.get("port_dst")) or ['']:
+            for new_port_src in util.decompose_port(rule.get("port_src")):
+                for new_port_dst in util.decompose_port(rule.get("port_dst")):
                     if new_port_src:
-                        posr_src = IpSrc(
-                            port=new_port_src
+                        posr_src = PortSrc(
+                            port=new_port_src,
+                            protocol=rule["port_prot"]
                         )
                         rule_db.port_src_list.append(posr_src)
                     if new_port_dst:
-                        port_dst = IpDst(
-                            host=new_port_dst
+                        port_dst = PortDst(
+                            host=new_port_dst,
+                            protocol=rule["port_prot"]
                         )
                         rule_db.port_dst_list.append(port_dst)
         chain_db.rules.append(rule_db)
@@ -235,41 +237,11 @@ def get_ruleset_db(type):
     return rules
 
 
-def add_rule_db(rule):
+def add_rule_controller(rule, type):
     try:
-        # chain = (
-        #     session.query(Chain)
-        #     .filter(
-        #         Chain.name.like(rule["chain"].get("name")),
-        #         Chain.table.has(name=rule["chain"].get("table"),
-        #                         family=rule["chain"].get("family")),
-        #     )
-        #     .first()
-        # )
-
-        # new_rule = Rule(
-        #     protocol=rule.get("protocol"),
-        #     policy=rule.get("policy"),
-        # )
-
-        # ip_src = IpSrc(
-        #     host=rule.get("ip_src"), port=rule.get("port_src")
-        # )
-
-        # ip_dst = IpDst(
-        #     host=rule.get("ip_dst"), port=rule.get("port_dst")
-        # )
-
-        # new_rule.ip_src_list.append(ip_src)
-        # new_rule.ip_dst_list.append(ip_dst)
-        # chain.rules.append(new_rule)
-        # session.add(chain)
-        # session.flush()
-        is_added = nft.add_filter_rule(rule)
+        is_added = nft.add_rule(rule, type)
         if not is_added:
             raise Exception("Could not add rule to nft")
-
-        # session.commit()
         return True
     except Exception as e:
         session.rollback()

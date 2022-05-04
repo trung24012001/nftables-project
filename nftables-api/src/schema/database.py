@@ -95,7 +95,7 @@ class IpSrc(Base):
     rule = relationship("Rule", back_populates="ip_src_list")
 
     def __repr__(self):
-        return "<IpSrc(host={self.port!r})>".format(self=self)
+        return "<IpSrc(host={self.host!r})>".format(self=self)
 
 
 class PortSrc(Base):
@@ -110,7 +110,7 @@ class PortSrc(Base):
         return "<PortSrc(host={self.port!r})>".format(self=self)
 
 
-class PortSrc(Base):
+class PortDst(Base):
     __tablename__ = "port_dst"
     id = sa.Column(sa.Integer, primary_key=True)
     port = sa.Column(sa.String(255))
@@ -119,7 +119,7 @@ class PortSrc(Base):
     rule = relationship("Rule", back_populates="port_dst_list")
 
     def __repr__(self):
-        return "<PortDst(host={self.host!r})>".format(self=self)
+        return "<PortDst(host={self.port!r})>".format(self=self)
 
 
 class Rule(Base):
