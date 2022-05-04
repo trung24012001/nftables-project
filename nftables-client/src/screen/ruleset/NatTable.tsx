@@ -49,7 +49,7 @@ export function NatTable(): React.ReactElement {
     }
   };
   return (
-    <Background title="Ruleset">
+    <Background title="Nat Ruleset">
       <ReactTable
         headers={natHeaders}
         rows={natRules}

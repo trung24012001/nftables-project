@@ -13,10 +13,9 @@ import {
   SelectChangeEvent,
   Stack,
   styled,
-  TextField,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { ChainType, request, RuleType, TableType } from "lib";
+import { ChainType, request, routes, RuleType, TableType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -24,13 +23,13 @@ import { getChains, setMessage } from "store/reducers";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 import Background from "components/Layout/Background";
-import { FormListControl } from "components/FormListIControl";
+import { FormListControl } from "components/FormListControl";
 
 const validate = yup.object({
   chain_name: yup.string().required("Chain is a required field"),
 });
 
-const POLICY_FILTER = ["accept", "drop"];
+const ACTION_FILTER = ["accept", "drop"];
 const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
 const PORT_PROTOCOL = ["tcp", "udp", "sctp"];
 
@@ -55,7 +54,7 @@ export function AddFirewallRule() {
     defaultValues: {
       chain_name: "",
       port_prot: "",
-      policy: "",
+      action: "",
     },
     resolver: yupResolver(validate),
   });
@@ -65,7 +64,7 @@ export function AddFirewallRule() {
   }, []);
 
   useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
+    const subscription = watch((value, { name }) => {
       name === "port_prot" && setValue("protocol", value.port_prot as string);
     });
     return () => subscription.unsubscribe();
@@ -132,10 +131,10 @@ export function AddFirewallRule() {
   return (
     <Background
       onClick={() => {
-        navigate("/rules");
+        navigate(routes.FIREWALL_ROUTE);
       }}
     >
-      <Page title="Add Rule">
+      <Page title="Add Firewall Rule">
         <Box
           p={5}
           display="flex"
@@ -154,25 +153,28 @@ export function AddFirewallRule() {
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
-                {chains.map((chain: ChainType, idx: number) => (
-                  <MenuItem key={idx} value={JSON.stringify(chain)}>
-                    {chain.name}
-                    <MenuSubTitle>
-                      family: {chain.family}; table: {chain.table}; hook:{" "}
-                      {chain.hook}; priority: {chain.priority}; policy:{" "}
-                      {chain.policy}
-                    </MenuSubTitle>
-                  </MenuItem>
-                ))}
+                {chains.map((chain: ChainType, idx: number) => {
+                  if (chain.type !== 'filter') return;
+                  return (
+                    <MenuItem key={idx} value={JSON.stringify(chain)}>
+                      {chain.name}
+                      <MenuSubTitle>
+                        table: {chain.family} {chain.table}; hook:{" "}
+                        {chain.hook}; priority: {chain.priority}; policy:{" "}
+                        {chain.policy}
+                      </MenuSubTitle>
+                    </MenuItem>
+                  )
+                })}
               </Select>
               <FormHelperText error={!!errors.chain_name?.message}>
                 {errors.chain_name?.message}
               </FormHelperText>
             </FormControl>
             <FormControl>
-              <FormLabel>Policy</FormLabel>
-              <Select value={watch("policy")} {...register("policy")}>
-                {POLICY_FILTER.map((p: string) => {
+              <FormLabel>Action</FormLabel>
+              <Select value={watch("action")} {...register("action")}>
+                {ACTION_FILTER.map((p: string) => {
                   return (
                     <MenuItem key={p} value={p}>
                       {p}

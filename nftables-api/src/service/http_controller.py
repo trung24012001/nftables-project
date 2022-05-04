@@ -3,6 +3,11 @@ import src.nftables.nft_controller as nft
 import src.lib.util as util
 
 
+def get_anomaly_db():
+
+    return []
+
+
 def get_tables_db():
     # query = session.query(Table).all()
     # tables = util.query_to_str(query)

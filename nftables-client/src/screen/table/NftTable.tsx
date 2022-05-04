@@ -2,6 +2,7 @@ import { Box, Toolbar } from "@mui/material";
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
 import { request, TableType } from "lib";
+import { useFetchData } from "lib/hooks";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -11,13 +12,20 @@ import { headers } from "./header";
 
 
 export function NftTable(): React.ReactElement {
-  const tables = useSelector((state: RootState) => state.ruleset.tables);
+  // const tables = useSelector((state: RootState) => state.ruleset.tables);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    dispatch(getTables({}));
-  }, []);
+  // useEffect(() => {
+  //   dispatch(getTables({}));
+  // }, []);
+
+  const { data, loading } = useFetchData<{ tables: TableType[] }>({
+    path: '/tables',
+    onError: (error) => {
+      console.log(error)
+    }
+  })
 
   const handleAdd = () => {
     console.log("hello");
@@ -55,7 +63,8 @@ export function NftTable(): React.ReactElement {
     <Background title='Tables'>
       <ReactTable
         headers={headers}
-        rows={tables}
+        rows={data?.tables}
+        loading={loading}
         onActionAdd={handleAdd}
         onActionDelete={handleDelete}
       />

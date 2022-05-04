@@ -9,7 +9,8 @@ from src.service.http_controller import (
     get_ruleset_db,
     get_tables_db,
     add_rule_db,
-    delete_rule_db
+    delete_rule_db,
+    get_anomaly_db
 )
 import json
 
@@ -32,6 +33,15 @@ def sync_nft():
         return jsonify({"message": "sync successfully"}), 200
     except:
         return jsonify({"error": "sync interrupted"}), 500
+
+
+@main_api.route("anomaly")
+def get_anomaly():
+    try:
+        anomaly = get_anomaly_db()
+        return jsonify({"anomaly": anomaly}), 200
+    except:
+        return jsonify({"error": "could not get anomaly"})
 
 
 @main_api.route("/tables")
@@ -133,7 +143,7 @@ def add_rule():
             port_dst=payload.get("port_dst"),
             port_prot=payload.get("port_prot"),
             protocol=payload.get("protocol"),
-            policy=payload.get("policy"),
+            policy=payload.get("action"),
         )
         is_added = add_rule_db(rule)
         if not is_added:

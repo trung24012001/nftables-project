@@ -9,12 +9,11 @@ import {
   ListItemText,
   Toolbar,
 } from "@mui/material";
-import { NavLink, useLocation, useMatch } from "react-router-dom";
-import { APP_NAME } from "lib";
+import { NavLink, useLocation } from "react-router-dom";
 import { sidebarItems, SidebarType } from "./sidebarItems";
 
 const DrawerItem: React.VFC = () => {
-
+  const APP_NAME = process.env.REACT_APP_NAME;
   const location = useLocation();
 
   const checkActiveRoute = (route: string) => {

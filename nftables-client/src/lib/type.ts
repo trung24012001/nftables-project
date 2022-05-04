@@ -29,7 +29,7 @@ export type RuleType = {
   port_prot: string;
   protocol: string;
   handle: number;
-  policy: string;
+  action: string;
 };
 
 export type RuleTypeResponse = {

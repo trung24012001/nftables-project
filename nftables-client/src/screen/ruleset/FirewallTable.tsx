@@ -51,7 +51,7 @@ export function FirewallTable(): React.ReactElement {
     }
   };
   return (
-    <Background title="Ruleset">
+    <Background title="Firewall Ruleset">
       <ReactTable
         headers={firewallHeaders}
         rows={firewallRules}
