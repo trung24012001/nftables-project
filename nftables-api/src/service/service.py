@@ -31,17 +31,18 @@ def sync_nft():
     try:
         sync_db_to_nft()
         return jsonify({"message": "sync successfully"}), 200
-    except:
+    except Exception as e:
         return jsonify({"error": "sync interrupted"}), 500
 
 
-@main_api.route("anomaly")
+@main_api.route("/anomaly")
 def get_anomaly():
     try:
         anomaly = get_anomaly_db()
         return jsonify({"anomaly": anomaly}), 200
-    except:
-        return jsonify({"error": "could not get anomaly"})
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "could not get anomaly"}), 500
 
 
 @main_api.route("/tables")
@@ -50,7 +51,7 @@ def get_tables():
         tables = get_tables_db()
         return jsonify({"tables": tables}), 200
     except:
-        return jsonify({"error": "could not get tables"})
+        return jsonify({"error": "could not get tables"}), 500
 
 
 @main_api.route("/tables", methods=["POST"])

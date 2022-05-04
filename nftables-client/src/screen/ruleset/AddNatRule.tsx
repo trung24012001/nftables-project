@@ -54,7 +54,7 @@ export function AddNatRule() {
     defaultValues: {
       chain_name: "",
       port_prot: "",
-      action: "",
+      policy: "",
     },
     resolver: yupResolver(validate),
   });
@@ -104,15 +104,15 @@ export function AddNatRule() {
   const onChainChange = (e: SelectChangeEvent<ChainType | string>) => {
     if (e.target.value) {
       const chainValue = JSON.parse(e.target.value as string);
-      if (chainValue.hook === 'prerouting') {
+      if (chainValue.hook === "prerouting") {
         setActions(["dnat", "redirect"]);
-      } else if (chainValue.hook === 'postrouting') {
+      } else if (chainValue.hook === "postrouting") {
         setActions(["snat", "masquerade"]);
       }
     }
     setChainSelected(e.target.value);
     setValue("chain_name", "value");
-  }
+  };
 
   const onProtocol = (protocols: string[]) => {
     protocolRef.current = protocols;
@@ -162,27 +162,30 @@ export function AddNatRule() {
                   None
                 </MenuItem>
                 {chains.map((chain: ChainType, idx: number) => {
-                  if (chain.type !== 'nat') return
+                  if (chain.type !== "nat") return;
                   return (
                     <MenuItem key={idx} value={JSON.stringify(chain)}>
                       {chain.name}
                       <MenuSubTitle>
-                        table: {chain.family} {chain.table}; hook:{" "}
-                        {chain.hook}; priority: {chain.priority}; policy:{" "}
-                        {chain.policy}
+                        table: {chain.family} {chain.table}; hook: {chain.hook};
+                        priority: {chain.priority}; policy: {chain.policy}
                       </MenuSubTitle>
                     </MenuItem>
-                  )
+                  );
                 })}
               </Select>
               <FormHelperText error={!!errors.chain_name?.message}>
                 {errors.chain_name?.message}
               </FormHelperText>
             </FormControl>
-            <Stack direction={'row'} spacing={2}>
+            <Stack direction={"row"} spacing={2}>
               <FormControl fullWidth>
                 <FormLabel>Action</FormLabel>
-                <Select value={watch("action")} {...register("action")} disabled={!chainSelected}>
+                <Select
+                  value={watch("policy")}
+                  {...register("policy")}
+                  disabled={!chainSelected}
+                >
                   {actions.map((p: string) => {
                     return (
                       <MenuItem key={p} value={p}>
@@ -194,10 +197,9 @@ export function AddNatRule() {
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>To</FormLabel>
-                <TextField disabled={!watch('action')} />
+                <TextField disabled={!watch("policy")} />
               </FormControl>
             </Stack>
-
 
             <Stack direction="row">
               <FormListControl

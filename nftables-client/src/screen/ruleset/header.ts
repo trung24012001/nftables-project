@@ -33,7 +33,7 @@ export const firewallHeaders = [
   },
   {
     name: "Action",
-    access: "action",
+    access: "policy",
   },
   {
     name: "Handle",
@@ -76,7 +76,7 @@ export const natHeaders = [
   },
   {
     name: "Action",
-    access: "action",
+    access: "policy",
   },
   {
     name: "Handle",

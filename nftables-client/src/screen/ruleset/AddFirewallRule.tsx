@@ -54,7 +54,7 @@ export function AddFirewallRule() {
     defaultValues: {
       chain_name: "",
       port_prot: "",
-      action: "",
+      policy: "",
     },
     resolver: yupResolver(validate),
   });
@@ -154,17 +154,16 @@ export function AddFirewallRule() {
                   None
                 </MenuItem>
                 {chains.map((chain: ChainType, idx: number) => {
-                  if (chain.type !== 'filter') return;
+                  if (chain.type !== "filter") return;
                   return (
                     <MenuItem key={idx} value={JSON.stringify(chain)}>
                       {chain.name}
                       <MenuSubTitle>
-                        table: {chain.family} {chain.table}; hook:{" "}
-                        {chain.hook}; priority: {chain.priority}; policy:{" "}
-                        {chain.policy}
+                        table: {chain.family} {chain.table}; hook: {chain.hook};
+                        priority: {chain.priority}; policy: {chain.policy}
                       </MenuSubTitle>
                     </MenuItem>
-                  )
+                  );
                 })}
               </Select>
               <FormHelperText error={!!errors.chain_name?.message}>
@@ -173,7 +172,7 @@ export function AddFirewallRule() {
             </FormControl>
             <FormControl>
               <FormLabel>Action</FormLabel>
-              <Select value={watch("action")} {...register("action")}>
+              <Select value={watch("policy")} {...register("policy")}>
                 {ACTION_FILTER.map((p: string) => {
                   return (
                     <MenuItem key={p} value={p}>

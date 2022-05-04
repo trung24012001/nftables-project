@@ -51,7 +51,7 @@ class Chain(Base):
     __tablename__ = "chains"
     id = sa.Column(sa.Integer, primary_key=True)
     name = sa.Column(sa.String(255), nullable=False)
-    # handle = sa.Column(sa.Integer)
+    handle = sa.Column(sa.Integer)
     type = sa.Column(
         sa.String(255),
         nullable=False,
@@ -61,7 +61,7 @@ class Chain(Base):
     priority = sa.Column(sa.Integer, default=0)
     policy = sa.Column(sa.String(255), default="accept")
     table_id = sa.Column(sa.Integer, sa.ForeignKey(
-        "tables.id", ondelete="CASCADE"))
+        "tables.id", ondelete="CASCADE"), nullable=False)
     table = relationship("Table", back_populates="chains")
     rules = relationship("Rule", back_populates="chain")
 
@@ -105,6 +105,7 @@ class Rule(Base):
     id = sa.Column(sa.Integer, primary_key=True)
     protocol = sa.Column(sa.String(255))
     policy = sa.Column(sa.String(255))
+    handle = sa.Column(sa.Integer)
     chain_id = sa.Column(sa.Integer, sa.ForeignKey(
         "chains.id", ondelete="CASCADE"))
     chain = relationship("Chain", back_populates="rules")

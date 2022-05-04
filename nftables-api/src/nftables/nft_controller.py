@@ -101,8 +101,30 @@ def delete_chain(chain):
         return False
 
 
-def get_ruleset(type='filter'):
-    data_structure = read_nft("list ruleset")
+def get_table(data):
+    data_structure = read_nft("list tables")
+    for object in data_structure["nftables"]:
+        table = object.get("table")
+        if not table:
+            continue
+        if table["family"] == data["family"] and table["name"] == data["name"]:
+            return table
+    return None
+
+
+def get_chain(data):
+    data_structure = read_nft("list chains")
+    for object in data_structure["nftables"]:
+        chain = object.get("chain")
+        if not chain:
+            continue
+        if chain["family"] == data["family"] and chain["name"] == data["name"] and chain["table"] == data["table"]:
+            return chain
+    return None
+
+
+def get_ruleset(type='filter', cmd='list ruleset'):
+    data_structure = read_nft(cmd)
     rules = []
     action = []
     if type == 'filter':
@@ -129,7 +151,7 @@ def get_ruleset(type='filter'):
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
                 protocol=util.get_expr_prot(rule.get("expr")),
-                action=util.get_expr_action(
+                policy=util.get_expr_action(
                     rule.get("expr"), action),
             )
         )
@@ -160,7 +182,7 @@ def get_nat_rules(type='nat'):
                 port_src=util.get_expr_value(rule.get("expr"), "sport"),
                 port_dst=util.get_expr_value(rule.get("expr"), "dport"),
                 protocol=util.get_expr_prot(rule.get("expr")),
-                action=util.get_expr_action(
+                policy=util.get_expr_action(
                     rule.get("expr"), nat_action),
             )
         )

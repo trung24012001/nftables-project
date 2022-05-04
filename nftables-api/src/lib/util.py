@@ -2,8 +2,8 @@ import json
 from src.schema.database import AlchemyEncoder
 
 
-def query_to_str(data):
-    return json.dumps(data, cls=AlchemyEncoder)
+def parse_query(data):
+    return json.loads(json.dumps(data, cls=AlchemyEncoder))
 
 
 def nft_handle_parser(data, handle):
@@ -135,3 +135,31 @@ def nft_rule_formater(rule):
     rule_formater["rule"]["expr"] = expr
 
     return rule_formater
+
+
+def decompose_range(data):
+    arr = []
+    for item in data:
+        if item.find('-') < 0:
+            arr.append(item)
+            continue
+        range_arr = item.split('-')
+        print(range_arr)
+        for i in range(int(range_arr[0]), int(range_arr[1]) + 1):
+            arr.append(i)
+    return arr
+
+
+def decompose_ip(array):
+    if not array:
+        return None
+    arr = []
+    for item in array:
+        if item.find('-') < 0:
+            arr.append(item)
+            continue
+        range_arr = item.split('-')
+        print(range_arr)
+        for item in range_arr:
+            arr.append(item)
+    return arr
