@@ -164,26 +164,21 @@ def decompose_range(data):
     return arr
 
 
-def decompose_ip(array):
-    if not array:
-        return ['']
+def decompose_ip(ips):
     arr = []
-    for item in array:
+    for item in ips:
         if item.find('-') < 0:
             arr.append(item)
             continue
         range_arr = item.split('-')
-        print(range_arr)
         for item in range_arr:
             arr.append(item)
     return arr
 
 
-def decompose_port(array):
-    if not array:
-        return ['']
+def decompose_port(ports):
     arr = []
-    for item in array:
+    for item in ports:
         if str(item).find('-') < 0:
             arr.append(item)
             continue

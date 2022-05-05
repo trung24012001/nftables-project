@@ -1,26 +1,32 @@
 from sqlalchemy import table
-from src.schema.database import IpDst, IpSrc, PortSrc, PortDst, Table, Chain, Rule, session
+from src.schema.database import IpDst, IpSrc, PortSrc, PortDst, Protocol, Table, Chain, Rule, session
 import src.nftables.nft_controller as nft
 import src.lib.util as util
 
 
 def get_anomaly_db():
-    rules = nft.get_ruleset(type="filter")
+    ruleset = nft.get_ruleset(type="filter")
     result = []
     is_clear = clear_database()
     if not is_clear:
         return []
-    for rule in rules:
+    for rule in ruleset:
+        print('xxxxxx', rule)
         result.append(util.parse_query(insert_db(rule)))
+    # detect_anomaly()
     return result
+
+
+def detect_anomaly():
+    sql = 'select  src.host as ip_src, dst.host as ip_dst, psrc.port as port_src, pdst.port as port_dst, prot.protocol as protocol, count(*) as anomaly from rules r join ip_src src on r.id = src.rule_id join ip_dst dst on r.id = dst.rule_id join port_src psrc on r.id = psrc.rule_id join port_dst pdst on r.id = pdst.rule_id join protocols prot on prot.rule_id = r.id  group by src.host, dst.host, psrc.port, pdst.port, prot.protocol;'
 
 
 def insert_db(rule):
     try:
-        table = nft.get_table(data=dict(
+        table = nft.get_table(dict(
             family=rule['family'], name=rule['table']))
         table_db = insert_table(table)
-        chain = nft.get_chain(data=dict(
+        chain = nft.get_chain(dict(
             family=rule['family'],
             table=rule['table'],
             name=rule['chain']
@@ -86,40 +92,37 @@ def insert_rule(rule, chain_db, table_db):
                 name=rule['table']
             )
         ).first()
-
         if not rule_db:
-            print(rule, 'uuuuuuuuuuu')
             rule_db = Rule(
-                protocol=rule.get("protocol"),
                 policy=rule.get("policy"),
                 handle=rule["handle"]
             )
             for new_ip_src in util.decompose_ip(rule.get("ip_src")):
-                for new_ip_dst in util.decompose_ip(rule.get("ip_dst")):
-                    if new_ip_src:
-                        ip_src = IpSrc(
-                            host=new_ip_src
-                        )
-                        rule_db.ip_src_list.append(ip_src)
-                    if new_ip_dst:
-                        ip_dst = IpDst(
-                            host=new_ip_dst
-                        )
-                        rule_db.ip_dst_list.append(ip_dst)
+                ip_src = IpSrc(
+                    host=new_ip_src
+                )
+                rule_db.ip_src_list.append(ip_src)
+            for new_ip_dst in util.decompose_ip(rule.get("ip_dst")):
+                ip_dst = IpDst(
+                    host=new_ip_dst
+                )
+                rule_db.ip_dst_list.append(ip_dst)
             for new_port_src in util.decompose_port(rule.get("port_src")):
-                for new_port_dst in util.decompose_port(rule.get("port_dst")):
-                    if new_port_src:
-                        posr_src = PortSrc(
-                            port=new_port_src,
-                            protocol=rule["port_prot"]
-                        )
-                        rule_db.port_src_list.append(posr_src)
-                    if new_port_dst:
-                        port_dst = PortDst(
-                            host=new_port_dst,
-                            protocol=rule["port_prot"]
-                        )
-                        rule_db.port_dst_list.append(port_dst)
+                posr_src = PortSrc(
+                    port=new_port_src,
+                )
+                rule_db.port_src_list.append(posr_src)
+
+            for new_port_dst in util.decompose_port(rule.get("port_dst")):
+                port_dst = PortDst(
+                    port=new_port_dst,
+                )
+                rule_db.port_dst_list.append(port_dst)
+            for new_prot in util.decompose_port(rule.get("protocol")):
+                prot = Protocol(
+                    protocol=new_prot,
+                )
+                rule_db.protocols.append(prot)
         chain_db.rules.append(rule_db)
         table_db.chains.append(chain_db)
         session.add(table_db)
@@ -134,6 +137,7 @@ def insert_rule(rule, chain_db, table_db):
 def get_tables_db():
     # query = session.query(Table).all()
     # tables = util.query_to_str(query)
+
     tables = nft.get_tables()
     return tables
 
@@ -264,6 +268,7 @@ def clear_database():
         session.query(Table).delete()
         session.commit()
         return True
-    except:
+    except Exception as e:
+        print(e)
         session.rollback()
         return False

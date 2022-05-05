@@ -6,7 +6,14 @@ import TableContainer from "@mui/material/TableContainer";
 import TableHead from "@mui/material/TableHead";
 import TableRow from "@mui/material/TableRow";
 import Paper from "@mui/material/Paper";
-import { Box, IconButton, Stack, styled, TablePagination, Theme } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Stack,
+  styled,
+  TablePagination,
+  Theme,
+} from "@mui/material";
 import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import MenuTable from "./MenuTable";
@@ -16,6 +23,7 @@ import EmptyTable from "./EmptyTable";
 export type HeaderType = {
   name: string;
   access: string;
+  default?: string;
 };
 
 export function ReactTable({
@@ -24,15 +32,14 @@ export function ReactTable({
   loading,
   onActionAdd,
   onActionDelete,
-  onActionRow
-
+  onActionRow,
 }: {
   headers: HeaderType[];
   rows: any[] | undefined;
   loading?: boolean;
   onActionAdd?: () => void;
   onActionDelete?: (row: any) => void;
-  onActionRow?: () => void
+  onActionRow?: () => void;
 }): React.ReactElement {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -68,21 +75,22 @@ export function ReactTable({
 
   const LoadingTable = () => {
     if (loading) {
-      return <TableSkeleton />
+      return <TableSkeleton />;
     }
 
-    return <EmptyTable />
-  }
+    return <EmptyTable />;
+  };
 
   return (
     <Stack spacing={2}>
       <Box>
-        {onActionAdd && <IconButton onClick={onActionAdd}>
-          <AddCircleIcon />
-        </IconButton>
-        }
+        {onActionAdd && (
+          <IconButton onClick={onActionAdd}>
+            <AddCircleIcon />
+          </IconButton>
+        )}
       </Box>
-      {rows?.length ?
+      {rows?.length ? (
         <TableContainer component={Paper}>
           <Table sx={{ minWidth: 600 }}>
             <TableHead>
@@ -129,10 +137,9 @@ export function ReactTable({
             handleClose={handleCloseMenu}
           />
         </TableContainer>
-        :
+      ) : (
         <LoadingTable />
-      }
-
+      )}
     </Stack>
   );
 }
@@ -154,5 +161,5 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
   "&:last-child td, &:last-child th": {
     border: 0,
   },
-  cursor: 'pointer'
+  cursor: "pointer",
 }));

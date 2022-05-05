@@ -79,6 +79,10 @@ export const natHeaders = [
     access: "policy",
   },
   {
+    name: "To",
+    access: "to",
+  },
+  {
     name: "Handle",
     access: "handle",
   },

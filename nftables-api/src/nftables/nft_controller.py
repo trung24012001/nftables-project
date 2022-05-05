@@ -1,6 +1,5 @@
 from src.nftables.nft import load_nft, read_nft
 import src.lib.util as util
-import json
 
 
 def get_tables():
@@ -14,14 +13,12 @@ def get_tables():
             dict(family=table["family"],
                  name=table["name"], handle=table["handle"])
         )
-
     return tables
 
 
 def add_table(table):
     data_structure = util.nft_handle_parser({"table": table}, "add")
     ret = load_nft(data_structure)
-
     return ret
 
 
@@ -50,7 +47,6 @@ def get_chains():
                 policy=chain.get("policy"),
             )
         )
-
     return chains
 
 
@@ -101,27 +97,27 @@ def delete_chain(chain):
         return False
 
 
-def get_table(data):
+def get_table(table):
     data_structure = read_nft("list tables")
     for object in data_structure["nftables"]:
-        table = object.get("table")
-        if not table:
+        raw_table = object.get("table")
+        if not raw_table:
             continue
-        if table["family"] == data["family"] and table["name"] == data["name"]:
-            return table
+        if raw_table["family"] == table["family"] and raw_table["name"] == table["name"]:
+            return raw_table
     return None
 
 
-def get_chain(data):
+def get_chain(chain):
     data_structure = read_nft("list chains")
     for object in data_structure["nftables"]:
-        chain = object.get("chain")
-        if not chain:
+        raw_chain = object.get("chain")
+        if not raw_chain:
             continue
-        if chain["family"] == data["family"] and \
-                chain["name"] == data["name"] and \
-                chain["table"] == data["table"]:
-            return chain
+        if raw_chain["family"] == chain["family"] and \
+                raw_chain["name"] == chain["name"] and \
+                raw_chain["table"] == chain["table"]:
+            return raw_chain
     return None
 
 
@@ -133,31 +129,30 @@ def get_ruleset(type='filter', cmd='list ruleset'):
         action = ['accept', 'drop']
     elif type == 'nat':
         action = ["snat", "dnat", "masquerade", "redirect"]
-
     for object in data_structure["nftables"]:
         rule = object.get("rule")
         if not rule:
             continue
-
         if not check_rule_type(rule, type):
             continue
 
         raw_chain = get_chain(
             dict(family=rule["family"], table=rule["table"], name=rule["chain"]))
-
-        print('kakaka', rule)
-
+        print(rule)
         rules.append(
             dict(
                 family=rule["family"],
                 table=rule["table"],
                 chain=rule["chain"],
                 handle=rule["handle"],
-                ip_src=util.get_expr_value(rule.get("expr"), "saddr"),
-                ip_dst=util.get_expr_value(rule.get("expr"), "daddr"),
-                port_src=util.get_expr_value(rule.get("expr"), "sport"),
-                port_dst=util.get_expr_value(rule.get("expr"), "dport"),
-                protocol=util.get_expr_prot(rule.get("expr")),
+                ip_src=util.get_expr_value(rule.get("expr"), "saddr") or ["*"],
+                ip_dst=util.get_expr_value(rule.get("expr"), "daddr") or ["*"],
+                port_src=util.get_expr_value(
+                    rule.get("expr"), "sport") or ["*"],
+                port_dst=util.get_expr_value(
+                    rule.get("expr"), "dport") or ["*"],
+                protocol=util.get_expr_prot(rule.get("expr")) or [
+                    "tcp", "udp"],
                 policy=util.get_expr_policy(
                     rule.get("expr"), action, default_policy=raw_chain["policy"]),
             )
@@ -174,10 +169,8 @@ def get_nat_rules(type='nat'):
         rule = object.get("rule")
         if not rule:
             continue
-
         if not check_rule_type(rule, type):
             continue
-
         rules.append(
             dict(
                 family=rule["family"],
@@ -193,8 +186,6 @@ def get_nat_rules(type='nat'):
                     rule.get("expr"), nat_action),
             )
         )
-
-    print(rules)
     return rules
 
 
@@ -207,7 +198,6 @@ def check_rule_type(rule, type):
         if chain["family"] == rule["family"] and \
                 chain["table"] == rule["table"] and \
                 chain["name"] == rule["chain"]:
-            print(chain)
             if chain["type"] == type:
                 return True
             return False
