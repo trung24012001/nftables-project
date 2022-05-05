@@ -129,6 +129,7 @@ export function AddChain() {
               <FormHelperText error={!!errors.name?.message}>
                 {errors.name?.message}
               </FormHelperText>
+              
             </FormControl>
             <FormControl fullWidth>
               <FormLabel>Table</FormLabel>
