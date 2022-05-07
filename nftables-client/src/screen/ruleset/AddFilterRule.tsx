@@ -54,7 +54,7 @@ export function AddFirewallRule() {
     defaultValues: {
       chain_name: "",
       port_prot: "",
-      policy: "",
+      policy: "accept",
     },
     resolver: yupResolver(validate),
   });
@@ -71,17 +71,22 @@ export function AddFirewallRule() {
   }, [watch]);
 
   const onSubmit: SubmitHandler<FilterRuleType> = async (data) => {
-    const payload = {
-      ...data,
-      chain: JSON.parse(chainSelected as string),
-      protocol: protocolRef.current,
-      ip_src: ipSrcRef.current,
-      ip_dst: ipDstRef.current,
-      port_src: portSrcRef.current,
-      port_dst: portDstRef.current,
-    };
     try {
-      const res = await request.post("/rules/filter", payload);
+      const payload = {
+        ...data,
+        chain: JSON.parse(chainSelected as string),
+        protocol: protocolRef.current,
+        ip_src: ipSrcRef.current,
+        ip_dst: ipDstRef.current,
+        port_src: portSrcRef.current,
+        port_dst: portDstRef.current,
+      };
+      delete payload.chain_name
+      const res = await request.post("/rules", payload, {
+        params: {
+          type: 'filter'
+        }
+      });
       if (res.status === 200) {
         dispatch(
           setMessage({
@@ -142,7 +147,7 @@ export function AddFirewallRule() {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Stack spacing={2} width="70%" minWidth="600px">
+          <Stack spacing={2} width="70%" >
             <FormControl fullWidth>
               <FormLabel>Chain</FormLabel>
               <Select

@@ -4,6 +4,7 @@ import { Provider } from "react-redux";
 import { Router } from "routers";
 import { store } from "store";
 import ThemeProvider from "styles/theme-provider";
+import './styles/global.style.css'
 
 function App() {
   return (

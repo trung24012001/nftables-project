@@ -26,8 +26,7 @@ import Background from "components/Layout/Background";
 const validate = yup.object({
   table_name: yup.string().required("Table is a required field"),
   name: yup.string().required("Name is a required field"),
-  type: yup.string().required(),
-  hook: yup.string().required(),
+  hook: yup.string().required('Hook is a required field'),
   priority: yup.number().required(),
 });
 
@@ -41,6 +40,7 @@ export function AddChain() {
   const dispatch = useDispatch();
   const tables = useSelector((state: RootState) => state.ruleset.tables);
   const [tableSelected, setTableSelected] = useState<TableType | string>("");
+  const [typeSelected, setTypeSelected] = useState<string>("filter");
 
   useEffect(() => {
     dispatch(getTables({}));
@@ -57,7 +57,6 @@ export function AddChain() {
     defaultValues: {
       table_name: "",
       name: "",
-      type: "filter",
       hook: "",
       priority: 0,
       policy: "accept",
@@ -65,17 +64,17 @@ export function AddChain() {
     resolver: yupResolver(validate),
   });
   const onSubmit: SubmitHandler<ChainType> = async (data) => {
-
-    const payload = {
-      ...data,
-      table: JSON.parse(tableSelected as string)
-    }
-
-    delete payload.table_name;
-
-    console.log(payload)
-
     try {
+      const payload = {
+        ...data,
+        table: JSON.parse(tableSelected as string),
+        type: typeSelected
+      }
+
+      delete payload.table_name;
+
+      console.log(payload)
+
       const res = await request.post("/chains", payload);
       if (res.status === 200) {
         dispatch(
@@ -97,17 +96,22 @@ export function AddChain() {
   };
 
   const hooksFromType = useMemo(() => {
-    switch (watch("type")) {
+    switch (typeSelected) {
       case "filter":
         return HOOK_FILTER;
       case "nat":
         return HOOK_NAT;
     }
-  }, [watch("type")]);
+  }, [typeSelected]);
 
   const onTableChange = (e: SelectChangeEvent<TableType | string>) => {
     setTableSelected(e.target.value);
     setValue('table_name', e.target.value as string);
+  }
+
+  const onTypeChange = (e: SelectChangeEvent<string>) => {
+    setTypeSelected(e.target.value);
+    setValue('hook', '')
   }
 
   return (
@@ -122,7 +126,7 @@ export function AddChain() {
           noValidate
           autoComplete="off"
         >
-          <Stack spacing={2} width="70%" minWidth="600px">
+          <Stack spacing={2} width="70%" >
             <FormControl>
               <FormLabel>Name</FormLabel>
               <TextField error={!!errors.name?.message} {...register("name")} />
@@ -152,7 +156,7 @@ export function AddChain() {
             <Stack direction={'row'} spacing={2}>
               <FormControl fullWidth>
                 <FormLabel>Type</FormLabel>
-                <Select value={watch("type")} {...register("type")} >
+                <Select value={typeSelected} onChange={onTypeChange}>
                   {TYPE.map((t: string) => {
                     return (
                       <MenuItem key={t} value={t}>

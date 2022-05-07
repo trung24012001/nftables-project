@@ -138,54 +138,30 @@ def get_ruleset(type='filter', cmd='list ruleset'):
 
         raw_chain = get_chain(
             dict(family=rule["family"], table=rule["table"], name=rule["chain"]))
-        print(rule)
+
+        result = util.get_expr_value(rule.get('expr'), keys=[
+            'saddr', 'daddr', 'sport', 'dport'])
+
         rules.append(
             dict(
                 family=rule["family"],
                 table=rule["table"],
                 chain=rule["chain"],
                 handle=rule["handle"],
-                ip_src=util.get_expr_value(rule.get("expr"), "saddr") or ["*"],
-                ip_dst=util.get_expr_value(rule.get("expr"), "daddr") or ["*"],
-                port_src=util.get_expr_value(
-                    rule.get("expr"), "sport") or ["*"],
-                port_dst=util.get_expr_value(
-                    rule.get("expr"), "dport") or ["*"],
-                protocol=util.get_expr_prot(rule.get("expr")) or [
-                    "tcp", "udp"],
+                ip_src=result.get('saddr') or ["*"],
+                ip_dst=result.get('daddr') or ["*"],
+                port_src=result.get('sport') or ["*"],
+                port_dst=result.get('dport') or ["*"],
+                protocol=util.get_expr_prot(rule.get("expr")) or ["*"],
                 policy=util.get_expr_policy(
-                    rule.get("expr"), action, default_policy=raw_chain["policy"]),
+                    rule.get("expr"), action) or raw_chain["policy"],
+                to=util.get_expr_nat(rule.get('expr'))
             )
         )
 
-    return rules
-
-
-def get_nat_rules(type='nat'):
-    data_structure = read_nft("list ruleset")
-    rules = []
-    nat_action = ["snat", "dnat", "masquerade", "redirect"]
-    for object in data_structure["nftables"]:
-        rule = object.get("rule")
-        if not rule:
-            continue
-        if not check_rule_type(rule, type):
-            continue
-        rules.append(
-            dict(
-                family=rule["family"],
-                table=rule["table"],
-                chain=rule["chain"],
-                handle=rule["handle"],
-                ip_src=util.get_expr_value(rule.get("expr"), "saddr"),
-                ip_dst=util.get_expr_value(rule.get("expr"), "daddr"),
-                port_src=util.get_expr_value(rule.get("expr"), "sport"),
-                port_dst=util.get_expr_value(rule.get("expr"), "dport"),
-                protocol=util.get_expr_prot(rule.get("expr")),
-                policy=util.get_expr_policy(
-                    rule.get("expr"), nat_action),
-            )
-        )
+    # def get_handle(rule):
+    #     return rule.get("handle")
+    # rules.sort(key=get_handle)
     return rules
 
 
@@ -209,7 +185,7 @@ def add_rule(rule, type):
         if type == 'filter':
             rule_formatter = util.filter_rule_formatter(rule)
         elif type == 'nat':
-            rule_formatter = util.filter_rule_formatter(rule)
+            rule_formatter = util.nat_rule_formatter(rule)
         data_structure = util.nft_handle_parser(
             rule_formatter,
             "add",

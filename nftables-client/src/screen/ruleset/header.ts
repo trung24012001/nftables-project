@@ -1,5 +1,9 @@
 export const firewallHeaders = [
   {
+    name: "Rule",
+    access: "handle",
+  },
+  {
     name: "Family",
     access: "family",
   },
@@ -35,13 +39,13 @@ export const firewallHeaders = [
     name: "Action",
     access: "policy",
   },
-  {
-    name: "Handle",
-    access: "handle",
-  },
 ];
 
 export const natHeaders = [
+  {
+    name: "Rule",
+    access: "handle",
+  },
   {
     name: "Family",
     access: "family",
@@ -81,9 +85,5 @@ export const natHeaders = [
   {
     name: "To",
     access: "to",
-  },
-  {
-    name: "Handle",
-    access: "handle",
   },
 ];

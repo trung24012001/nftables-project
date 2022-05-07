@@ -20,7 +20,7 @@ export type ChainType = {
 
 export type FilterRuleType = {
   chain: ChainType;
-  chain_name: string;
+  chain_name?: string;
   ip_src: string;
   ip_dst: string;
   port_src: string;
@@ -33,7 +33,7 @@ export type FilterRuleType = {
 
 export type NatRuleType = {
   chain: ChainType;
-  chain_name: string;
+  chain_name?: string;
   ip_src: string;
   ip_dst: string;
   port_src: string;

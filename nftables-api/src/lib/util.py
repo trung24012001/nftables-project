@@ -11,8 +11,14 @@ def nft_handle_parser(data, handle):
 
 
 def nft_expr_parser(data):
-    if data["value"] is None:
-        return ""
+    if not isinstance(data["value"], list):
+        return {
+            "match": {
+                "op": "==",
+                "left": {"payload": data["payload"]},
+                "right":  data['value']
+            }
+        }
     list_data = []
     for value in data["value"]:
         if value.find('-') >= 0:
@@ -32,18 +38,20 @@ def nft_expr_parser(data):
     }
 
 
-def get_expr_value(expr, key):
+def get_expr_value(expr, keys):
     if not expr:
         return None
+    result = {}
     for object in expr:
         match = object.get("match")
         if not match:
             continue
         m_key = match.get("left").get("payload").get("field")
-        if m_key == key:
+        if m_key in keys:
             right = match.get("right")
             if not isinstance(right, dict):
-                return [right]
+                result[m_key] = [right]
+                continue
             set = right.get("set")
             if not set:
                 continue
@@ -55,13 +63,15 @@ def get_expr_value(expr, key):
                 data.append('-'.join(str(x)
                             for x in value.get("range")))
 
-            return data
-    return None
+            result[m_key] = data
+    return result
 
 
 def get_expr_prot(expr):
     if not expr:
         return None
+
+    prots = None
 
     for object in expr:
         match = object.get("match")
@@ -74,23 +84,49 @@ def get_expr_prot(expr):
             return [left.get("payload").get("protocol")]
         if m_key == "protocol":
             if isinstance(right, dict):
-                return right.get("set")
-            return [right]
-    return None
+                prots = right.get("set")
+            else:
+                prots = [right]
+    return prots
 
 
-def get_expr_policy(expr, actions, default_policy):
+def get_expr_policy(expr, actions):
     if not expr:
         return None
     for object in expr:
         for type in actions:
             if type in object:
                 return type
-    return default_policy
+    return None
+
+
+def get_expr_nat(expr):
+    for object in expr:
+        policy = object.get('dnat') or object.get('snat')
+        if policy:
+            result = ''
+            if policy.get('addr'):
+                addr = policy['addr']
+                if isinstance(addr, dict):
+                    result += '-'.join(addr.get('range'))
+                else:
+                    result += addr
+            if policy.get('port'):
+                result += ':'
+                port = policy.get('port')
+                if isinstance(port, dict):
+                    result += '-'.join(str(p) for p in port.get('range'))
+                else:
+                    result += str(port)
+            return result
+        policy = object.get('redirect')
+        if policy:
+            return policy.get("port")
+
+    return None
 
 
 def nft_rule_formatter(rule):
-    port_prot = rule.get('port_prot')
     family = rule["chain"].get("family")
     rule_formatter = {
         "rule": {
@@ -114,29 +150,33 @@ def nft_rule_formatter(rule):
         }
         expr.append(
             nft_expr_parser(ip_dst_match))
-    if rule.get("protocol"):
+    if rule.get("protocol") or rule.get("port_prot"):
+        value = None
+        if rule.get('port_prot'):
+            value = rule["port_prot"]
+        else:
+            value = rule["protocol"]
+        print('aaaaaaaaa', value)
         protocol_match = {
             "payload": {"protocol": family, "field": "protocol"},
-            "value": rule["protocol"],
+            "value": value,
         }
         expr.append(
             nft_expr_parser(protocol_match))
     if rule.get("port_src"):
         port_src_match = {
-            "payload": {"protocol": port_prot, "field": "sport"},
+            "payload": {"protocol": rule['port_prot'], "field": "sport"},
             "value": rule["port_src"],
         }
         expr.append(
             nft_expr_parser(port_src_match))
     if rule.get("port_dst"):
         port_dst_match = {
-            "payload": {"protocol": port_prot, "field": "dport"},
+            "payload": {"protocol": rule['port_prot'], "field": "dport"},
             "value": rule["port_dst"],
         }
         expr.append(
             nft_expr_parser(port_dst_match))
-    if rule.get("policy"):
-        expr.append({rule["policy"]: None})
 
     rule_formatter["rule"]["expr"] = expr
 
@@ -144,34 +184,42 @@ def nft_rule_formatter(rule):
 
 
 def filter_rule_formatter(rule):
-    return nft_rule_formatter(rule)
+    rule_formatter = nft_rule_formatter(rule)
+    rule_formatter["rule"]["expr"].append({
+        rule["policy"]: None
+    })
+    return rule_formatter
 
 
 def nat_rule_formatter(rule):
-    return nft_rule_formatter(rule)
-
-
-def decompose_range(data):
-    arr = []
-    for item in data:
-        if item.find('-') < 0:
-            arr.append(item)
-            continue
-        range_arr = item.split('-')
-        print(range_arr)
-        for i in range(int(range_arr[0]), int(range_arr[1]) + 1):
-            arr.append(i)
-    return arr
+    rule_formatter = nft_rule_formatter(rule)
+    ip_and_port = rule['to'].split(':')
+    result = {}
+    if ip_and_port[0]:
+        ip = ip_and_port[0]
+        if ip.find('-') >= 0:
+            ip = dict(range=ip.split('-'))
+        if ip.find('/') >= 0:
+            ip = ip.split('/')[0]
+        result['addr'] = ip
+    if len(ip_and_port) == 2:
+        port = ip_and_port[1]
+        if port.find('-') >= 0:
+            port = dict(range=port.split('-'))
+        else:
+            port = int(port)
+        result['port'] = port
+    rule_formatter["rule"]["expr"].append({
+        rule["policy"]: result or None
+    })
+    return rule_formatter
 
 
 def decompose_ip(ips):
     arr = []
     for item in ips:
-        if item.find('-') < 0:
-            arr.append(item)
-            continue
-        range_arr = item.split('-')
-        for item in range_arr:
+        range = item.split('-')
+        for item in range:
             arr.append(item)
     return arr
 
@@ -179,11 +227,7 @@ def decompose_ip(ips):
 def decompose_port(ports):
     arr = []
     for item in ports:
-        if str(item).find('-') < 0:
-            arr.append(item)
-            continue
-        range_arr = item.split('-')
-        print(range_arr)
-        for item in range_arr:
+        range = item.split('-')
+        for item in range:
             arr.append(item)
     return arr

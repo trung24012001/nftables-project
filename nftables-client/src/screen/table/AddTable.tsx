@@ -83,7 +83,7 @@ export function AddTable() {
           noValidate
           autoComplete="off"
         >
-          <Stack spacing={2} width="70%" minWidth="600px">
+          <Stack spacing={2} width="70%" >
             <Stack direction='row' spacing={2}>
               <FormControl sx={{ width: '200px' }}>
                 <FormLabel>Family</FormLabel>

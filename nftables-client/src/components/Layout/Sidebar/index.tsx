@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Drawer from '@mui/material/Drawer';
 import { DrawerItem } from './DrawerItem';
 
-export const drawerWidth = 300;
+export const drawerWidth = '250px';
 
 interface Props {
   /**

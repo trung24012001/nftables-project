@@ -72,17 +72,26 @@ export function AddNatRule() {
   }, [watch]);
 
   const onSubmit: SubmitHandler<NatRuleType> = async (data) => {
-    const payload = {
-      ...data,
-      chain: JSON.parse(chainSelected as string),
-      protocol: protocolRef.current,
-      ip_src: ipSrcRef.current,
-      ip_dst: ipDstRef.current,
-      port_src: portSrcRef.current,
-      port_dst: portDstRef.current,
-    };
     try {
-      const res = await request.post("/rules/nat", payload);
+      const payload = {
+        ...data,
+        chain: JSON.parse(chainSelected as string),
+        protocol: protocolRef.current,
+        ip_src: ipSrcRef.current,
+        ip_dst: ipDstRef.current,
+        port_src: portSrcRef.current,
+        port_dst: portDstRef.current,
+      };
+
+      delete payload.chain_name;
+
+      console.log(payload)
+
+      const res = await request.post("/rules", payload, {
+        params: {
+          type: 'nat'
+        }
+      });
       if (res.status === 200) {
         dispatch(
           setMessage({
@@ -113,6 +122,7 @@ export function AddNatRule() {
     }
     setChainSelected(e.target.value);
     setValue("chain_name", "value");
+    setValue(("policy"), '')
   };
 
   const onProtocol = (protocols: string[]) => {
@@ -151,7 +161,7 @@ export function AddNatRule() {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Stack spacing={2} width="70%" minWidth="600px">
+          <Stack spacing={2} width="80%" >
             <FormControl fullWidth>
               <FormLabel>Chain</FormLabel>
               <Select

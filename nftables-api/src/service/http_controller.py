@@ -11,7 +11,6 @@ def get_anomaly_db():
     if not is_clear:
         return []
     for rule in ruleset:
-        print('xxxxxx', rule)
         result.append(util.parse_query(insert_db(rule)))
     # detect_anomaly()
     return result
