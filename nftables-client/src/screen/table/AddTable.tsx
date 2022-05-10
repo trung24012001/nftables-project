@@ -6,7 +6,6 @@ import {
   FormControl,
   FormHelperText,
   FormLabel,
-  Grid,
   MenuItem,
   Select,
   Stack,
@@ -20,7 +19,6 @@ import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch } from "react-redux";
 import { setMessage } from "store/reducers";
-import KeyboardBackspaceIcon from "@mui/icons-material/KeyboardBackspace";
 import { useNavigate } from "react-router-dom";
 import Background from "components/Layout/Background";
 
@@ -68,6 +66,8 @@ export function AddTable() {
           type: "error",
         })
       );
+    } finally {
+      reset()
     }
   };
 
@@ -83,7 +83,7 @@ export function AddTable() {
           noValidate
           autoComplete="off"
         >
-          <Stack spacing={2} width="70%" >
+          <Stack spacing={2} width="80%" >
             <Stack direction='row' spacing={2}>
               <FormControl sx={{ width: '200px' }}>
                 <FormLabel>Family</FormLabel>

@@ -19,7 +19,7 @@ export type ChainType = {
 };
 
 export type FilterRuleType = {
-  chain: ChainType;
+  chain: ChainType | string;
   chain_name?: string;
   ip_src: string;
   ip_dst: string;
@@ -32,7 +32,7 @@ export type FilterRuleType = {
 };
 
 export type NatRuleType = {
-  chain: ChainType;
+  chain: ChainType | string;
   chain_name?: string;
   ip_src: string;
   ip_dst: string;
@@ -57,9 +57,10 @@ export type RuleTypeResponse = {
   policy: string;
 };
 
-export type PortType = {
-  port: string;
-  protocol: string;
+export type AnomalyType = {
+  rule_a: FilterRuleType;
+  rule_b: FilterRuleType;
+  anomay_type: string;
 };
 
 export type MessageAlertType = {

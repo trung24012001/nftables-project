@@ -39,7 +39,7 @@ export function ReactTable({
   loading?: boolean;
   onActionAdd?: () => void;
   onActionDelete?: (row: any) => void;
-  onActionRow?: () => void;
+  onActionRow?: (row: any) => void;
 }): React.ReactElement {
   const [page, setPage] = React.useState(0);
   const [rowsPerPage, setRowsPerPage] = React.useState(5);
@@ -47,6 +47,7 @@ export function ReactTable({
   const [anchorMenu, setAnchorMenu] = React.useState<null | HTMLElement>(null);
   const handleOpenMenu =
     (row: any) => (event: React.MouseEvent<HTMLElement>) => {
+      event.stopPropagation()
       setAnchorMenu(event.currentTarget);
       setRowSelected(row);
     };
@@ -106,7 +107,7 @@ export function ReactTable({
             <TableBody>
               {rows?.map((row: any, idx: number) => {
                 return (
-                  <StyledTableRow hover key={idx} onClick={onActionRow}>
+                  <StyledTableRow hover key={idx} onClick={() => onActionRow && onActionRow(row)}>
                     {headers.map((header: HeaderType) => (
                       <TableCell key={header.access} align="left">
                         {row[header.access]}

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Box,
   FormLabel,
@@ -11,24 +11,37 @@ export function FormListControl({
   type = 'select',
   title,
   options,
-  fullWidth,
-  onCallback
+  onCallback,
+  placeholder,
+  resetTrigger
 }: {
   type?: 'select' | 'textfield',
   title: string,
-  fullWidth?: boolean,
   options?: string[],
-  onCallback: (selected: string[]) => void
+  onCallback: (data: string[]) => void,
+  placeholder?: string,
+  resetTrigger?: Date | string | number
 }) {
   const [data, setData] = useState<string[]>(['']);
+
+  useEffect(() => {
+    setData([''])
+  }, [resetTrigger])
 
   return (
     <Box width={'100%'}>
       <FormLabel>{title}</FormLabel>
       <Stack spacing={2}>
         {
-          data.map((s: string, idx: number) => (
-            <FormItem key={idx} position={idx} options={options} setData={setData} data={data} onCallback={onCallback} type={type} />
+          data.map((_: string, idx: number) => (
+            <FormItem key={idx}
+              position={idx}
+              options={options}
+              setData={setData}
+              data={data}
+              onCallback={onCallback}
+              type={type}
+              placeholder={placeholder} />
           ))
         }
       </Stack>

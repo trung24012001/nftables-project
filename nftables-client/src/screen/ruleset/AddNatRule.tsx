@@ -161,7 +161,7 @@ export function AddNatRule() {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Stack spacing={2} width="80%" >
+          <Stack spacing={3} width="80%" >
             <FormControl fullWidth>
               <FormLabel>Chain</FormLabel>
               <Select
@@ -195,7 +195,6 @@ export function AddNatRule() {
                 <Select
                   value={watch("policy")}
                   {...register("policy")}
-                  disabled={!chainSelected}
                 >
                   {actions.map((p: string) => {
                     return (
@@ -208,8 +207,10 @@ export function AddNatRule() {
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>To</FormLabel>
-                <TextField disabled={!watch("policy")} value={watch("to")}
-                  {...register("to")} />
+                <TextField
+                  value={watch("to")}
+                  {...register("to")}
+                  placeholder='0.0.0.0:port' />
               </FormControl>
             </Stack>
 
@@ -218,17 +219,18 @@ export function AddNatRule() {
                 title="IP source"
                 type="textfield"
                 onCallback={onIpSrc}
+                placeholder='0.0.0.0'
               />
               <FormListControl
                 title="IP destination"
                 type="textfield"
                 onCallback={onIpDst}
+                placeholder='0.0.0.0'
               />
               <FormListControl
                 title="Protocol"
                 options={PROTOCOL}
                 onCallback={onProtocol}
-                fullWidth
               />
             </Stack>
 

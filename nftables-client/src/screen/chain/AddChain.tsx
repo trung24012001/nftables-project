@@ -40,7 +40,7 @@ export function AddChain() {
   const dispatch = useDispatch();
   const tables = useSelector((state: RootState) => state.ruleset.tables);
   const [tableSelected, setTableSelected] = useState<TableType | string>("");
-  const [typeSelected, setTypeSelected] = useState<string>("filter");
+  const [typeSelected, setTypeSelected] = useState<string>(TYPE[0]);
 
   useEffect(() => {
     dispatch(getTables({}));
@@ -92,6 +92,10 @@ export function AddChain() {
           type: "error",
         })
       );
+    } finally {
+      reset()
+      setTableSelected("")
+      setTypeSelected(TYPE[0])
     }
   };
 
@@ -126,14 +130,7 @@ export function AddChain() {
           noValidate
           autoComplete="off"
         >
-          <Stack spacing={2} width="70%" >
-            <FormControl>
-              <FormLabel>Name</FormLabel>
-              <TextField error={!!errors.name?.message} {...register("name")} />
-              <FormHelperText error={!!errors.name?.message}>
-                {errors.name?.message}
-              </FormHelperText>
-            </FormControl>
+          <Stack spacing={2} width="80%" >
             <FormControl fullWidth>
               <FormLabel>Table</FormLabel>
               <Select value={tableSelected} onChange={onTableChange} error={!!errors.table_name?.message}>
@@ -151,6 +148,13 @@ export function AddChain() {
               </Select>
               <FormHelperText error={!!errors.table_name?.message}>
                 {errors.table_name?.message}
+              </FormHelperText>
+            </FormControl>
+            <FormControl>
+              <FormLabel>Name</FormLabel>
+              <TextField error={!!errors.name?.message} {...register("name")} />
+              <FormHelperText error={!!errors.name?.message}>
+                {errors.name?.message}
               </FormHelperText>
             </FormControl>
             <Stack direction={'row'} spacing={2}>

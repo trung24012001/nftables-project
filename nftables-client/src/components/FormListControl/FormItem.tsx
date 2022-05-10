@@ -8,14 +8,16 @@ export default function FormItem({
   position,
   data,
   setData,
-  onCallback
+  onCallback,
+  placeholder
 }: {
   type?: 'select' | 'textfield',
   options?: string[],
   position: number,
   data: string[],
   setData: React.Dispatch<React.SetStateAction<string[]>>,
-  onCallback: (selected: string[]) => void
+  onCallback: (selected: string[]) => void,
+  placeholder?: string
 }) {
 
   const onSelectChange = (e: SelectChangeEvent<unknown>) => {
@@ -47,10 +49,13 @@ export default function FormItem({
   }
 
   return (
-    <ActionContainer hasDelete={position > 0} hasAdd={position === 0} onAdd={handleAdd} onDelete={() => handleDelete(position)}>
+    <ActionContainer hasDelete={position > 0}
+      hasAdd={position === 0}
+      onAdd={handleAdd}
+      onDelete={() => handleDelete(position)}>
       {
         type === 'select' &&
-        <Select value={data[position]} onChange={onSelectChange} fullWidth>
+        <Select value={data[position]} onChange={onSelectChange} fullWidth placeholder={placeholder} >
           <MenuItem value="" sx={{ opacity: 0.6 }}>
             Any
           </MenuItem>
@@ -64,7 +69,7 @@ export default function FormItem({
         </Select>
       }
       {type === 'textfield' &&
-        <TextField value={data[position]} onChange={onTextFieldChange} fullWidth />
+        <TextField value={data[position]} onChange={onTextFieldChange} fullWidth placeholder={placeholder} />
       }
     </ActionContainer>
   )

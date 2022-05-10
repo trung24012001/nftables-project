@@ -1,31 +1,37 @@
-import { Box } from "@mui/material";
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
-import { request, routes } from "lib";
+import { FilterRuleType, request, routes } from "lib";
+import { useFetchData } from "lib/hooks";
 import React, { useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { RootState } from "store";
-import { getRuleset, setMessage } from "store/reducers";
+import { useDispatch } from "react-redux";
+import { useNavigate, useSearchParams } from "react-router-dom";
+import { setMessage } from "store/reducers";
 import { firewallHeaders } from "./header";
 
 export function FirewallTable(): React.ReactElement {
-  const firewallRules = useSelector(
-    (state: RootState) => state.ruleset.filter_rules
-  );
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
 
-  useEffect(() => {
-    dispatch(getRuleset({ type: "filter" }));
-  }, []);
+  const { data, loading, refetch } = useFetchData<{ ruleset: FilterRuleType[] }>({
+    path: '/rules',
+    config: {
+      params: {
+        type: 'filter',
+        chain: params.get("chain"),
+      }
+    },
+    onError: (error) => {
+      console.log(error)
+    }
+  })
+
   const handleAdd = () => {
     navigate(routes.ADD_FIREWALL_ROUTE);
   };
 
-  const handleDelete = async (rule: any) => {
+  const handleDelete = async (rule: FilterRuleType) => {
     try {
-      console.log(rule);
       const res = await request.delete("/rules", {
         params: {
           rule,
@@ -38,7 +44,7 @@ export function FirewallTable(): React.ReactElement {
             type: "success",
           })
         );
-        dispatch(getRuleset({ type: "filter" }));
+        refetch()
       }
     } catch (error) {
       console.log(error);
@@ -54,9 +60,10 @@ export function FirewallTable(): React.ReactElement {
     <Background title="Firewall Ruleset">
       <ReactTable
         headers={firewallHeaders}
-        rows={firewallRules}
+        rows={data?.ruleset}
         onActionAdd={handleAdd}
         onActionDelete={handleDelete}
+        loading={loading}
       />
     </Background>
   );

@@ -1,4 +1,5 @@
 import json
+from ipaddress import ip_network, IPv4Address as ipv4
 from src.schema.database import AlchemyEncoder
 
 
@@ -26,6 +27,15 @@ def nft_expr_parser(data):
                 'range': value.split('-')
             })
             continue
+        if value.find('/') >= 0:
+            net = ip_network(value, strict=False)
+            list_data.append({
+                'prefix': {
+                    'addr': str(net.network_address),
+                    'len': net.prefixlen
+                }
+            })
+            continue
         list_data.append(value)
     return {
         "match": {
@@ -49,21 +59,26 @@ def get_expr_value(expr, keys):
         m_key = match.get("left").get("payload").get("field")
         if m_key in keys:
             right = match.get("right")
-            if not isinstance(right, dict):
-                result[m_key] = [right]
-                continue
-            set = right.get("set")
-            if not set:
-                continue
-            data = []
-            for value in set:
-                if not isinstance(value, dict):
-                    data.append(value)
-                    continue
-                data.append('-'.join(str(x)
-                            for x in value.get("range")))
+            result[m_key] = parse_expr_value(right)
 
-            result[m_key] = data
+    return result
+
+
+def parse_expr_value(value):
+    result = []
+    if not isinstance(value, dict):
+        return [value]
+    if value.get('range'):
+        return ['-'.join(str(x) for x in value["range"])]
+    if value.get('prefix'):
+        prefix = value['prefix']
+        net = prefix.get('addr') + '/' + str(prefix.get('len'))
+        return [net]
+    if value.get("set"):
+        for item in value["set"]:
+            for i in parse_expr_value(item):
+                result.append(i)
+
     return result
 
 
@@ -102,26 +117,25 @@ def get_expr_policy(expr, actions):
 
 def get_expr_nat(expr):
     for object in expr:
-        policy = object.get('dnat') or object.get('snat')
-        if policy:
-            result = ''
-            if policy.get('addr'):
-                addr = policy['addr']
-                if isinstance(addr, dict):
-                    result += '-'.join(addr.get('range'))
-                else:
-                    result += addr
-            if policy.get('port'):
-                result += ':'
-                port = policy.get('port')
-                if isinstance(port, dict):
-                    result += '-'.join(str(p) for p in port.get('range'))
-                else:
-                    result += str(port)
-            return result
-        policy = object.get('redirect')
-        if policy:
-            return policy.get("port")
+        to_net = object.get('dnat') or object.get(
+            'snat') or object.get('redirect')
+        if not to_net:
+            continue
+        result = ''
+        if to_net.get('addr'):
+            addr = to_net['addr']
+            if isinstance(addr, dict):
+                result += '-'.join(addr.get('range'))
+            else:
+                result += addr
+        if to_net.get('port'):
+            result += ':'
+            port = to_net['port']
+            if isinstance(port, dict):
+                result += '-'.join(str(p) for p in port.get('range'))
+            else:
+                result += str(port)
+        return result
 
     return None
 
@@ -156,7 +170,6 @@ def nft_rule_formatter(rule):
             value = rule["port_prot"]
         else:
             value = rule["protocol"]
-        print('aaaaaaaaa', value)
         protocol_match = {
             "payload": {"protocol": family, "field": "protocol"},
             "value": value,
@@ -200,7 +213,11 @@ def nat_rule_formatter(rule):
         if ip.find('-') >= 0:
             ip = dict(range=ip.split('-'))
         if ip.find('/') >= 0:
-            ip = ip.split('/')[0]
+            net = ip_network(ip, strict=False)
+            ip = dict(prefix={
+                'addr': str(net.network_address),
+                'len': net.prefixlen
+            })
         result['addr'] = ip
     if len(ip_and_port) == 2:
         port = ip_and_port[1]
@@ -215,19 +232,26 @@ def nat_rule_formatter(rule):
     return rule_formatter
 
 
-def decompose_ip(ips):
+def decompose_data(data, type=None):
     arr = []
-    for item in ips:
-        range = item.split('-')
-        for item in range:
-            arr.append(item)
-    return arr
-
-
-def decompose_port(ports):
-    arr = []
-    for item in ports:
-        range = item.split('-')
-        for item in range:
-            arr.append(item)
+    for item in data:
+        if item.find('/') >= 0:
+            net = ip_network(item)
+            for ip in net:
+                arr.append(ip)
+            continue
+        if item.find('-') >= 0 and type:
+            range = item.split('-')
+            cur, end = 1, 0
+            if type == 'ip':
+                cur = ipv4(range[0])
+                end = ipv4(range[1])
+            elif type == 'port':
+                cur = int(range[0])
+                end = int(range[1])
+            while (cur <= end):
+                arr.append(str(cur))
+                cur += 1
+            continue
+        arr.append(item)
     return arr

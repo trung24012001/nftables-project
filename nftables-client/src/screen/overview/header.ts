@@ -1,14 +1,14 @@
 export const headers = [
   {
-    name: "Family",
-    access: "family",
+    name: "Rule A",
+    access: "rule_a",
   },
   {
-    name: "Name",
-    access: "name",
+    name: "Rule B",
+    access: "rule_b",
   },
   {
-    name: "Handle",
-    access: "handle",
+    name: "Anomaly Type",
+    access: "anomaly_type",
   },
 ];

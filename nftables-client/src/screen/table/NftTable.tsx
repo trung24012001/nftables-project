@@ -1,26 +1,19 @@
-import { Box, Toolbar } from "@mui/material";
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
 import { request, TableType } from "lib";
 import { useFetchData } from "lib/hooks";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { RootState } from "store";
-import { getTables, setMessage } from "store/reducers";
+import { useNavigate, createSearchParams } from "react-router-dom";
+import { setMessage } from "store/reducers";
 import { headers } from "./header";
 
 
 export function NftTable(): React.ReactElement {
-  // const tables = useSelector((state: RootState) => state.ruleset.tables);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  // useEffect(() => {
-  //   dispatch(getTables({}));
-  // }, []);
-
-  const { data, loading } = useFetchData<{ tables: TableType[] }>({
+  const { data, loading, refetch } = useFetchData<{ tables: TableType[] }>({
     path: '/tables',
     onError: (error) => {
       console.log(error)
@@ -28,7 +21,6 @@ export function NftTable(): React.ReactElement {
   })
 
   const handleAdd = () => {
-    console.log("hello");
     navigate("/tables/add");
   };
 
@@ -46,8 +38,8 @@ export function NftTable(): React.ReactElement {
             type: "success",
           })
         );
+        refetch()
       }
-      dispatch(getTables({}));
     } catch (err) {
       console.log(err);
       dispatch(
@@ -59,6 +51,14 @@ export function NftTable(): React.ReactElement {
     }
   };
 
+  const handleSelectRow = (row: TableType) => {
+    console.log(row)
+    navigate({
+      pathname: '/chains',
+      search: `?table=${encodeURIComponent(JSON.stringify(row))}`
+    })
+  }
+
   return (
     <Background title='Tables'>
       <ReactTable
@@ -67,6 +67,7 @@ export function NftTable(): React.ReactElement {
         loading={loading}
         onActionAdd={handleAdd}
         onActionDelete={handleDelete}
+        onActionRow={handleSelectRow}
       />
     </Background>
   );

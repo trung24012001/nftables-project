@@ -28,8 +28,12 @@ def delete_table(table):
     return ret
 
 
-def get_chains():
-    data_structure = read_nft("list chains")
+def get_chains(table):
+    cmd = "list chains"
+    if table:
+        cmd = "list table {family} {name}".format(
+            family=table.get('family'), name=table.get('name'))
+    data_structure = read_nft(cmd)
     chains = []
     for object in data_structure["nftables"]:
         chain = object.get("chain")
@@ -47,33 +51,6 @@ def get_chains():
                 policy=chain.get("policy"),
             )
         )
-    return chains
-
-
-def get_chains_from_table(table=""):
-    data_structure = read_nft("list chains")
-    chains = []
-
-    for object in data_structure["nftables"]:
-        chain = object.get("chain")
-        if not chain:
-            continue
-        if table != chain.get("table"):
-            print("check")
-            continue
-        chains.append(
-            dict(
-                family=chain["family"],
-                table=chain["table"],
-                name=chain["name"],
-                handle=chain["handle"],
-                hook=chain.get("hook"),
-                type=chain.get("type"),
-                priority=chain.get("prio"),
-                policy=chain.get("policy"),
-            )
-        )
-
     return chains
 
 
@@ -121,7 +98,12 @@ def get_chain(chain):
     return None
 
 
-def get_ruleset(type='filter', cmd='list ruleset'):
+def get_ruleset(type='filter', chain=None):
+    cmd = 'list ruleset'
+    if chain:
+        cmd = "list chain {family} {table} {name}".format(family=chain.get(
+            'family'), table=chain.get('table'), name=chain.get('name'))
+
     data_structure = read_nft(cmd)
     rules = []
     action = []

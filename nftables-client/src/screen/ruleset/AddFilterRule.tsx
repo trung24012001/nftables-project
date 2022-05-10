@@ -38,6 +38,7 @@ export function AddFirewallRule() {
   const dispatch = useDispatch();
   const chains = useSelector((state: RootState) => state.ruleset.chains);
   const [chainSelected, setChainSelected] = useState<ChainType | string>("");
+  const [resetForm, setResetForm] = useState<Date | string | number | undefined>();
   const protocolRef = useRef<string[]>([]);
   const ipSrcRef = useRef<string[]>([]);
   const ipDstRef = useRef<string[]>([]);
@@ -49,6 +50,7 @@ export function AddFirewallRule() {
     handleSubmit,
     watch,
     setValue,
+    reset,
     formState: { errors },
   } = useForm<FilterRuleType>({
     defaultValues: {
@@ -103,12 +105,21 @@ export function AddFirewallRule() {
           type: "error",
         })
       );
+    } finally {
+      reset()
+      setChainSelected("")
+      setResetForm(new Date())
+      protocolRef.current = []
+      ipSrcRef.current = []
+      ipDstRef.current = []
+      portSrcRef.current = []
+      portDstRef.current = []
     }
   };
 
   const onChainChange = (e: SelectChangeEvent<ChainType | string>) => {
     setChainSelected(e.target.value);
-    setValue("chain_name", "has value");
+    setValue("chain_name", e.target.value as string);
   };
 
   const onProtocol = (protocols: string[]) => {
@@ -147,7 +158,7 @@ export function AddFirewallRule() {
           component="form"
           onSubmit={handleSubmit(onSubmit)}
         >
-          <Stack spacing={2} width="70%" >
+          <Stack spacing={3} width="80%" >
             <FormControl fullWidth>
               <FormLabel>Chain</FormLabel>
               <Select
@@ -158,7 +169,7 @@ export function AddFirewallRule() {
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
-                {chains.map((chain: ChainType, idx: number) => {
+                {chains?.map((chain: ChainType, idx: number) => {
                   if (chain.type !== "filter") return;
                   return (
                     <MenuItem key={idx} value={JSON.stringify(chain)}>
@@ -193,17 +204,21 @@ export function AddFirewallRule() {
                 title="IP source"
                 type="textfield"
                 onCallback={onIpSrc}
+                placeholder='0.0.0.0'
+                resetTrigger={resetForm}
               />
               <FormListControl
                 title="IP destination"
                 type="textfield"
                 onCallback={onIpDst}
+                placeholder='0.0.0.0'
+                resetTrigger={resetForm}
               />
               <FormListControl
                 title="Protocol"
                 options={PROTOCOL}
                 onCallback={onProtocol}
-                fullWidth
+                resetTrigger={resetForm}
               />
             </Stack>
 
@@ -212,11 +227,13 @@ export function AddFirewallRule() {
                 title="Port source"
                 type="textfield"
                 onCallback={onPortSrc}
+                resetTrigger={resetForm}
               />
               <FormListControl
                 title="Port destination"
                 type="textfield"
                 onCallback={onPortDst}
+                resetTrigger={resetForm}
               />
               <FormControl fullWidth>
                 <FormLabel>Port Protocol</FormLabel>
