@@ -18,6 +18,21 @@ def detect_anomaly():
     sql = 'select src.host as ip_src, dst.host as ip_dst, psrc.port as port_src, pdst.port as port_dst, prot.protocol, r.policy, r.handle, r.id as rule_id, chains.hook as hook, chains.name as chain, tables.family, tables.name as "table" from rules r  join ip_src src on r.id = src.rule_id join ip_dst dst on r.id = dst.rule_id join port_src psrc on r.id = psrc.rule_id join port_dst pdst on r.id = pdst.rule_id  join protocols prot on r.id = prot.rule_id join chains on r.chain_id = chains.id join tables on chains.table_id = tables.id where chains.type = "filter"'
     query = list(session.execute(sql))
     length = len(query)
+
+    def rule_schema(rule):
+        return dict(
+            ip_src=rule['ip_src'],
+            ip_dst=rule['ip_dst'],
+            port_src=rule['port_src'],
+            port_dst=rule['port_dst'],
+            protocol=rule['protocol'],
+            family=rule['family'],
+            table=rule['table'],
+            chain=rule['chain'],
+            hook=rule['hook']
+
+        )
+
     # loop 2 times in ruleset to detect the same attr
     for i in range(length):
         j = i + 1
@@ -39,11 +54,10 @@ def detect_anomaly():
                 else:
                     anomaly_type = 'redundancy'
                 result.append(dict(
-                    rule_a=[x for x in rule_a],
-                    rule_b=[x for x in rule_b],
+                    rule_a=[rule_schema(rule_a)],
+                    rule_b=[rule_schema(rule_a)],
                     anomaly_type=anomaly_type))
             j += 1
-    print(result)
     return result
 
 

@@ -3,6 +3,7 @@ import { useForm, SubmitHandler } from "react-hook-form";
 import {
   Box,
   Button,
+  Chip,
   FormControl,
   FormHelperText,
   FormLabel,
@@ -24,6 +25,7 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 import Background from "components/Layout/Background";
 import { FormListControl } from "components/FormListControl";
+import { MultipleSelectChip } from "components/FormSelectChip";
 
 const validate = yup.object({
   chain_name: yup.string().required("Chain is a required field"),
@@ -208,25 +210,20 @@ export function AddFirewallRule() {
                 resetTrigger={resetForm}
               />
               <FormListControl
-                title="IP destination"
+                title="Port source"
                 type="textfield"
-                onCallback={onIpDst}
-                placeholder='0.0.0.0'
+                onCallback={onPortSrc}
                 resetTrigger={resetForm}
               />
-              <FormListControl
-                title="Protocol"
-                options={PROTOCOL}
-                onCallback={onProtocol}
-                resetTrigger={resetForm}
-              />
+
             </Stack>
 
             <Stack direction={"row"}>
               <FormListControl
-                title="Port source"
+                title="IP destination"
                 type="textfield"
-                onCallback={onPortSrc}
+                onCallback={onIpDst}
+                placeholder='0.0.0.0'
                 resetTrigger={resetForm}
               />
               <FormListControl
@@ -235,6 +232,15 @@ export function AddFirewallRule() {
                 onCallback={onPortDst}
                 resetTrigger={resetForm}
               />
+            </Stack>
+            <Stack direction='row' >
+              <FormListControl
+                title="Protocol"
+                options={PROTOCOL}
+                onCallback={onProtocol}
+                resetTrigger={resetForm}
+              />
+              {/* <MultipleSelectChip ref={protocolRef} options={PROTOCOL} label="Protocol" /> */}
               <FormControl fullWidth>
                 <FormLabel>Port Protocol</FormLabel>
                 <Select value={watch("port_prot")} {...register("port_prot")}>

@@ -222,28 +222,30 @@ export function AddNatRule() {
                 placeholder='0.0.0.0'
               />
               <FormListControl
+                title="Port source"
+                type="textfield"
+                onCallback={onPortSrc}
+              />
+            </Stack>
+
+            <Stack direction={"row"}>
+              <FormListControl
                 title="IP destination"
                 type="textfield"
                 onCallback={onIpDst}
                 placeholder='0.0.0.0'
               />
               <FormListControl
-                title="Protocol"
-                options={PROTOCOL}
-                onCallback={onProtocol}
-              />
-            </Stack>
-
-            <Stack direction={"row"}>
-              <FormListControl
-                title="Port source"
-                type="textfield"
-                onCallback={onPortSrc}
-              />
-              <FormListControl
                 title="Port destination"
                 type="textfield"
                 onCallback={onPortDst}
+              />
+            </Stack>
+            <Stack direction={'row'}>
+              <FormListControl
+                title="Protocol"
+                options={PROTOCOL}
+                onCallback={onProtocol}
               />
               <FormControl fullWidth>
                 <FormLabel>Port Protocol</FormLabel>
@@ -259,7 +261,6 @@ export function AddNatRule() {
                 </Select>
               </FormControl>
             </Stack>
-
             <Button variant="contained" type="submit">
               Add
             </Button>
