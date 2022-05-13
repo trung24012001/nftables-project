@@ -1,6 +1,6 @@
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
-import { request, TableType } from "lib";
+import { request, routes, TableType } from "lib";
 import { useFetchData } from "lib/hooks";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -21,7 +21,7 @@ export function NftTable(): React.ReactElement {
   })
 
   const handleAdd = () => {
-    navigate("/tables/add");
+    navigate(routes.ADD_TABLE_ROUTE);
   };
 
   const handleDelete = async (table: TableType) => {
@@ -52,9 +52,8 @@ export function NftTable(): React.ReactElement {
   };
 
   const handleSelectRow = (row: TableType) => {
-    console.log(row)
     navigate({
-      pathname: '/chains',
+      pathname: routes.CHAIN_ROUTE,
       search: `?table=${encodeURIComponent(JSON.stringify(row))}`
     })
   }

@@ -3,65 +3,43 @@ import { AlertColor } from "@mui/material";
 export type TableType = {
   family: string;
   name: string;
-  handle?: number;
+  handle: number;
 };
 
 export type ChainType = {
-  table_name?: string;
-  table: TableType;
+  table: TableType | string;
   family: string;
   name: string;
   type: string;
   hook: string;
   priority: number;
-  handle?: number;
+  handle: number;
   policy: string;
 };
 
-export type FilterRuleType = {
+export type RuleType = {
+  family?: string;
+  table?: string;
   chain: ChainType | string;
-  chain_name?: string;
-  ip_src: string;
-  ip_dst: string;
-  port_src: string;
-  port_dst: string;
-  port_prot: string;
-  protocol: string;
+  ip_src: string | string[];
+  ip_dst: string | string[];
+  port_src: string | number[] | string[];
+  port_dst: string | number[] | string[];
+  port_prot: string | number;
+  protocol: string | string[];
   handle: number;
+  unique_handle?: number;
   policy: string;
-};
-
-export type NatRuleType = {
-  chain: ChainType | string;
-  chain_name?: string;
-  ip_src: string;
-  ip_dst: string;
-  port_src: string;
-  port_dst: string;
-  port_prot: string;
-  protocol: string;
-  handle: number;
-  policy: string;
-  to: string;
-};
-
-export type RuleTypeResponse = {
-  chain: ChainType;
-  ip_src: string[];
-  ip_dst: string[];
-  port_src: string[];
-  port_dst: string[];
-  port_prot: string;
-  protocol: string[];
-  handle: number;
-  policy: string;
+  to?: string;
 };
 
 export type AnomalyType = {
-  rule_a: FilterRuleType;
-  rule_b: FilterRuleType;
-  anomay_type: string;
+  rule_a: RuleType;
+  rule_b: RuleType;
+  anomaly_type: string;
 };
+
+export type AnalyticsType = {};
 
 export type MessageAlertType = {
   content: string;

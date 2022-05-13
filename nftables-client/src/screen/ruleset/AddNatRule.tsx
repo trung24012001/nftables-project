@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FieldError } from "react-hook-form";
 import {
   Box,
   Button,
@@ -14,7 +14,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { ChainType, request, routes, NatRuleType } from "lib";
+import { ChainType, request, routes, RuleType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,11 +25,12 @@ import Background from "components/Layout/Background";
 import { FormListControl } from "components/FormListControl";
 
 const validate = yup.object({
-  chain_name: yup.string().required("Chain is a required field"),
+  chain: yup.string().required("Chain is a required field"),
 });
 
 const ACTION_NAT = ["snat", "dnat", "redirect", "masquerade"];
-const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
+const PROTOCOL = ["tcp", "udp", "icmp", "sctp"];
+// const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
 const PORT_PROTOCOL = ["tcp", "udp", "sctp"];
 
 export function AddNatRule() {
@@ -50,9 +51,9 @@ export function AddNatRule() {
     watch,
     setValue,
     formState: { errors },
-  } = useForm<NatRuleType>({
+  } = useForm<RuleType>({
     defaultValues: {
-      chain_name: "",
+      chain: "",
       port_prot: "",
       policy: "",
       to: "",
@@ -71,7 +72,7 @@ export function AddNatRule() {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  const onSubmit: SubmitHandler<NatRuleType> = async (data) => {
+  const onSubmit: SubmitHandler<RuleType> = async (data) => {
     try {
       const payload = {
         ...data,
@@ -83,7 +84,7 @@ export function AddNatRule() {
         port_dst: portDstRef.current,
       };
 
-      delete payload.chain_name;
+      // delete payload.chain_name;
 
       console.log(payload)
 
@@ -121,7 +122,7 @@ export function AddNatRule() {
       }
     }
     setChainSelected(e.target.value);
-    setValue("chain_name", "value");
+    setValue("chain", e.target.value);
     setValue(("policy"), '')
   };
 
@@ -167,7 +168,7 @@ export function AddNatRule() {
               <Select
                 value={chainSelected}
                 onChange={onChainChange}
-                error={!!errors.chain_name?.message}
+                error={!!(errors.chain as FieldError)?.message}
               >
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
@@ -185,8 +186,8 @@ export function AddNatRule() {
                   );
                 })}
               </Select>
-              <FormHelperText error={!!errors.chain_name?.message}>
-                {errors.chain_name?.message}
+              <FormHelperText error={!!(errors.chain as FieldError)?.message}>
+                {(errors.chain as FieldError)?.message}
               </FormHelperText>
             </FormControl>
             <Stack direction={"row"} spacing={2}>

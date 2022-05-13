@@ -1,4 +1,4 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { MessageAlertType } from "lib";
 
 export interface ICommonState {
@@ -13,7 +13,10 @@ export const commonSlice = createSlice({
   name: "common",
   initialState,
   reducers: {
-    setMessage: (state, action) => {
+    setMessage: (
+      state: ICommonState,
+      action: PayloadAction<MessageAlertType | null>
+    ) => {
       state.message = action.payload;
     },
   },

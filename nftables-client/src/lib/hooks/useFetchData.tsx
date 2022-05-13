@@ -1,44 +1,49 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { request } from 'lib/request';
 
 export function useFetchData<T>({
-  path, config, onSuccess, onError
+  path, config, onSuccess, onError, isFetch = true
 }: {
   path: string,
   config?: Record<string, any>,
+  isFetch?: boolean,
   onSuccess?: (data: T) => void,
   onError?: (error: string) => void
 }) {
   const [data, setData] = useState<T>();
   const [loading, setLoading] = useState<boolean>(false);
-  const [reload, setReload] = useState<Date>(new Date());
-  const pathUrl = useRef<string>(path)
+  const pathRef = useRef<string>(path)
 
   useEffect(() => {
-    const fetch = async () => {
-      try {
-        const res = await fetchData()
-        setData(res.data)
-        onSuccess && onSuccess(res.data)
-      } catch (error) {
-        onError && onError(error as string)
-      } finally {
-        setLoading(false)
-      }
+    if (isFetch) {
+      fetch()
     }
-    fetch()
-  }, [path, reload])
+  }, [path])
 
-  const refetch = (refetchPath?: string) => {
-    if (refetchPath) {
-      pathUrl.current = refetchPath
+  const fetch = async () => {
+    try {
+      load()
+      const res = await request.get(pathRef.current, config);
+      setData(res.data)
+      onSuccess && onSuccess(res.data)
+      return res.data;
+    } catch (error) {
+      onError && onError(error as string)
+    } finally {
+      setLoading(false)
     }
-    setReload(new Date())
   }
 
-  const fetchData = async () => {
+  const load = () => {
     setLoading(true)
-    return await request.get(pathUrl.current, config);
+  }
+
+  const refetch = async (newPath?: string) => {
+    if (newPath) {
+      pathRef.current = newPath
+    }
+
+    return await fetch()
   }
 
   return { data, loading, refetch };

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FieldError } from "react-hook-form";
 import {
   Autocomplete,
   Box,
@@ -15,7 +15,7 @@ import {
   TextField,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { ChainType, request, TableType } from "lib";
+import { ChainType, request, routes, TableType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -25,7 +25,7 @@ import { RootState } from "store";
 import Background from "components/Layout/Background";
 
 const validate = yup.object({
-  table_name: yup.string().required("Table is a required field"),
+  table: yup.string().required("Table is a required field"),
   name: yup.string().required("Name is a required field"),
   hook: yup.string().required('Hook is a required field'),
   priority: yup.number().required(),
@@ -56,7 +56,7 @@ export function AddChain() {
     formState: { errors },
   } = useForm<ChainType>({
     defaultValues: {
-      table_name: "",
+      table: "",
       name: "",
       hook: "",
       priority: 0,
@@ -71,8 +71,6 @@ export function AddChain() {
         table: JSON.parse(tableSelected as string),
         type: typeSelected
       }
-
-      delete payload.table_name;
 
       console.log(payload)
 
@@ -111,7 +109,7 @@ export function AddChain() {
 
   const onTableChange = (e: SelectChangeEvent<TableType | string>) => {
     setTableSelected(e.target.value);
-    setValue('table_name', e.target.value as string);
+    setValue('table', e.target.value);
   }
 
   const onTypeChange = (e: SelectChangeEvent<string>) => {
@@ -120,7 +118,7 @@ export function AddChain() {
   }
 
   return (
-    <Background onClick={() => { navigate('/chains') }}>
+    <Background onClick={() => { navigate(routes.CHAIN_ROUTE) }}>
       <Page title="Add chain">
         <Box
           p={5}
@@ -134,7 +132,7 @@ export function AddChain() {
           <Stack spacing={2} width="80%" >
             <FormControl fullWidth>
               <FormLabel>Table</FormLabel>
-              <Select value={tableSelected} onChange={onTableChange} error={!!errors.table_name?.message}>
+              <Select value={tableSelected} onChange={onTableChange} error={!!(errors.table as FieldError)?.message}>
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
@@ -147,8 +145,8 @@ export function AddChain() {
                   </MenuItem>
                 ))}
               </Select>
-              <FormHelperText error={!!errors.table_name?.message}>
-                {errors.table_name?.message}
+              <FormHelperText error={!!(errors.table as FieldError)?.message}>
+                {(errors.table as FieldError)?.message}
               </FormHelperText>
             </FormControl>
             <FormControl>

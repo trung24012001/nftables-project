@@ -220,7 +220,7 @@ def nat_rule_formatter(rule):
             })
         result['addr'] = ip
     if len(ip_and_port) == 2:
-        port = ip_and_port[1]
+        port = str(ip_and_port[1])
         if port.find('-') >= 0:
             port = dict(range=port.split('-'))
         else:
@@ -235,6 +235,7 @@ def nat_rule_formatter(rule):
 def decompose_data(data, type=None):
     arr = []
     for item in data:
+        item = str(item)
         if item.find('/') >= 0:
             net = ip_network(item)
             for ip in net:

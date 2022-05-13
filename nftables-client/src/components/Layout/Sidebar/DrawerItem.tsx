@@ -17,10 +17,10 @@ const DrawerItem: React.VFC = () => {
   const location = useLocation();
 
   const checkActiveRoute = (route: string) => {
-    if (route == '/')
-      return location.pathname === '/'
+    if (route === '/')
+      return location.pathname === '/' || location.pathname === '/analytics'
 
-    return location.pathname.indexOf(route) >= 0;
+    return location.pathname.startsWith(route);
   }
 
   return (

@@ -10,8 +10,8 @@ export type SidebarType = {
 
 export const sidebarItems: SidebarType[] = [
   {
-    name: "Anomaly",
-    route: routes.OVERVIEW_ROUTE,
+    name: "Analytics",
+    route: routes.INDEX_ROUTE,
     icon: <InboxIcon />,
   },
   {

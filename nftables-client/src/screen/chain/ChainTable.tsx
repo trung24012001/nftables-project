@@ -1,6 +1,6 @@
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
-import { ChainType, request } from "lib";
+import { ChainType, request, routes } from "lib";
 import { useFetchData } from "lib/hooks";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -12,10 +12,6 @@ export function ChainTable(): React.ReactElement {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [params] = useSearchParams();
-
-  useEffect(() => {
-    console.log(params.get('table'))
-  }, [params])
 
   const { data, loading, refetch } = useFetchData<{ chains: ChainType[] }>({
     path: '/chains',
@@ -30,7 +26,7 @@ export function ChainTable(): React.ReactElement {
   })
 
   const handleAdd = () => {
-    navigate("/chains/add");
+    navigate(routes.ADD_CHAIN_ROUTE);
   };
 
   const handleDelete = async (chain: ChainType) => {
@@ -56,9 +52,8 @@ export function ChainTable(): React.ReactElement {
   };
 
   const handleSelectRow = (row: ChainType) => {
-    console.log(row)
     navigate({
-      pathname: '/rules/' + row.type,
+      pathname: row.type === 'filter' ? routes.FIREWALL_ROUTE : routes.NAT_ROUTE,
       search: `?chain=${encodeURIComponent(JSON.stringify(row))}`
     })
   }

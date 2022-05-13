@@ -1,6 +1,6 @@
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
-import { request, routes } from "lib";
+import { RuleType, request, routes } from "lib";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -16,13 +16,13 @@ export function NatTable(): React.ReactElement {
   useEffect(() => {
     dispatch(getRuleset({ type: "nat" }));
   }, []);
+
   const handleAdd = () => {
     navigate(routes.ADD_NAT_ROUTE);
   };
 
   const handleDelete = async (rule: any) => {
     try {
-      console.log(rule);
       const res = await request.delete("/rules", {
         params: {
           rule,
@@ -47,12 +47,21 @@ export function NatTable(): React.ReactElement {
       );
     }
   };
+
+  const handleSelctRow = (row: RuleType) => {
+    navigate({
+      pathname: routes.NAT_DETAIL_ROUTE,
+      search: `?rule=${encodeURIComponent(JSON.stringify(row))}`
+    })
+  }
+
   return (
     <Background title="Nat Ruleset">
       <ReactTable
         headers={natHeaders}
         rows={natRules}
         onActionAdd={handleAdd}
+        onActionRow={handleSelctRow}
         onActionDelete={handleDelete}
       />
     </Background>

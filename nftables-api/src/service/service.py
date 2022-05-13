@@ -8,8 +8,11 @@ main_api = Blueprint("api", __name__)
 @main_api.route("/anomaly")
 def get_anomaly():
     try:
-        anomaly = http.get_anomaly_http()
-        return jsonify({"anomaly": anomaly}), 200
+        result = http.get_anomaly_http()
+        return jsonify({
+            "anomalies": result['anomalies'],
+            "analytics": result['analytics']
+        }), 200
     except Exception as e:
         print(e)
         return jsonify({"error": "could not get anomaly"}), 500
@@ -18,7 +21,7 @@ def get_anomaly():
 @main_api.route("/tables")
 def get_tables():
     try:
-        tables = http.get_tables_db()
+        tables = http.get_tables_http()
         return jsonify({"tables": tables}), 200
     except:
         return jsonify({"error": "could not get tables"}), 500
@@ -29,7 +32,7 @@ def add_table():
     try:
         payload = request.get_json()
         table = dict(family=payload["family"], name=payload["name"])
-        if not http.add_table_db(table):
+        if not http.add_table_http(table):
             return jsonify({"error": "could not add table"}), 400
         return jsonify({"message": "successfully"}), 200
     except Exception as e:
@@ -41,7 +44,7 @@ def add_table():
 def delete_table():
     try:
         table = json.loads(request.args.get('table'))
-        if not http.delete_table_db(table):
+        if not http.delete_table_http(table):
             return jsonify({"error": "could not delete table"}), 500
         return jsonify({"message": "success"}), 200
     except:
@@ -87,7 +90,7 @@ def add_chain():
 def delete_chain():
     try:
         chain = json.loads(request.args.get('chain'))
-        if not http.delete_chain_db(chain):
+        if not http.delete_chain_http(chain):
             return jsonify({"error": "could not delete chain"}), 400
         return jsonify({"message": "successfully"}), 200
 
@@ -135,7 +138,7 @@ def delete_rule():
             handle=query_rule.get("handle")
         )
         print(rule)
-        if not http.delete_rule_db(rule):
+        if not http.delete_rule_http(rule):
             return jsonify({"error": "could not delete rule"}), 400
         return jsonify({"message": "Delete successfully"}), 200
     except Exception as e:

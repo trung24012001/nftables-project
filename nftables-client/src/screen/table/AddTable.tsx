@@ -14,7 +14,7 @@ import {
   Typography,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { request, TableType } from "lib";
+import { request, routes, TableType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch } from "react-redux";
@@ -72,7 +72,7 @@ export function AddTable() {
   };
 
   return (
-    <Background onClick={() => { navigate('/tables') }}>
+    <Background onClick={() => { navigate(routes.TABLE_ROUTE) }}>
       <Page title="Add Table">
         <Box
           p={5}

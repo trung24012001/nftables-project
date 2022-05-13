@@ -1,12 +1,14 @@
-import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { request, RuleTypeResponse } from "lib";
-import { ChainType, FilterRuleType, NatRuleType, TableType } from "lib";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { AnomalyType, request } from "lib";
+import { ChainType, RuleType, TableType } from "lib";
 
 export interface IRuleState {
   tables: TableType[];
   chains: ChainType[];
-  filter_rules: FilterRuleType[];
-  nat_rules: NatRuleType[];
+  filter_rules: RuleType[];
+  nat_rules: RuleType[];
+  anomalies: AnomalyType[];
+  analytics: Record<string, number>[];
 }
 
 const initialState: IRuleState = {
@@ -14,6 +16,8 @@ const initialState: IRuleState = {
   chains: [],
   filter_rules: [],
   nat_rules: [],
+  anomalies: [],
+  analytics: [],
 };
 
 export const getTables = createAsyncThunk(
@@ -49,14 +53,14 @@ export const getRuleset = createAsyncThunk(
       const res = await request.get("/rules", {
         params: { type },
       });
-      const rules = res.data.ruleset.map((rule: RuleTypeResponse) => {
+      const rules = res.data.ruleset.map((rule: RuleType) => {
         return {
           ...rule,
-          ip_src: rule.ip_src?.join(", "),
-          ip_dst: rule.ip_dst?.join(", "),
-          port_src: rule.port_src?.join(", "),
-          port_dst: rule.port_dst?.join(", "),
-          protocol: rule.protocol?.join(", "),
+          ip_src: (rule.ip_src as string[])?.join(", "),
+          ip_dst: (rule.ip_dst as string[])?.join(", "),
+          port_src: (rule.port_src as string[])?.join(", "),
+          port_dst: (rule.port_dst as string[])?.join(", "),
+          protocol: (rule.protocol as string[])?.join(", "),
         };
       });
       return {
@@ -73,7 +77,20 @@ export const getRuleset = createAsyncThunk(
 export const rulesetSlice = createSlice({
   name: "ruleset",
   initialState,
-  reducers: {},
+  reducers: {
+    getAnomalies: (
+      state: IRuleState,
+      action: PayloadAction<{
+        anomalies: AnomalyType[];
+        analytics: Record<string, number>[];
+      }>
+    ) => {
+      const { anomalies, analytics } = action.payload;
+      console.log(analytics);
+      state.anomalies = anomalies;
+      state.analytics = analytics;
+    },
+  },
   extraReducers(builder) {
     builder.addCase(getTables.rejected, (state, action) => {
       console.log("get tables rejected!");
@@ -103,6 +120,6 @@ export const rulesetSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const {} = rulesetSlice.actions;
+export const { getAnomalies } = rulesetSlice.actions;
 
 export default rulesetSlice.reducer;

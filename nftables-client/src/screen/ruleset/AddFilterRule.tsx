@@ -1,14 +1,11 @@
 import React, { useEffect, useRef, useState } from "react";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FieldError } from "react-hook-form";
 import {
   Box,
   Button,
-  Chip,
   FormControl,
   FormHelperText,
   FormLabel,
-  Grid,
-  IconButton,
   MenuItem,
   Select,
   SelectChangeEvent,
@@ -16,7 +13,7 @@ import {
   styled,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
-import { ChainType, request, routes, FilterRuleType } from "lib";
+import { ChainType, request, routes, RuleType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
@@ -27,13 +24,15 @@ import Background from "components/Layout/Background";
 import { FormListControl } from "components/FormListControl";
 import { MultipleSelectChip } from "components/FormSelectChip";
 
-const validate = yup.object({
-  chain_name: yup.string().required("Chain is a required field"),
-});
 
 const ACTION_FILTER = ["accept", "drop"];
-const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
+const PROTOCOL = ["tcp", "udp", "icmp", "sctp"];
+// const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
 const PORT_PROTOCOL = ["tcp", "udp", "sctp"];
+
+const validate = yup.object({
+  chain: yup.string().required("Chain is a required field"),
+});
 
 export function AddFirewallRule() {
   const navigate = useNavigate();
@@ -54,9 +53,9 @@ export function AddFirewallRule() {
     setValue,
     reset,
     formState: { errors },
-  } = useForm<FilterRuleType>({
+  } = useForm<RuleType>({
     defaultValues: {
-      chain_name: "",
+      chain: "",
       port_prot: "",
       policy: "accept",
     },
@@ -74,7 +73,7 @@ export function AddFirewallRule() {
     return () => subscription.unsubscribe();
   }, [watch]);
 
-  const onSubmit: SubmitHandler<FilterRuleType> = async (data) => {
+  const onSubmit: SubmitHandler<RuleType> = async (data) => {
     try {
       const payload = {
         ...data,
@@ -85,7 +84,7 @@ export function AddFirewallRule() {
         port_src: portSrcRef.current,
         port_dst: portDstRef.current,
       };
-      delete payload.chain_name
+      // delete payload.chain_name
       const res = await request.post("/rules", payload, {
         params: {
           type: 'filter'
@@ -121,7 +120,7 @@ export function AddFirewallRule() {
 
   const onChainChange = (e: SelectChangeEvent<ChainType | string>) => {
     setChainSelected(e.target.value);
-    setValue("chain_name", e.target.value as string);
+    setValue("chain", e.target.value);
   };
 
   const onProtocol = (protocols: string[]) => {
@@ -166,26 +165,26 @@ export function AddFirewallRule() {
               <Select
                 value={chainSelected}
                 onChange={onChainChange}
-                error={!!errors.chain_name?.message}
+                error={!!(errors.chain as FieldError)?.message}
               >
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
-                {chains?.map((chain: ChainType, idx: number) => {
-                  if (chain.type !== "filter") return;
+                {chains?.map((chainItem: ChainType, idx: number) => {
+                  if (chainItem.type !== "filter") return;
                   return (
-                    <MenuItem key={idx} value={JSON.stringify(chain)}>
-                      {chain.name}
+                    <MenuItem key={idx} value={JSON.stringify(chainItem)}>
+                      {chainItem.name}
                       <MenuSubTitle>
-                        table: {chain.family} {chain.table}; hook: {chain.hook};
-                        priority: {chain.priority}; policy: {chain.policy}
+                        table: {chainItem.family} {chainItem.table}; hook: {chainItem.hook};
+                        priority: {chainItem.priority}; policy: {chainItem.policy}
                       </MenuSubTitle>
                     </MenuItem>
                   );
                 })}
               </Select>
-              <FormHelperText error={!!errors.chain_name?.message}>
-                {errors.chain_name?.message}
+              <FormHelperText error={!!(errors.chain as FieldError)?.message}>
+                {(errors.chain as FieldError)?.message}
               </FormHelperText>
             </FormControl>
             <FormControl>
