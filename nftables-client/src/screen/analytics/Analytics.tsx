@@ -3,13 +3,12 @@ import { Box, Button, CircularProgress, Stack } from "@mui/material";
 import Background from "components/Layout/Background";
 import { AnomalyType } from "lib";
 import { useFetchData } from "lib/hooks";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "store";
 import { getAnomalies } from "store/reducers";
 import EchartBar from "./EchartBar";
 import RuleAnomaly from "./RuleAnomaly";
-
 
 export function Analytics(): React.ReactElement {
   const dispatch = useDispatch();
@@ -35,31 +34,13 @@ export function Analytics(): React.ReactElement {
           Detect
         </Button>
       </Box>
-
       {loading &&
         <Stack spacing={2} alignItems='center' >
           <CircularProgress />
-          <Box fontWeight='bold'>Analysing...</Box>
+          <Box >Analysing...</Box>
         </Stack>
       }
-
-      {analytics.length > 0 && !loading &&
-        <>
-          <EchartBar analytics={analytics} />
-          <Box>
-            {analytics.map((item) => {
-              let [key] = Object.keys(item);
-              return (
-                <Box key={key}>
-                  <b>{key}:</b> {item[key]}
-                </Box>
-              )
-            })}
-          </Box>
-        </>
-
-      }
-
+      <EchartBar analytics={analytics || {}} />
       {anomalies.map((anomaly: AnomalyType, idx: number) => {
         return (
           <RuleAnomaly key={idx} anomaly={anomaly} />

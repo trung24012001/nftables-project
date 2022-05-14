@@ -125,26 +125,17 @@ def parse_anomaly(row):
 
 
 def analytics(anomalies):
-    result = [
-        {
-            "shadowing": 0
-        },
-        {
-            "generalization": 0
-        },
-        {
-            "correlation": 0
-        },
-        {
-            "redundancy": 0
-        }
-    ]
+    result = {
+        "shadowing": 0,
+        "generalization": 0,
+        "correlation": 0,
+        "redundancy": 0,
+    }
     for anomaly in anomalies:
         type = anomaly['anomaly_type']
-        for item in result:
-            if item.get(type) == None:
-                continue
-            item[type] += 1
+        if result.get(type) == None:
+            continue
+        result[type] += 1
     print(result)
     return result
 

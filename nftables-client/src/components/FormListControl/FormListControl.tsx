@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { MutableRefObject, useEffect, useState } from "react";
 import {
   Box,
   FormLabel,
@@ -11,22 +11,30 @@ export function FormListControl({
   type = 'select',
   title,
   options,
-  onCallback,
+  onChange,
   placeholder,
-  resetTrigger
+  resetTrigger,
+  dataRef
 }: {
   type?: 'select' | 'textfield',
   title: string,
   options?: string[],
-  onCallback: (data: string[]) => void,
+  onChange?: (data: string[]) => void,
   placeholder?: string,
-  resetTrigger?: Date | string | number
+  resetTrigger?: Date | string | number,
+  dataRef: MutableRefObject<string[]>
 }) {
   const [data, setData] = useState<string[]>(['']);
 
   useEffect(() => {
     setData([''])
+    dataRef.current = []
   }, [resetTrigger])
+
+  const onCallback = (items: string[]) => {
+    dataRef.current = items
+    onChange && onChange(items)
+  }
 
   return (
     <Box width={'100%'}>

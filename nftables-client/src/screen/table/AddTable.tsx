@@ -23,8 +23,7 @@ import { useNavigate } from "react-router-dom";
 import Background from "components/Layout/Background";
 
 const validate = yup.object({
-  family: yup.string().required("Family is required"),
-  name: yup.string().required("Name is required"),
+  name: yup.string().required("Name is a required field"),
 });
 
 const FAMILY = ["ip", "ip6", "inet", "bridge"];
@@ -83,29 +82,29 @@ export function AddTable() {
           noValidate
           autoComplete="off"
         >
-          <Stack spacing={2} width="80%" >
-            <Stack direction='row' spacing={2}>
-              <FormControl sx={{ width: '200px' }}>
-                <FormLabel>Family</FormLabel>
-                <Select value={watch("family")} {...register("family")}>
-                  {FAMILY.map((fam) => (
-                    <MenuItem key={fam} value={fam}>
-                      {fam}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-              <FormControl fullWidth>
-                <FormLabel>Name</FormLabel>
-                <TextField error={!!errors.name?.message} {...register("name")} />
-                <FormHelperText error={!!errors.name?.message}>
-                  {errors.name?.message}
-                </FormHelperText>
-              </FormControl>
-            </Stack>
-            <Button variant="contained" type="submit">
-              Add
-            </Button>
+          <Stack spacing={2} width="80%" alignItems={'center'}>
+            <FormControl fullWidth>
+              <FormLabel>Family</FormLabel>
+              <Select value={watch("family")} {...register("family")}>
+                {FAMILY.map((fam) => (
+                  <MenuItem key={fam} value={fam}>
+                    {fam}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+            <FormControl fullWidth>
+              <FormLabel>Name</FormLabel>
+              <TextField error={!!errors.name?.message} {...register("name")} />
+              <FormHelperText error={!!errors.name?.message}>
+                {errors.name?.message}
+              </FormHelperText>
+            </FormControl>
+            <Box textAlign={'center'} pt={5} >
+              <Button variant="contained" type="submit" sx={{ width: 300 }}>
+                Add
+              </Button>
+            </Box>
           </Stack>
         </Box>
       </Page>

@@ -8,7 +8,7 @@ export interface IRuleState {
   filter_rules: RuleType[];
   nat_rules: RuleType[];
   anomalies: AnomalyType[];
-  analytics: Record<string, number>[];
+  analytics: Record<string, number> | undefined;
 }
 
 const initialState: IRuleState = {
@@ -17,7 +17,7 @@ const initialState: IRuleState = {
   filter_rules: [],
   nat_rules: [],
   anomalies: [],
-  analytics: [],
+  analytics: undefined,
 };
 
 export const getTables = createAsyncThunk(
@@ -82,7 +82,7 @@ export const rulesetSlice = createSlice({
       state: IRuleState,
       action: PayloadAction<{
         anomalies: AnomalyType[];
-        analytics: Record<string, number>[];
+        analytics: Record<string, number>;
       }>
     ) => {
       const { anomalies, analytics } = action.payload;

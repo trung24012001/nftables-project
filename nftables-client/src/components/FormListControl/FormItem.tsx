@@ -1,5 +1,5 @@
 import { MenuItem, Select, SelectChangeEvent, TextField } from '@mui/material';
-import React, { useState } from 'react'
+import React from 'react'
 import ActionContainer from './ActionContainer';
 
 export default function FormItem({
@@ -9,7 +9,7 @@ export default function FormItem({
   data,
   setData,
   onCallback,
-  placeholder
+  placeholder,
 }: {
   type?: 'select' | 'textfield',
   options?: string[],
@@ -17,7 +17,7 @@ export default function FormItem({
   data: string[],
   setData: React.Dispatch<React.SetStateAction<string[]>>,
   onCallback: (selected: string[]) => void,
-  placeholder?: string
+  placeholder?: string,
 }) {
 
   const onSelectChange = (e: SelectChangeEvent<unknown>) => {

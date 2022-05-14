@@ -23,12 +23,13 @@ import { getTables, setMessage } from "store/reducers";
 import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 import Background from "components/Layout/Background";
+import { useFetchData } from "lib/hooks";
 
 const validate = yup.object({
   table: yup.string().required("Table is a required field"),
   name: yup.string().required("Name is a required field"),
   hook: yup.string().required('Hook is a required field'),
-  priority: yup.number().required(),
+  priority: yup.string().required("Priority is a required field"),
 });
 
 const TYPE = ["filter", "nat"];
@@ -39,13 +40,15 @@ const POLICY_FILTER = ["accept", "drop"];
 export function AddChain() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const tables = useSelector((state: RootState) => state.ruleset.tables);
   const [tableSelected, setTableSelected] = useState<TableType | string>("");
   const [typeSelected, setTypeSelected] = useState<string>(TYPE[0]);
 
-  useEffect(() => {
-    dispatch(getTables({}));
-  }, []);
+  const { data: tablesRes } = useFetchData<{ tables: TableType[] }>({
+    path: '/tables',
+    onError: (error) => {
+      console.log(error)
+    }
+  })
 
   const {
     register,
@@ -72,8 +75,6 @@ export function AddChain() {
         type: typeSelected
       }
 
-      console.log(payload)
-
       const res = await request.post("/chains", payload);
       if (res.status === 200) {
         dispatch(
@@ -98,13 +99,11 @@ export function AddChain() {
     }
   };
 
-  const hooksFromType = useMemo(() => {
-    switch (typeSelected) {
-      case "filter":
-        return HOOK_FILTER;
-      case "nat":
-        return HOOK_NAT;
+  const hooks = useMemo(() => {
+    if (typeSelected === "nat") {
+      return HOOK_NAT
     }
+    return HOOK_FILTER
   }, [typeSelected]);
 
   const onTableChange = (e: SelectChangeEvent<TableType | string>) => {
@@ -136,7 +135,7 @@ export function AddChain() {
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
-                {tables.map((table: TableType, idx: number) => (
+                {(tablesRes?.tables || []).map((table: TableType, idx: number) => (
                   <MenuItem key={idx} value={JSON.stringify(table)}>
                     {table.name}
                     <MenuSubTitle>
@@ -171,23 +170,28 @@ export function AddChain() {
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Hook</FormLabel>
-                {hooksFromType && (
-                  <Select value={watch("hook")} {...register("hook")} >
-                    {hooksFromType.map((hook: string) => (
-                      <MenuItem key={hook} value={hook}>
-                        {hook}
-                      </MenuItem>
-                    ))}
-                  </Select>
-                )}
+                <Select value={watch("hook")} {...register("hook")} error={!!errors.hook?.message} >
+                  {hooks.map((hook: string) => (
+                    <MenuItem key={hook} value={hook}>
+                      {hook}
+                    </MenuItem>
+                  ))}
+                </Select>
+                <FormHelperText error={!!errors.hook?.message}>
+                  {errors.hook?.message}
+                </FormHelperText>
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Priority</FormLabel>
                 <TextField
+                  error={!!errors.priority?.message}
                   type="number"
                   value={watch("priority")}
                   {...register("priority")}
                 />
+                <FormHelperText error={!!errors.priority?.message}>
+                  {errors.priority?.message}
+                </FormHelperText>
               </FormControl>
               <FormControl fullWidth>
                 <FormLabel>Policy</FormLabel>
@@ -200,9 +204,11 @@ export function AddChain() {
                 </Select>
               </FormControl>
             </Stack>
-            <Button variant="contained" type="submit">
-              Add
-            </Button>
+            <Box textAlign={'center'} pt={5} >
+              <Button variant="contained" type="submit" sx={{ width: 300 }}>
+                Add
+              </Button>
+            </Box>
           </Stack>
         </Box>
       </Page>

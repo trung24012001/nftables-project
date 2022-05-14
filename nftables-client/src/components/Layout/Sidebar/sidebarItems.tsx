@@ -1,6 +1,10 @@
 import React from "react";
 import { routes } from "lib/constant";
-import InboxIcon from "@mui/icons-material/MoveToInbox";
+import BackupTableIcon from '@mui/icons-material/BackupTable';
+import BarChartIcon from '@mui/icons-material/BarChart';
+import TableViewIcon from '@mui/icons-material/TableView';
+import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
+import RouterIcon from '@mui/icons-material/Router';
 
 export type SidebarType = {
   name: string;
@@ -12,26 +16,26 @@ export const sidebarItems: SidebarType[] = [
   {
     name: "Analytics",
     route: routes.INDEX_ROUTE,
-    icon: <InboxIcon />,
+    icon: <BarChartIcon />,
   },
   {
     name: "Tables",
     route: routes.TABLE_ROUTE,
-    icon: <InboxIcon />,
+    icon: <TableViewIcon />,
   },
   {
     name: "Chains",
     route: routes.CHAIN_ROUTE,
-    icon: <InboxIcon />,
+    icon: <BackupTableIcon />,
   },
   {
     name: "Firewall",
     route: routes.FIREWALL_ROUTE,
-    icon: <InboxIcon />,
+    icon: <LocalFireDepartmentIcon />,
   },
   {
     name: "Nat",
     route: routes.NAT_ROUTE,
-    icon: <InboxIcon />,
+    icon: <RouterIcon />,
   },
 ];

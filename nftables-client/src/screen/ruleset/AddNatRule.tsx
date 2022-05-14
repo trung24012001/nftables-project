@@ -23,10 +23,9 @@ import { useNavigate } from "react-router-dom";
 import { RootState } from "store";
 import Background from "components/Layout/Background";
 import { FormListControl } from "components/FormListControl";
+import { useFetchData } from "lib/hooks";
 
-const validate = yup.object({
-  chain: yup.string().required("Chain is a required field"),
-});
+
 
 const ACTION_NAT = ["snat", "dnat", "redirect", "masquerade"];
 const PROTOCOL = ["tcp", "udp", "icmp", "sctp"];
@@ -36,7 +35,6 @@ const PORT_PROTOCOL = ["tcp", "udp", "sctp"];
 export function AddNatRule() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const chains = useSelector((state: RootState) => state.ruleset.chains);
   const [chainSelected, setChainSelected] = useState<ChainType | string>("");
   const [actions, setActions] = useState<string[]>(ACTION_NAT);
   const protocolRef = useRef<string[]>([]);
@@ -44,6 +42,19 @@ export function AddNatRule() {
   const ipDstRef = useRef<string[]>([]);
   const portSrcRef = useRef<string[]>([]);
   const portDstRef = useRef<string[]>([]);
+
+  const validate = yup.object({
+    chain: yup.string().required("Chain is a required field"),
+    port_prot: yup.string().test({
+      message: 'Port protocol is required when port is filled',
+      test: (value) => {
+        if (portSrcRef.current.length || portDstRef.current.length) {
+          return !!value
+        }
+        return true
+      },
+    })
+  });
 
   const {
     register,
@@ -61,16 +72,12 @@ export function AddNatRule() {
     resolver: yupResolver(validate),
   });
 
-  useEffect(() => {
-    dispatch(getChains({}));
-  }, []);
-
-  useEffect(() => {
-    const subscription = watch((value, { name, type }) => {
-      name === "port_prot" && setValue("protocol", value.port_prot as string);
-    });
-    return () => subscription.unsubscribe();
-  }, [watch]);
+  const { data: chainsRes } = useFetchData<{ chains: ChainType[] }>({
+    path: '/chains',
+    onError: (error) => {
+      console.log(error)
+    }
+  })
 
   const onSubmit: SubmitHandler<RuleType> = async (data) => {
     try {
@@ -83,10 +90,6 @@ export function AddNatRule() {
         port_src: portSrcRef.current,
         port_dst: portDstRef.current,
       };
-
-      // delete payload.chain_name;
-
-      console.log(payload)
 
       const res = await request.post("/rules", payload, {
         params: {
@@ -126,27 +129,11 @@ export function AddNatRule() {
     setValue(("policy"), '')
   };
 
-  const onProtocol = (protocols: string[]) => {
-    protocolRef.current = protocols;
-  };
-
-  const onIpSrc = (ipSrc: string[]) => {
-    ipSrcRef.current = ipSrc;
-  };
-
-  const onIpDst = (ipDst: string[]) => {
-    ipDstRef.current = ipDst;
-  };
-
-  const onPortSrc = (portSrc: string[]) => {
-    portSrcRef.current = portSrc;
-    if (portDstRef.current.length) {
+  const onPortChange = (ports: string[]) => {
+    if (ports.length > 0 && ports[0]) {
+      console.log('required port')
     }
-  };
-
-  const onPortDst = (portDst: string[]) => {
-    portDstRef.current = portDst;
-  };
+  }
 
   return (
     <Background
@@ -173,7 +160,7 @@ export function AddNatRule() {
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
-                {chains.map((chain: ChainType, idx: number) => {
+                {(chainsRes?.chains || []).map((chain: ChainType, idx: number) => {
                   if (chain.type !== "nat") return;
                   return (
                     <MenuItem key={idx} value={JSON.stringify(chain)}>
@@ -219,13 +206,14 @@ export function AddNatRule() {
               <FormListControl
                 title="IP source"
                 type="textfield"
-                onCallback={onIpSrc}
                 placeholder='0.0.0.0'
+                dataRef={ipSrcRef}
               />
               <FormListControl
                 title="Port source"
                 type="textfield"
-                onCallback={onPortSrc}
+                dataRef={portSrcRef}
+                onChange={onPortChange}
               />
             </Stack>
 
@@ -233,24 +221,25 @@ export function AddNatRule() {
               <FormListControl
                 title="IP destination"
                 type="textfield"
-                onCallback={onIpDst}
                 placeholder='0.0.0.0'
+                dataRef={ipDstRef}
               />
               <FormListControl
                 title="Port destination"
                 type="textfield"
-                onCallback={onPortDst}
+                dataRef={portDstRef}
+                onChange={onPortChange}
               />
             </Stack>
             <Stack direction={'row'}>
               <FormListControl
                 title="Protocol"
                 options={PROTOCOL}
-                onCallback={onProtocol}
+                dataRef={protocolRef}
               />
               <FormControl fullWidth>
                 <FormLabel>Port Protocol</FormLabel>
-                <Select value={watch("port_prot")} {...register("port_prot")}>
+                <Select value={watch("port_prot")} {...register("port_prot")} error={!!errors.port_prot?.message}>
                   <MenuItem value="" sx={{ opacity: 0.6 }}>
                     None
                   </MenuItem>
@@ -260,11 +249,16 @@ export function AddNatRule() {
                     </MenuItem>
                   ))}
                 </Select>
+                <FormHelperText error={!!errors.port_prot?.message}>
+                  {errors.port_prot?.message}
+                </FormHelperText>
               </FormControl>
             </Stack>
-            <Button variant="contained" type="submit">
-              Add
-            </Button>
+            <Box textAlign={'center'} pt={5}>
+              <Button variant="contained" type="submit" sx={{ width: 300 }}>
+                Add
+              </Button>
+            </Box>
           </Stack>
         </Box>
       </Page>
