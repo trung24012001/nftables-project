@@ -105,7 +105,7 @@ export function ReactTable({
               </TableRow>
             </TableHead>
             <TableBody>
-              {rows?.map((row: any, idx: number) => {
+              {rows?.slice(page * rowsPerPage, (page + 1) * rowsPerPage).map((row: any, idx: number) => {
                 return (
                   <StyledTableRow hover key={idx} onClick={() => onActionRow && onActionRow(row)}>
                     {headers.map((header: HeaderType) => (

@@ -29,7 +29,7 @@ const validate = yup.object({
   table: yup.string().required("Table is a required field"),
   name: yup.string().required("Name is a required field"),
   hook: yup.string().required('Hook is a required field'),
-  priority: yup.string().required("Priority is a required field"),
+  priority: yup.number().typeError("you must specify a number"),
 });
 
 const TYPE = ["filter", "nat"];
@@ -74,6 +74,8 @@ export function AddChain() {
         table: JSON.parse(tableSelected as string),
         type: typeSelected
       }
+
+      console.log(payload)
 
       const res = await request.post("/chains", payload);
       if (res.status === 200) {

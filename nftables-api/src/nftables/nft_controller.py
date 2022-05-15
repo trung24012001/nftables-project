@@ -141,9 +141,9 @@ def get_ruleset(type='filter', chain=None):
             )
         )
 
-    # def get_handle(rule):
-    #     return rule.get("handle")
-    # rules.sort(key=get_handle)
+    def get_handle(rule):
+        return rule.get("handle")
+    rules.sort(key=get_handle)
     return rules
 
 

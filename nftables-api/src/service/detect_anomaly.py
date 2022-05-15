@@ -30,7 +30,6 @@ def query_rule(rule_id):
         "port_dst": port_dst,
         "protocol": prots,
         "policy": rule.policy,
-        "unique_handle": rule.chain.table.handle * 100 + rule.chain.handle * 10 + rule.handle,
         "handle": rule.handle,
         "family": rule.chain.table.family,
         "table": rule.chain.table.name,
@@ -98,10 +97,10 @@ def classify_anomaly(norm, fields):
 def parse_anomaly(row):
     rule_1 = query_rule(row.rule_id_1)
     rule_2 = query_rule(row.rule_id_2)
-    if rule_1['unique_handle'] > rule_2['unique_handle']:
+    if rule_1['handle'] > rule_2['handle']:
         rule_1, rule_2 = rule_2, rule_1
     anomaly = {
-        'id':  '-'.join(str(x) for x in [rule_1['unique_handle'], rule_2['unique_handle']]),
+        'id':  '-'.join(str(x) for x in [rule_1['handle'], rule_2['handle']]),
         'rule_a': rule_1,
         'rule_b': rule_2
     }
