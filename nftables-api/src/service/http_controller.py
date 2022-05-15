@@ -5,7 +5,7 @@ import src.service.detect_anomaly as detect
 
 
 def get_anomaly_http():
-    ruleset = nft.get_ruleset(type="filter")
+    ruleset = nft.get_ruleset(rule_type="filter")
     is_clear = clear_database()
     if not is_clear:
         return []
@@ -70,8 +70,8 @@ def delete_chain_http(chain):
         return False
 
 
-def get_ruleset_http(type, chain):
-    rules = nft.get_ruleset(type, chain)
+def get_ruleset_http(rule_type, chain):
+    rules = nft.get_ruleset(rule_type, chain)
     return rules
 
 

@@ -98,31 +98,26 @@ def get_chain(chain):
     return None
 
 
-def get_ruleset(type='filter', chain=None):
+def get_ruleset(rule_type, chain=None):
     cmd = 'list ruleset'
     if chain:
         cmd = "list chain {family} {table} {name}".format(family=chain.get(
             'family'), table=chain.get('table'), name=chain.get('name'))
-
     data_structure = read_nft(cmd)
     rules = []
-    action = []
-    if type == 'filter':
-        action = ['accept', 'reject', 'drop']
-    elif type == 'nat':
-        action = ["snat", "dnat", "masquerade", "redirect"]
     for object in data_structure["nftables"]:
         rule = object.get("rule")
         if not rule:
             continue
-        if not check_rule_type(rule, type):
+        if not check_rule_type(rule, rule_type):
             continue
-
         raw_chain = get_chain(
             dict(family=rule["family"], table=rule["table"], name=rule["chain"]))
 
-        result = util.get_expr_value(rule.get('expr'), keys=[
+        expr = rule.get("expr")
+        network = util.get_expr_value(expr, keys=[
             'saddr', 'daddr', 'sport', 'dport'])
+        interface = util.get_expr_interface(expr, keys=["iifname", "oifname"])
 
         rules.append(
             dict(
@@ -130,14 +125,15 @@ def get_ruleset(type='filter', chain=None):
                 table=rule["table"],
                 chain=rule["chain"],
                 handle=rule["handle"],
-                ip_src=result.get('saddr') or ["*"],
-                ip_dst=result.get('daddr') or ["*"],
-                port_src=result.get('sport') or ["*"],
-                port_dst=result.get('dport') or ["*"],
-                protocol=util.get_expr_prot(rule.get("expr")) or ["*"],
-                policy=util.get_expr_policy(
-                    rule.get("expr"), action) or raw_chain["policy"],
-                to=util.get_expr_nat(rule.get('expr'))
+                ip_src=network.get('saddr') or ["*"],
+                ip_dst=network.get('daddr') or ["*"],
+                port_src=network.get('sport') or ["*"],
+                port_dst=network.get('dport') or ["*"],
+                protocol=util.get_expr_prot(expr) or ["*"],
+                policy=util.get_expr_policy(expr) or raw_chain.get("policy"),
+                iif=interface.get("iifname") or ["*"],
+                oif=interface.get("oifname") or ["*"],
+                to=util.get_expr_nat(expr)
             )
         )
 
@@ -147,7 +143,7 @@ def get_ruleset(type='filter', chain=None):
     return rules
 
 
-def check_rule_type(rule, type):
+def check_rule_type(rule, rule_type):
     data_structure = read_nft("list chains")
     for object in data_structure["nftables"]:
         chain = object.get('chain')
@@ -156,7 +152,10 @@ def check_rule_type(rule, type):
         if chain["family"] == rule["family"] and \
                 chain["table"] == rule["table"] and \
                 chain["name"] == rule["chain"]:
-            if chain["type"] == type:
+            chain_type = chain.get("type")
+            if chain_type == rule_type:
+                return True
+            elif chain_type == None and rule_type == "return":
                 return True
             return False
     return False

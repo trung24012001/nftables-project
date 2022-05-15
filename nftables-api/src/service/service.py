@@ -103,13 +103,12 @@ def delete_chain():
 def get_ruleset():
     try:
         chain = request.args.get('chain')
+        rule_type = request.args.get("type")
         if chain:
             chain = json.loads(chain)
-        ruleset = http.get_ruleset_http(
-            type=request.args.get("type"), chain=chain)
-        return jsonify({"ruleset": ruleset}), 200
+        ruleset = http.get_ruleset_http(rule_type, chain)
+        return jsonify({"ruleset": ruleset, "rule_type": rule_type}), 200
     except Exception as e:
-
         print(e)
         return jsonify({"error": "could not get rules"}), 500
 

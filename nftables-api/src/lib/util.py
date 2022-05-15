@@ -56,28 +56,62 @@ def get_expr_value(expr, keys):
         match = object.get("match")
         if not match:
             continue
-        m_key = match.get("left").get("payload").get("field")
+        left = match.get("left")
+        if not left:
+            continue
+        payload = left.get("payload")
+        if not payload:
+            continue
+        m_key = payload.get("field")
         if m_key in keys:
+            op = match.get("op")
             right = match.get("right")
-            result[m_key] = parse_expr_value(right)
+            result[m_key] = parse_expr_value(right, op)
 
     return result
 
 
-def parse_expr_value(value):
+def get_expr_interface(expr, keys):
+    if not expr:
+        return None
+    result = {}
+    for object in expr:
+        match = object.get("match")
+        if not match:
+            continue
+        left = match.get("left")
+        if not left:
+            continue
+        meta = left.get("meta")
+        if not meta:
+            continue
+        m_key = meta.get("key")
+        if m_key in keys:
+            op = match.get("op")
+            right = match.get("right")
+            result[m_key] = parse_expr_value(right, op)
+
+    return result
+
+
+def parse_expr_value(value, op):
     result = []
+    if not op or op == "==":
+        op = ""
     if not isinstance(value, dict):
-        return [value]
+        if not value:
+            return []
+        return [op + str(value)]
     if value.get('range'):
-        return ['-'.join(str(x) for x in value["range"])]
+        return [op + '-'.join(str(x) for x in value["range"])]
     if value.get('prefix'):
         prefix = value['prefix']
         net = prefix.get('addr') + '/' + str(prefix.get('len'))
-        return [net]
+        return [op + net]
     if value.get("set"):
         for item in value["set"]:
-            for i in parse_expr_value(item):
-                result.append(i)
+            for i in parse_expr_value(item, op):
+                result.append(op + i)
 
     return result
 
@@ -85,18 +119,21 @@ def parse_expr_value(value):
 def get_expr_prot(expr):
     if not expr:
         return None
-
     prots = None
-
     for object in expr:
         match = object.get("match")
         if not match:
             continue
-        left = object.get("match").get("left")
-        right = object.get("match").get("right")
-        m_key = left.get("payload").get("field")
+        left = match.get("left")
+        right = match.get("right")
+        if not left or not right:
+            continue
+        payload = left.get("payload")
+        if not payload:
+            continue
+        m_key = payload.get("field")
         if m_key == "sport" or m_key == "dport":
-            return [left.get("payload").get("protocol")]
+            return [payload.get("protocol")]
         if m_key == "protocol":
             if isinstance(right, dict):
                 prots = right.get("set")
@@ -105,20 +142,28 @@ def get_expr_prot(expr):
     return prots
 
 
-def get_expr_policy(expr, actions):
+def get_expr_policy(expr):
+    actions = ["snat", "dnat", "masquerade",
+               "redirect", "accept", "reject", "drop", "return", "jump"]
     if not expr:
         return None
     for object in expr:
         for type in actions:
             if type in object:
+                if type == "jump":
+                    return object["jump"].get("target")
                 return type
     return None
 
 
 def get_expr_nat(expr):
+    actions = ['dnat', 'snat', 'redirect']
+    to_net = None
     for object in expr:
-        to_net = object.get('dnat') or object.get(
-            'snat') or object.get('redirect')
+        for action in actions:
+            if action in object:
+                to_net = object[action]
+                break
         if not to_net:
             continue
         result = ''

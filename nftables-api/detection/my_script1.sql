@@ -9,10 +9,10 @@ select
 --	r.policy as action, 
 --	r.handle as handle, 
 	r.id as rule_id, 
---	tables.family,
---	tables.name as "table",
---	chains.name as chain, 
-	chains.hook as hook 
+	tables.family,
+	tables.name as "table",
+	chains.name as chain
+	-- chains.hook as hook 
 from rules r 
 	join ip_src src on r.id = src.rule_id
 	join ip_dst dst on r.id = dst.rule_id
@@ -20,8 +20,9 @@ from rules r
 	join port_dst pdst on r.id = pdst.rule_id 
 	join protocols prot on r.id = prot.rule_id
 	join chains on r.chain_id = chains.id
---	join tables on chains.table_id = tables.id
-where chains.type = "filter"
+	join tables on chains.table_id = tables.id
+where r.policy in ("accept", "reject", "drop")  
+-- 		and chains.type = "filter" 
 ) tb, rules r
 	join ip_src src on r.id = src.rule_id
 	join ip_dst dst on r.id = dst.rule_id
@@ -37,5 +38,7 @@ where
 	(pdst.port = tb.port_dst or tb.port_dst = '*' or pdst.port = '*') and 
 	(prot.protocol = tb.protocol or tb.protocol = '*' or prot.protocol = '*') and
 	r.id != tb.rule_id and
-	chains.type = "filter" and
-	chains.hook = tb.hook;
+	tables.family = tb.family and
+	tables.name = tb.table and
+	chains.name = tb.chain and
+	r.policy in ("accept", "reject", "drop");
