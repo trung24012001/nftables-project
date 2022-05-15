@@ -4,9 +4,6 @@ import { RuleType } from 'lib'
 
 export function RuleInfo({ rule, renderNumber }: { rule: RuleType, renderNumber?: number }) {
   const data = [{
-    label: "Priority",
-    value: rule.unique_handle,
-  }, {
     label: "Family",
     value: rule.family,
   }, {
@@ -20,7 +17,7 @@ export function RuleInfo({ rule, renderNumber }: { rule: RuleType, renderNumber?
     value: rule.policy,
   },
   {
-    label: "Handle",
+    label: "Priority",
     value: rule.handle,
   },
   {
