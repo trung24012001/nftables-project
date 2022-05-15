@@ -4,3 +4,4 @@ export * from "./AddFilterRule";
 export * from "./AddNatRule";
 export * from "./FilterRuleDetail";
 export * from "./NatRuleDetail";
+export * from "./ReturnRuleTable";

@@ -13,7 +13,7 @@ export function RuleInfo({ rule, renderNumber }: { rule: RuleType, renderNumber?
     label: "Chain",
     value: rule.chain,
   }, {
-    label: "Action",
+    label: "Target",
     value: rule.policy,
   },
   {

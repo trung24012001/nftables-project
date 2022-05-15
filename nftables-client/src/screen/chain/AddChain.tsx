@@ -5,6 +5,7 @@ import {
   Box,
   Button,
   FormControl,
+  FormControlLabel,
   FormHelperText,
   FormLabel,
   MenuItem,
@@ -12,25 +13,19 @@ import {
   SelectChangeEvent,
   Stack,
   styled,
+  Switch,
   TextField,
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
 import { ChainType, request, routes, TableType } from "lib";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { useDispatch, useSelector } from "react-redux";
-import { getTables, setMessage } from "store/reducers";
+import { useDispatch } from "react-redux";
+import { setMessage } from "store/reducers";
 import { useNavigate } from "react-router-dom";
-import { RootState } from "store";
 import Background from "components/Layout/Background";
 import { useFetchData } from "lib/hooks";
 
-const validate = yup.object({
-  table: yup.string().required("Table is a required field"),
-  name: yup.string().required("Name is a required field"),
-  hook: yup.string().required('Hook is a required field'),
-  priority: yup.number().typeError("you must specify a number"),
-});
 
 const TYPE = ["filter", "nat"];
 const HOOK_FILTER = ["input", "forward", "output"];
@@ -42,6 +37,22 @@ export function AddChain() {
   const dispatch = useDispatch();
   const [tableSelected, setTableSelected] = useState<TableType | string>("");
   const [typeSelected, setTypeSelected] = useState<string>(TYPE[0]);
+  const [emptyChain, setEmptyChain] = useState<boolean>(false);
+
+  const validate = yup.object({
+    table: yup.string().required("Table is a required field"),
+    name: yup.string().required("Name is a required field"),
+    hook: yup.string().test({
+      message: "Hook is a required field",
+      test: (value) => {
+        if (!emptyChain) {
+          return !!value
+        }
+        return true
+      },
+    }),
+    // priority: yup.number().typeError("you must specify a number"),
+  });
 
   const { data: tablesRes } = useFetchData<{ tables: TableType[] }>({
     path: '/tables',
@@ -72,8 +83,11 @@ export function AddChain() {
       const payload = {
         ...data,
         table: JSON.parse(tableSelected as string),
-        type: typeSelected
+        type: typeSelected,
+        priority: emptyChain ? "0" : 0
       }
+
+      // Priority string 0 make rule didnt access type and hook. 
 
       console.log(payload)
 
@@ -157,8 +171,12 @@ export function AddChain() {
                 {errors.name?.message}
               </FormHelperText>
             </FormControl>
+            <FormControlLabel control={<Switch checked={emptyChain}
+              onChange={(event: React.ChangeEvent<HTMLInputElement>) => { setEmptyChain(event.target.checked) }}
+            />} label="Empty chain" />
+
             <Stack direction={'row'} spacing={2}>
-              <FormControl fullWidth>
+              <FormControl fullWidth disabled={emptyChain}>
                 <FormLabel>Type</FormLabel>
                 <Select value={typeSelected} onChange={onTypeChange}>
                   {TYPE.map((t: string) => {
@@ -170,7 +188,7 @@ export function AddChain() {
                   })}
                 </Select>
               </FormControl>
-              <FormControl fullWidth>
+              <FormControl fullWidth disabled={emptyChain}>
                 <FormLabel>Hook</FormLabel>
                 <Select value={watch("hook")} {...register("hook")} error={!!errors.hook?.message} >
                   {hooks.map((hook: string) => (
@@ -183,7 +201,7 @@ export function AddChain() {
                   {errors.hook?.message}
                 </FormHelperText>
               </FormControl>
-              <FormControl fullWidth>
+              {/* <FormControl fullWidth disabled={emptyChain}>
                 <FormLabel>Priority</FormLabel>
                 <TextField
                   error={!!errors.priority?.message}
@@ -194,8 +212,8 @@ export function AddChain() {
                 <FormHelperText error={!!errors.priority?.message}>
                   {errors.priority?.message}
                 </FormHelperText>
-              </FormControl>
-              <FormControl fullWidth>
+              </FormControl> */}
+              <FormControl fullWidth disabled={emptyChain}>
                 <FormLabel>Policy</FormLabel>
                 <Select value={watch("policy")} {...register("policy")}>
                   {POLICY_FILTER.map((p: string) => (
@@ -206,6 +224,7 @@ export function AddChain() {
                 </Select>
               </FormControl>
             </Stack>
+
             <Box textAlign={'center'} pt={5} >
               <Button variant="contained" type="submit" sx={{ width: 300 }}>
                 Add

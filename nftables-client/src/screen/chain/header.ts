@@ -20,9 +20,13 @@ export const headers = [
     access: "hook",
   },
   {
-    name: "Priority",
-    access: "priority",
+    name: "Policy",
+    access: "policy",
   },
+  // {
+  //   name: "Priority",
+  //   access: "priority",
+  // },
   // {
   //   name: "Handle",
   //   access: "handle",

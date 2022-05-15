@@ -167,7 +167,7 @@ export function AddFirewallRule() {
                   None
                 </MenuItem>
                 {(chainsRes?.chains || [])?.map((chainItem: ChainType, idx: number) => {
-                  if (chainItem.type !== "filter") return;
+                  if (chainItem.type === "nat") return;
                   return (
                     <MenuItem key={idx} value={JSON.stringify(chainItem)}>
                       {chainItem.name}
