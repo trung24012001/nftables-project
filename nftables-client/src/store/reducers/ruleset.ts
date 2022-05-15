@@ -7,6 +7,7 @@ export interface IRuleState {
   chains: ChainType[];
   filter_rules: RuleType[];
   nat_rules: RuleType[];
+  return_rules: RuleType[];
   anomalies: AnomalyType[];
   analytics: Record<string, number> | undefined;
 }
@@ -16,6 +17,7 @@ const initialState: IRuleState = {
   chains: [],
   filter_rules: [],
   nat_rules: [],
+  return_rules: [],
   anomalies: [],
   analytics: undefined,
 };
@@ -65,7 +67,7 @@ export const getRuleset = createAsyncThunk(
       });
       return {
         rules,
-        type,
+        type: res.data.rule_type,
       };
     } catch (err) {
       console.log(err);
@@ -114,6 +116,8 @@ export const rulesetSlice = createSlice({
         state.filter_rules = rules;
       } else if (type === "nat") {
         state.nat_rules = rules;
+      } else if (type === "return") {
+        state.return_rules = rules;
       }
     });
   },

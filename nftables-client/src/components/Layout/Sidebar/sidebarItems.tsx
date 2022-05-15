@@ -5,6 +5,7 @@ import BarChartIcon from '@mui/icons-material/BarChart';
 import TableViewIcon from '@mui/icons-material/TableView';
 import LocalFireDepartmentIcon from '@mui/icons-material/LocalFireDepartment';
 import RouterIcon from '@mui/icons-material/Router';
+import ReplayIcon from '@mui/icons-material/Replay';
 
 export type SidebarType = {
   name: string;
@@ -34,8 +35,13 @@ export const sidebarItems: SidebarType[] = [
     icon: <LocalFireDepartmentIcon />,
   },
   {
-    name: "Nat",
+    name: "Nat Rule",
     route: routes.NAT_ROUTE,
     icon: <RouterIcon />,
+  },
+  {
+    name: "Return Rule",
+    route: routes.RETURN_ROUTE,
+    icon: <ReplayIcon />,
   },
 ];

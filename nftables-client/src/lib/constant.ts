@@ -6,6 +6,7 @@ type RoutesType = {
   FIREWALL_DETAIL_ROUTE: string;
   NAT_ROUTE: string;
   NAT_DETAIL_ROUTE: string;
+  RETURN_ROUTE: string;
   ANALYTICS_ROUTE: string;
   ADD_TABLE_ROUTE: string;
   ADD_CHAIN_ROUTE: string;
@@ -21,6 +22,7 @@ const routes: RoutesType = {
   FIREWALL_DETAIL_ROUTE: "/rules/filter/detail",
   NAT_ROUTE: "/rules/nat",
   NAT_DETAIL_ROUTE: "/rules/nat/detail",
+  RETURN_ROUTE: "/rules/return",
   ANALYTICS_ROUTE: "/analytics",
   ADD_TABLE_ROUTE: "/tables/add",
   ADD_CHAIN_ROUTE: "/chains/add",

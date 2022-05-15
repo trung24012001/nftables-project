@@ -161,7 +161,7 @@ export function AddNatRule() {
                   None
                 </MenuItem>
                 {(chainsRes?.chains || []).map((chain: ChainType, idx: number) => {
-                  if (chain.type !== "nat") return;
+                  if (chain.type === "filter") return;
                   return (
                     <MenuItem key={idx} value={JSON.stringify(chain)}>
                       {chain.name}

@@ -1,3 +1,4 @@
+import { Box, Typography } from "@mui/material";
 import Background from "components/Layout/Background";
 import { ReactTable } from "components/ReactTable";
 import { ChainType, request, routes } from "lib";
@@ -52,8 +53,9 @@ export function ChainTable(): React.ReactElement {
   };
 
   const handleSelectRow = (row: ChainType) => {
+    const ruleType = row.type || "return";
     navigate({
-      pathname: row.type === 'filter' ? routes.FIREWALL_ROUTE : routes.NAT_ROUTE,
+      pathname: "/rules/" + ruleType,
       search: `?chain=${encodeURIComponent(JSON.stringify(row))}`
     })
   }
@@ -68,6 +70,7 @@ export function ChainTable(): React.ReactElement {
         onActionRow={handleSelectRow}
         loading={loading}
       />
+
     </Background>
   );
 }

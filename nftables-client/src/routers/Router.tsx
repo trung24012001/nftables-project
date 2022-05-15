@@ -12,6 +12,7 @@ import {
   FirewallTable,
   NatRuleDetail,
   NatTable,
+  ReturnRuleTable,
 } from "screen/ruleset";
 import { AddChain } from "screen/chain/AddChain";
 import { AnalyticDetail, Analytics } from "screen/analytics";
@@ -29,6 +30,7 @@ const Router: React.VFC = () => {
           <Route path={routes.NAT_DETAIL_ROUTE} element={<NatRuleDetail />} />
           <Route path={routes.FIREWALL_DETAIL_ROUTE} element={<FilterRuleDetail />} />
           <Route path={routes.NAT_ROUTE} element={<NatTable />} />
+          <Route path={routes.RETURN_ROUTE} element={<ReturnRuleTable />} />
           <Route path={routes.ADD_TABLE_ROUTE} element={<AddTable />} />
           <Route path={routes.ADD_CHAIN_ROUTE} element={<AddChain />} />
           <Route
