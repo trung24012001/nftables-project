@@ -7,8 +7,8 @@ export const headers = [
     name: "Name",
     access: "name",
   },
-  {
-    name: "Handle",
-    access: "handle",
-  },
+  // {
+  //   name: "Handle",
+  //   access: "handle",
+  // },
 ];

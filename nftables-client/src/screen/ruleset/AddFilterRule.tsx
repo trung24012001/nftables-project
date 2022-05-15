@@ -26,7 +26,7 @@ import { MultipleSelectChip } from "components/FormSelectChip";
 import { useFetchData } from "lib/hooks";
 
 
-const ACTION_FILTER = ["accept", "drop"];
+const ACTION_FILTER = ["accept", "reject", "drop"];
 const PROTOCOL = ["tcp", "udp", "icmp", "sctp"];
 // const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
 const PORT_PROTOCOL = ["tcp", "udp", "sctp"];

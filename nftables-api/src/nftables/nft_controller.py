@@ -108,7 +108,7 @@ def get_ruleset(type='filter', chain=None):
     rules = []
     action = []
     if type == 'filter':
-        action = ['accept', 'drop']
+        action = ['accept', 'reject', 'drop']
     elif type == 'nat':
         action = ["snat", "dnat", "masquerade", "redirect"]
     for object in data_structure["nftables"]:

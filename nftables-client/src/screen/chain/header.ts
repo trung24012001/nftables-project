@@ -23,8 +23,8 @@ export const headers = [
     name: "Priority",
     access: "priority",
   },
-  {
-    name: "Handle",
-    access: "handle",
-  },
+  // {
+  //   name: "Handle",
+  //   access: "handle",
+  // },
 ];
