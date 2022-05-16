@@ -15,7 +15,7 @@ import {
 } from "@mui/material";
 import { Page } from "components/Layout/Page";
 import { ChainType, request, routes, RuleType } from "lib";
-import * as yup from "yup";
+import yup from "../../lib/yup-extended";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useDispatch, useSelector } from "react-redux";
 import { getChains, setMessage } from "store/reducers";
@@ -26,6 +26,12 @@ import { FormListControl } from "components/FormListControl";
 import { useFetchData } from "lib/hooks";
 
 
+const validate = yup.object({
+  chain: yup.string().required("Chain is a required field"),
+  ip_src: yup.string().required("IP source is a required field"),
+  ip_dst: yup.string().required("IP destination is a required field"),
+  to: yup.string().ipv4WithPort().required("You must entered the right ip address with port!")
+});
 
 const ACTION_NAT = ["snat", "dnat", "redirect", "masquerade"];
 const PROTOCOL = ["tcp", "udp", "icmp", "sctp"];
@@ -198,7 +204,11 @@ export function AddNatRule() {
                 <TextField
                   value={watch("to")}
                   {...register("to")}
+                  error={!!(errors.to)?.message}
                   placeholder='0.0.0.0:port' />
+                <FormHelperText error={!!(errors.to)?.message}>
+                  {(errors.to)?.message}
+                </FormHelperText>  
               </FormControl>
             </Stack>
 

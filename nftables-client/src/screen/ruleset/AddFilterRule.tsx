@@ -23,18 +23,28 @@ import { RootState } from "store";
 import Background from "components/Layout/Background";
 import { FormListControl } from "components/FormListControl";
 import { MultipleSelectChip } from "components/FormSelectChip";
-import { useFetchData } from "lib/hooks";
 
 
-const ACTION_FILTER = ["accept", "reject", "drop"];
+const ACTION_FILTER = ["accept", "drop"];
 const PROTOCOL = ["tcp", "udp", "icmp", "sctp"];
 // const PROTOCOL = ["tcp", "udp", "icmp", "sctp", "dccp", "gre", "icmpv6"];
 const PORT_PROTOCOL = ["tcp", "udp", "sctp"];
 
+const validate = yup.object({
+  chain: yup.string().required("Chain is a required field"),
+  ip_src: yup.string().required("IP source is a required field"),
+  ip_dst: yup.string().required("IP destination is a required field"),
+  to: yup.string().ipv4().required("You must entered the right ip address with port!"),
+  port_prot: yup.string().when(['port_src, port_dst'], {
+    is: (port_src: number, port_dst: number) => (port_src || port_dst), // 2 tham so port_src và port_dst đang coi là number
+    then: yup.string().required("You must choose a port protocol!")
+  })
+});
 
 export function AddFirewallRule() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const chains = useSelector((state: RootState) => state.ruleset.chains);
   const [chainSelected, setChainSelected] = useState<ChainType | string>("");
   const [resetForm, setResetForm] = useState<Date | string | number | undefined>();
   const protocolRef = useRef<string[]>([]);
@@ -42,20 +52,6 @@ export function AddFirewallRule() {
   const ipDstRef = useRef<string[]>([]);
   const portSrcRef = useRef<string[]>([]);
   const portDstRef = useRef<string[]>([]);
-
-  const validate = yup.object({
-    chain: yup.string().required("Chain is a required field"),
-    port_prot: yup.string().test({
-      message: 'Port protocol is required when port is filled',
-      test: (value) => {
-        if (portSrcRef.current.length || portDstRef.current.length) {
-          return !!value
-        }
-        return true
-      },
-    })
-  });
-
 
   const {
     register,
@@ -73,13 +69,9 @@ export function AddFirewallRule() {
     resolver: yupResolver(validate),
   });
 
-  const { data: chainsRes } = useFetchData<{ chains: ChainType[] }>({
-    path: '/chains',
-    onError: (error) => {
-      console.log(error)
-    }
-  })
-
+  useEffect(() => {
+    dispatch(getChains({}));
+  }, []);
 
   useEffect(() => {
     const subscription = watch((value, { name }) => {
@@ -99,9 +91,7 @@ export function AddFirewallRule() {
         port_src: portSrcRef.current,
         port_dst: portDstRef.current,
       };
-
-      console.log(payload)
-
+      // delete payload.chain_name
       const res = await request.post("/rules", payload, {
         params: {
           type: 'filter'
@@ -140,6 +130,27 @@ export function AddFirewallRule() {
     setValue("chain", e.target.value);
   };
 
+  const onProtocol = (protocols: string[]) => {
+    protocolRef.current = protocols;
+  };
+
+  const onIpSrc = (ipSrc: string[]) => {
+    ipSrcRef.current = ipSrc;
+  };
+
+  const onIpDst = (ipDst: string[]) => {
+    ipDstRef.current = ipDst;
+  };
+
+  const onPortSrc = (portSrc: string[]) => {
+    portSrcRef.current = portSrc;
+    if (portDstRef.current.length) {
+    }
+  };
+
+  const onPortDst = (portDst: string[]) => {
+    portDstRef.current = portDst;
+  };
 
   return (
     <Background
@@ -166,8 +177,8 @@ export function AddFirewallRule() {
                 <MenuItem value="" sx={{ opacity: 0.6 }}>
                   None
                 </MenuItem>
-                {(chainsRes?.chains || [])?.map((chainItem: ChainType, idx: number) => {
-                  if (chainItem.type === "nat") return;
+                {chains?.map((chainItem: ChainType, idx: number) => {
+                  if (chainItem.type !== "filter") return;
                   return (
                     <MenuItem key={idx} value={JSON.stringify(chainItem)}>
                       {chainItem.name}
@@ -200,44 +211,45 @@ export function AddFirewallRule() {
               <FormListControl
                 title="IP source"
                 type="textfield"
+                onCallback={onIpSrc}
                 placeholder='0.0.0.0'
                 resetTrigger={resetForm}
-                dataRef={ipSrcRef}
               />
               <FormListControl
                 title="Port source"
                 type="textfield"
+                onCallback={onPortSrc}
                 resetTrigger={resetForm}
-                dataRef={portSrcRef}
               />
+
             </Stack>
 
             <Stack direction={"row"}>
               <FormListControl
                 title="IP destination"
                 type="textfield"
+                onCallback={onIpDst}
                 placeholder='0.0.0.0'
                 resetTrigger={resetForm}
-                dataRef={ipDstRef}
               />
               <FormListControl
                 title="Port destination"
                 type="textfield"
+                onCallback={onPortDst}
                 resetTrigger={resetForm}
-                dataRef={portDstRef}
               />
             </Stack>
-            <Stack direction='row'>
+            <Stack direction='row' >
               <FormListControl
                 title="Protocol"
                 options={PROTOCOL}
+                onCallback={onProtocol}
                 resetTrigger={resetForm}
-                dataRef={protocolRef}
               />
               {/* <MultipleSelectChip ref={protocolRef} options={PROTOCOL} label="Protocol" /> */}
               <FormControl fullWidth>
                 <FormLabel>Port Protocol</FormLabel>
-                <Select value={watch("port_prot")} {...register("port_prot")} error={!!errors.port_prot?.message}>
+                <Select value={watch("port_prot")} {...register("port_prot")}>
                   <MenuItem value="" sx={{ opacity: 0.6 }}>
                     None
                   </MenuItem>
@@ -247,16 +259,12 @@ export function AddFirewallRule() {
                     </MenuItem>
                   ))}
                 </Select>
-                <FormHelperText error={!!errors.port_prot?.message}>
-                  {errors.port_prot?.message}
-                </FormHelperText>
               </FormControl>
             </Stack>
-            <Box textAlign={'center'} pt={5}>
-              <Button variant="contained" type="submit" sx={{ width: 300 }}>
-                Add
-              </Button>
-            </Box>
+
+            <Button variant="contained" type="submit">
+              Add
+            </Button>
           </Stack>
         </Box>
       </Page>
