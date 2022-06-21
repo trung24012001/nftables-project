@@ -125,6 +125,7 @@ def get_ruleset(rule_type, chain=None):
                 table=rule["table"],
                 chain=rule["chain"],
                 handle=rule["handle"],
+                hook=raw_chain['hook'],
                 ip_src=network.get('saddr') or ["*"],
                 ip_dst=network.get('daddr') or ["*"],
                 port_src=network.get('sport') or ["*"],

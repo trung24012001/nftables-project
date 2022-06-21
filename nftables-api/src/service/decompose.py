@@ -3,15 +3,29 @@ import src.nftables.nft_controller as nft
 import src.lib.util as util
 
 
-def decompose(ruleset):
-    fields = [{'name': 'ip_src', 'type': 'ip'}, {'name': 'ip_dst', 'type': 'ip'},
-              {'name': 'port_src', 'type': 'port'}, {
-                  'name': 'port_dst', 'type': 'port'},
-              {'name': 'protocols', 'type': None}]
+def recompose(ruleset, fields):
     for rule in ruleset:
         for field in fields:
-            rule[field['name']] = util.decompose_data(
-                rule.get(field), type=field['type'])
+            value = rule[field]
+            if len(value) >= 2 and type(value) == list:
+                value = '-'.join(str(x) for x in [value[0], value[-1]])
+            rule[field] = value
+    return True
+
+
+def decompose(ruleset):
+
+    for rule in ruleset:
+        rule['ip_src'] = util.decompose_data(
+            rule.get('ip_src'), type='ip')
+        rule['ip_dst'] = util.decompose_data(
+            rule.get('ip_dst'), type='ip')
+        rule['port_src'] = util.decompose_data(
+            rule.get('port_src'), type='port')
+        rule['port_dst'] = util.decompose_data(
+            rule.get('port_dst'), type='port')
+        rule['protocol'] = util.decompose_data(
+            rule.get('protocol'))
 
     return True
 

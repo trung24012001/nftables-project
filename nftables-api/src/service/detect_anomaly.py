@@ -1,5 +1,5 @@
-from unittest import result
 from src.schema.database import IpDst, IpSrc, PortSrc, PortDst, Protocol, Table, Chain, Rule, session
+import src.service.decompose as decompose
 import numpy as np
 
 
@@ -71,7 +71,7 @@ def normalize_anomaly(anomaly, fields):
         else:
             anomaly['norm'][field] = 'Y'
 
-    return anomaly
+    return True
 
 
 def classify_anomaly(norm, fields):
@@ -95,6 +95,7 @@ def classify_anomaly(norm, fields):
 
 
 def parse_anomaly(row):
+    fields = ['ip_src', 'ip_dst', 'port_src', 'port_dst', 'protocol']
     rule_1 = query_rule(row.rule_id_1)
     rule_2 = query_rule(row.rule_id_2)
     if rule_1['handle'] > rule_2['handle']:
@@ -105,21 +106,12 @@ def parse_anomaly(row):
         'rule_b': rule_2
     }
 
-    anomaly = normalize_anomaly(
-        anomaly, ["ip_src", "ip_dst", "port_src", "port_dst", "protocol"])
-    anomaly['anomaly_type'] = classify_anomaly(norm=anomaly['norm'], fields=[
-        'ip_src', 'ip_dst', 'port_src', 'port_dst', 'protocol'])
-
-    def format_property(rule, fields):
-        for field in fields:
-            value = rule[field]
-            if len(value) >= 2:
-                value = '-'.join(str(x) for x in [value[0], value[-1]])
-            rule[field] = value
-        return rule
-    fields = ['ip_src', 'ip_dst', 'port_src', 'port_dst', 'protocol']
-    anomaly['rule_a'] = format_property(anomaly['rule_a'], fields)
-    anomaly['rule_b'] = format_property(anomaly['rule_b'], fields)
+    normalize_anomaly(anomaly, fields)
+    anomaly['anomaly_type'] = classify_anomaly(
+        norm=anomaly['norm'], fields=fields)
+    # it works good
+    # decompose.recompose(
+    #     [anomaly['rule_a'], anomaly['rule_b']], fields)
     return anomaly
 
 
@@ -135,15 +127,18 @@ def analytics(anomalies):
         if result.get(type) == None:
             continue
         result[type] += 1
-    print(result)
     return result
 
 
-def detect_anomaly():
+def sql_detect_anomaly(ruleset):
+    for rule in ruleset:
+        decompose.insert_db(rule)
+
     with open("detection/my_script1.sql", encoding='utf-8') as f:
         anomaly_sql = f.read()
     query = list(session.execute(anomaly_sql))
-    anomalies = list(map(parse_anomaly, query))
+    classify = list(map(parse_anomaly, query))
+
     tmp = []
 
     def remove_dup(anomaly):
@@ -151,28 +146,60 @@ def detect_anomaly():
             tmp.append(anomaly['id'])
             return True
         return False
+    anomalies = list(filter(remove_dup, classify))
+
     return {
-        "anomalies": list(filter(remove_dup, anomalies)),
+        "anomalies": anomalies,
+        "analytics": analytics(anomalies)
+    }
+
+
+# raw detection
+
+def format_anomaly(anomaly):
+    fields = ['ip_src', 'ip_dst', 'port_src', 'port_dst', 'protocol']
+
+    normalize_anomaly(anomaly, fields)
+    anomaly['anomaly_type'] = classify_anomaly(
+        norm=anomaly['norm'], fields=fields)
+    # this comment is bugggg unknown why????
+    # decompose.recompose(
+    #     [anomaly['rule_a'], anomaly['rule_b']], fields)
+    return anomaly
+
+
+def test(anomaly):
+    fields = ['ip_src', 'ip_dst', 'port_src', 'port_dst', 'protocol']
+    decompose.recompose(
+        [anomaly['rule_a'], anomaly['rule_b']], fields)
+
+
+def raw_detect_anomaly(ruleset):
+    decompose.decompose(ruleset)
+    pair_list = algorithm_detection(ruleset)
+    anomalies = list(map(format_anomaly, pair_list))
+    return {
+        "anomalies":  anomalies,
         "analytics": analytics(anomalies)
     }
 
 
 def algorithm_detection(ruleset):
-    anomalies = []
+    pair_list = []
     len_ruleset = len(ruleset)
     for i in range(len_ruleset - 1):
         for j in range(i + 1, len_ruleset):
             if compare_rule(ruleset[i], ruleset[j]):
-                anomalies.append({
+                pair_list.append({
                     'id':  '-'.join(str(x) for x in [ruleset[i]['handle'], ruleset[j]['handle']]),
                     'rule_a': ruleset[i],
                     'rule_b': ruleset[j]
                 })
-    return anomalies
+    return pair_list
 
 
 def compare_rule(rule_1, rule_2):
-    fields = ['family', 'table', 'chain', 'ip_src',
+    fields = ['family', 'table', 'chain', 'hook', 'ip_src',
               'ip_dst', 'port_src', 'port_dst', 'protocol']
 
     for field in fields:
@@ -183,8 +210,11 @@ def compare_rule(rule_1, rule_2):
 
 
 def match_property(prop_1, prop_2):
-    if type(prop_1) == str and prop_1 == prop_2:
-        return True
+    if type(prop_1) == str:
+        if prop_1 == prop_2:
+            return True
+        else:
+            return False
 
     if '*' in [*prop_1, *prop_2]:
         return True

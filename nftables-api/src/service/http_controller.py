@@ -1,17 +1,21 @@
 from src.schema.database import Table, session
 import src.nftables.nft_controller as nft
-import src.service.decompose as decompose
 import src.service.detect_anomaly as detect
 
 
-def get_anomaly_http():
+def detect_anomaly_http():
+    ruleset = nft.get_ruleset(rule_type="filter")
+    result = detect.raw_detect_anomaly(ruleset)
+    return result
+
+
+def sql_anomaly_http():
     ruleset = nft.get_ruleset(rule_type="filter")
     is_clear = clear_database()
     if not is_clear:
+        print('fail to clear database')
         return []
-    for rule in ruleset:
-        decompose.insert_db(rule)
-    result = detect.detect_anomaly()
+    result = detect.sql_detect_anomaly(ruleset)
     return result
 
 

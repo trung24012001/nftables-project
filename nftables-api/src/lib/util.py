@@ -284,7 +284,7 @@ def decompose_data(data, type=None):
         if item.find('/') >= 0:
             net = ip_network(item)
             for ip in net:
-                arr.append(ip)
+                arr.append(str(ip))
             continue
         if item.find('-') >= 0 and type:
             range = item.split('-')

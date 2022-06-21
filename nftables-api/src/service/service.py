@@ -5,14 +5,21 @@ import json
 main_api = Blueprint("api", __name__)
 
 
+@main_api.route("/detect-anomaly")
+def detect_anomaly():
+    try:
+        result = http.detect_anomaly_http()
+        return jsonify(result), 200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "could not get anomaly"}), 500
+
+
 @main_api.route("/anomaly")
 def get_anomaly():
     try:
-        result = http.get_anomaly_http()
-        return jsonify({
-            "anomalies": result['anomalies'],
-            "analytics": result['analytics']
-        }), 200
+        result = http.sql_anomaly_http()
+        return jsonify(result), 200
     except Exception as e:
         print(e)
         return jsonify({"error": "could not get anomaly"}), 500
