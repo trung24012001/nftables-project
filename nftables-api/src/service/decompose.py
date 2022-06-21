@@ -3,6 +3,19 @@ import src.nftables.nft_controller as nft
 import src.lib.util as util
 
 
+def decompose(ruleset):
+    fields = [{'name': 'ip_src', 'type': 'ip'}, {'name': 'ip_dst', 'type': 'ip'},
+              {'name': 'port_src', 'type': 'port'}, {
+                  'name': 'port_dst', 'type': 'port'},
+              {'name': 'protocols', 'type': None}]
+    for rule in ruleset:
+        for field in fields:
+            rule[field['name']] = util.decompose_data(
+                rule.get(field), type=field['type'])
+
+    return True
+
+
 def insert_db(rule):
     try:
         table = nft.get_table(dict(
