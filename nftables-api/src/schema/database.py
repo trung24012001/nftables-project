@@ -137,7 +137,7 @@ class Rule(Base):
     __tablename__ = "rules"
     id = sa.Column(sa.Integer, primary_key=True)
     policy = sa.Column(sa.String(255))
-    description = sa.Column(sa.TEXT)
+    # description = sa.Column(sa.TEXT)
     handle = sa.Column(sa.Integer, nullable=False)
     chain_id = sa.Column(sa.Integer, sa.ForeignKey(
         "chains.id", ondelete="CASCADE"))
