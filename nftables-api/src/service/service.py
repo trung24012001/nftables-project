@@ -5,8 +5,8 @@ import json
 main_api = Blueprint("api", __name__)
 
 
-@main_api.route("/detect-anomaly")
-def detect_anomaly():
+@main_api.route("/raw-detection")
+def raw_detect_anomaly():
     try:
         result = http.detect_anomaly_http()
         return jsonify(result), 200
@@ -15,11 +15,22 @@ def detect_anomaly():
         return jsonify({"error": "could not get anomaly"}), 500
 
 
-@main_api.route("/anomaly")
-def get_anomaly():
+@main_api.route("/sql-detection")
+def sql_detect_anomaly():
     try:
         result = http.sql_anomaly_http()
         return jsonify(result), 200
+    except Exception as e:
+        print(e)
+        return jsonify({"error": "could not get anomaly"}), 500
+
+@main_api.route("/sync-db")
+def sync_database():
+    try:
+        is_sync = http.sync_database()
+        if is_sync:
+            return jsonify({"message": "Sync successfully"}), 200
+        return jsonify({"message": "Sync fail"}), 400
     except Exception as e:
         print(e)
         return jsonify({"error": "could not get anomaly"}), 500

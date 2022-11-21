@@ -1,0 +1,132 @@
+table ip filter {
+	chain INPUT {
+		type filter hook input priority filter; policy accept;
+		ip protocol tcp ip saddr 59.162.183.204 ip daddr 64.56.122.246
+		ip protocol tcp ip saddr 60.163.139.141 ip daddr 96.239.86.70
+		ip protocol udp ip saddr 223.133.114.51 ip daddr 230.61.13.49
+		ip protocol tcp ip saddr 189.251.153.249 ip daddr 135.147.130.38
+		ip protocol udp ip saddr 33.110.174.221 ip daddr 7.205.198.148
+		ip protocol tcp ip saddr 215.81.43.155 ip daddr 8.82.230.25
+		ip protocol udp ip saddr 129.205.187.210 ip daddr 215.101.207.172
+		ip protocol tcp ip saddr 194.206.174.19 ip daddr 145.190.19.60
+		ip protocol tcp ip saddr 178.46.140.22 ip daddr 119.60.217.95
+		ip protocol udp ip saddr 60.237.24.148 ip daddr 14.46.88.13
+		ip protocol tcp ip saddr 246.137.68.129 ip daddr 235.93.60.65
+		ip protocol tcp ip saddr 163.13.24.70 ip daddr 41.70.17.6
+		ip protocol tcp ip saddr 52.122.148.4 ip daddr 179.112.218.128
+		ip protocol udp ip saddr 107.84.180.200 ip daddr 132.56.169.78
+		ip protocol udp ip saddr 180.14.171.37 ip daddr 34.236.53.184
+		ip protocol udp ip saddr 191.65.95.185 ip daddr 73.149.94.255
+		ip protocol tcp ip saddr 221.54.189.172 ip daddr 129.221.231.187
+		ip protocol udp ip saddr 147.84.19.55 ip daddr 185.44.169.48
+		ip protocol tcp ip saddr 246.225.14.212 ip daddr 8.2.5.255
+		ip protocol tcp ip saddr 44.31.246.201 ip daddr 7.150.82.226
+		ip protocol tcp ip saddr 205.143.45.45 ip daddr 192.33.214.155
+		ip protocol tcp ip saddr 33.105.130.224 ip daddr 236.85.208.246
+		ip protocol tcp ip saddr 48.254.195.12 ip daddr 43.241.134.102
+		ip protocol udp ip saddr 171.161.82.193 ip daddr 154.48.39.210
+		ip protocol udp ip saddr 43.85.241.0 ip daddr 139.175.34.11
+		ip protocol udp ip saddr 216.116.49.106 ip daddr 18.170.205.176
+		ip protocol tcp ip saddr 209.201.31.218 ip daddr 174.141.139.202
+		ip protocol tcp ip saddr 123.148.145.198 ip daddr 85.30.160.21
+		ip protocol udp ip saddr 50.227.28.26 ip daddr 220.197.10.111
+		ip protocol tcp ip saddr 26.73.239.245 ip daddr 254.43.89.112
+		ip protocol udp ip saddr 15.72.157.58 ip daddr 163.171.254.87
+		ip protocol udp ip saddr 254.99.196.36 ip daddr 17.229.251.214
+		ip protocol tcp ip saddr 250.76.19.17 ip daddr 124.185.99.13
+		ip protocol tcp ip saddr 169.207.28.144 ip daddr 30.168.137.216
+		ip protocol udp ip saddr 166.112.111.167 ip daddr 3.242.128.220
+		ip protocol udp ip saddr 123.24.65.146 ip daddr 62.114.30.68
+		ip protocol tcp ip saddr 88.120.186.108 ip daddr 77.24.75.77
+		ip protocol udp ip saddr 116.173.21.124 ip daddr 45.76.29.254
+		ip protocol udp ip saddr 182.183.225.174 ip daddr 110.37.174.106
+		ip protocol tcp ip saddr 215.194.23.140 ip daddr 12.127.111.162
+		ip protocol tcp ip saddr 62.13.175.69 ip daddr 107.226.141.250
+		ip protocol tcp ip saddr 167.105.47.178 ip daddr 13.3.5.110
+		ip protocol tcp ip saddr 106.242.193.64 ip daddr 181.140.207.107
+		ip protocol udp ip saddr 96.139.191.143 ip daddr 65.161.156.67
+		ip protocol tcp ip saddr 20.76.93.211 ip daddr 208.211.34.52
+		ip protocol udp ip saddr 183.95.180.129 ip daddr 106.156.173.31
+		ip protocol udp ip saddr 24.207.221.149 ip daddr 95.217.105.15
+		ip protocol tcp ip saddr 105.2.243.220 ip daddr 180.93.15.141
+		ip protocol tcp ip saddr 6.118.153.116 ip daddr 126.166.197.246
+		ip protocol udp ip saddr 76.186.230.49 ip daddr 248.143.106.56
+		ip protocol udp ip saddr 204.77.192.97 ip daddr 202.46.168.160
+		ip protocol tcp ip saddr 104.235.64.64 ip daddr 34.91.151.102
+		ip protocol tcp ip saddr 110.121.107.109 ip daddr 215.49.247.254
+		ip protocol udp ip saddr 218.104.178.214 ip daddr 170.160.6.21
+		ip protocol tcp ip saddr 142.171.195.64 ip daddr 0.13.7.60
+		ip protocol tcp ip saddr 66.172.254.75 ip daddr 37.73.115.228
+		ip protocol udp ip saddr 133.81.131.111 ip daddr 125.151.173.7
+		ip protocol udp ip saddr 74.103.36.115 ip daddr 215.139.236.243
+		ip protocol tcp ip saddr 79.219.188.190 ip daddr 68.83.29.167
+		ip protocol tcp ip saddr 129.132.105.50 ip daddr 96.213.250.3
+		ip protocol udp ip saddr 119.229.201.122 ip daddr 72.70.94.65
+		ip protocol tcp ip saddr 22.16.19.249 ip daddr 171.241.246.180
+		ip protocol udp ip saddr 42.168.234.166 ip daddr 14.174.133.11
+		ip protocol udp ip saddr 202.106.185.212 ip daddr 94.242.101.119
+		ip protocol udp ip saddr 191.255.34.87 ip daddr 243.87.20.217
+		ip protocol udp ip saddr 48.73.70.131 ip daddr 180.178.136.179
+		ip protocol udp ip saddr 221.148.200.138 ip daddr 144.238.30.100
+		ip protocol udp ip saddr 212.214.89.123 ip daddr 244.56.170.133
+		ip protocol udp ip saddr 219.157.230.3 ip daddr 248.25.234.86
+		ip protocol tcp ip saddr 245.157.116.82 ip daddr 126.102.244.39
+		ip protocol udp ip saddr 111.4.162.76 ip daddr 199.40.240.98
+		ip protocol tcp ip saddr 246.97.15.242 ip daddr 43.20.116.106
+		ip protocol udp ip saddr 7.222.55.130 ip daddr 106.230.103.98
+		ip protocol udp ip saddr 95.68.7.119 ip daddr 94.14.182.34
+		ip protocol tcp ip saddr 20.75.82.11 ip daddr 219.177.225.253
+		ip protocol udp ip saddr 61.23.178.56 ip daddr 231.221.232.58
+		ip protocol udp ip saddr 88.250.160.56 ip daddr 44.95.169.179
+		ip protocol udp ip saddr 253.40.49.18 ip daddr 58.3.204.233
+		ip protocol udp ip saddr 247.6.160.110 ip daddr 47.253.139.5
+		ip protocol tcp ip saddr 49.73.143.5 ip daddr 46.2.119.14
+		ip protocol tcp ip saddr 228.58.182.163 ip daddr 55.95.194.210
+		ip protocol udp ip saddr 177.171.31.255 ip daddr 245.16.126.141
+		ip protocol udp ip saddr 201.24.94.114 ip daddr 159.200.47.117
+		ip protocol tcp ip saddr 158.142.181.220 ip daddr 168.234.95.68
+		ip protocol udp ip saddr 52.39.80.253 ip daddr 247.80.87.244
+		ip protocol udp ip saddr 25.162.224.216 ip daddr 202.36.47.142
+		ip protocol udp ip saddr 93.111.146.1 ip daddr 23.214.217.106
+		ip protocol tcp ip saddr 88.219.52.158 ip daddr 219.1.73.203
+		ip protocol udp ip saddr 126.27.42.66 ip daddr 105.227.170.168
+		ip protocol tcp ip saddr 192.39.138.245 ip daddr 254.242.81.84
+		ip protocol tcp ip saddr 1.184.205.176 ip daddr 241.234.184.151
+		ip protocol tcp ip saddr 160.30.208.36 ip daddr 251.250.32.47
+		ip protocol udp ip saddr 7.185.184.191 ip daddr 248.57.166.112
+		ip protocol udp ip saddr 181.187.90.169 ip daddr 158.92.167.14
+		ip protocol udp ip saddr 70.69.72.35 ip daddr 107.88.248.105
+		ip protocol udp ip saddr 17.98.211.204 ip daddr 176.132.143.16
+		ip protocol udp ip saddr 114.36.68.89 ip daddr 177.103.104.204
+		ip protocol tcp ip saddr 135.176.149.164 ip daddr 155.89.224.241
+		ip protocol udp ip saddr 44.173.126.104 ip daddr 223.95.249.65
+		ip protocol udp ip saddr 41.184.68.165 ip daddr 201.244.9.184
+		ip protocol tcp ip saddr 1.2.3.0/24
+		ip saddr 1.2.3.5 ip protocol tcp reject
+		ip saddr 1.2.3.6-1.2.3.8 ip daddr 5.10.23.24 accept
+		ip saddr 1.2.3.7-1.2.3.9 ip daddr 5.10.23.24 reject
+		ip saddr 1.2.3.20-1.2.3.25 ip protocol tcp accept
+	}
+
+	chain OUTPUT {
+		type filter hook output priority filter; policy accept;
+	}
+
+	chain FORWARD {
+		type filter hook forward priority filter; policy accept;
+	}
+}
+table ip my_filter {
+	chain OUTPUT {
+		type filter hook output priority filter; policy accept;
+	}
+}
+table ip filter_1 {
+	chain input {
+		type filter hook input priority filter; policy accept;
+	}
+}
+table ip filter_2 {
+}
+table ip filter_3 {
+}
