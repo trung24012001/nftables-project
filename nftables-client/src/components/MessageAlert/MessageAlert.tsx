@@ -28,7 +28,7 @@ export function MessageAlert() {
   return (
     <Snackbar
       open={!!message?.content}
-      anchorOrigin={{ vertical: 'top', horizontal: 'right' }}
+      anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
       autoHideDuration={3000}
       onClose={handleClose}
 

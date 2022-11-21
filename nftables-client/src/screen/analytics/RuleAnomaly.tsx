@@ -21,26 +21,29 @@ export default function RuleAnomaly({ anomaly }: {
       <Stack spacing={3}>
         <Grid spacing={3} container>
           <Grid item xs={6}>
-            <Typography variant='h5'>
+            <Typography variant='h5' lineHeight={3}>
               Rule A
             </Typography>
-            <RuleInfo rule={anomaly.rule_a} renderNumber={6} />
+            <RuleInfo rule={anomaly.rule_a} renderNumber={9} />
           </Grid>
           <Grid item >
-            <Typography variant='h5'>
+            <Typography variant='h5' lineHeight={3}>
               Rule B
             </Typography>
-            <RuleInfo rule={anomaly.rule_b} renderNumber={6} />
+            <RuleInfo rule={anomaly.rule_b} renderNumber={9} />
           </Grid>
         </Grid>
         <Box>
-          This is a <b style={{ color: 'red' }}>{anomaly.anomaly_type}</b> anomaly. Click ANALYTICS to show more...
+          This is a <b style={{ color: 'red' }}>{anomaly.anomaly_type}</b> anomaly.
         </Box>
-        <Box>
+        {/* <Box>
+          This is a <b style={{ color: 'red' }}>{anomaly.anomaly_type}</b> anomaly. Click ANALYTICS to show more...
+        </Box> */}
+        {/* <Box>
           <Button variant='contained' onClick={handleAnalytics}>
             Analytics
           </Button>
-        </Box>
+        </Box> */}
 
       </Stack>
     </Paper >

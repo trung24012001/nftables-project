@@ -11,4 +11,8 @@ const numToIpv4 = (num: number) => {
   return d;
 };
 
-export { ipv4ToNum, numToIpv4 };
+const parseListValue = (value: string | string[] | number[]) => {
+  return (value as string[])?.join(", ")
+}
+
+export { ipv4ToNum, numToIpv4, parseListValue };

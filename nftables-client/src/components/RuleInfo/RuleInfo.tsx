@@ -1,19 +1,22 @@
-import React, { useEffect } from 'react'
-import { Box, Stack } from '@mui/material'
+import React from 'react'
+import { Box, Stack, Typography } from '@mui/material'
 import { RuleType } from 'lib'
+import { parseListValue } from 'lib/util'
 
 export function RuleInfo({ rule, renderNumber }: { rule: RuleType, renderNumber?: number }) {
-  const data = [{
-    label: "Family",
-    value: rule.family,
-  }, {
+  const data = [
+  //   {
+  //   label: "Family",
+  //   value: rule.family,
+  // }, 
+  {
     label: "Table",
     value: rule.table,
   }, {
     label: "Chain",
     value: rule.chain,
   }, {
-    label: "Target",
+    label: "Action",
     value: rule.policy,
   },
   {
@@ -22,16 +25,16 @@ export function RuleInfo({ rule, renderNumber }: { rule: RuleType, renderNumber?
   },
   {
     label: "IP src",
-    value: rule.ip_src,
+    value:  parseListValue(rule.ip_src),
   }, {
     label: "Port src",
-    value: rule.port_src,
+    value:  parseListValue(rule.port_src),
   }, {
     label: "IP dst",
-    value: rule.ip_dst,
+    value:  parseListValue(rule.ip_dst),
   }, {
     label: "Port dst",
-    value: rule.port_src,
+    value:  parseListValue(rule.port_src),
   }, {
     label: "Protocol",
     value: rule.protocol,
@@ -39,7 +42,7 @@ export function RuleInfo({ rule, renderNumber }: { rule: RuleType, renderNumber?
     label: "To",
     value: rule.to,
   }].filter((_, idx) => !renderNumber || idx < renderNumber)
-
+  console.log(rule)
 
   return (
     <Stack>
@@ -48,7 +51,9 @@ export function RuleInfo({ rule, renderNumber }: { rule: RuleType, renderNumber?
           <Box key={idx}>
             {item.value &&
               <Box>
-                <b>{item.label}:</b> {item.value}
+                <Typography sx={{width: "300px", whiteSpace: "nowrap", lineHeight: "2em", overflow: 'hidden', textOverflow: 'ellipsis'}}>
+                  <b>{item.label}:</b> {item.value}
+                </Typography>
               </Box>
             }
           </Box>
